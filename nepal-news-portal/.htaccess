@@ -1,0 +1,49 @@
+Options -Indexes
+Options FollowSymLinks
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Don't rewrite actual files / directories
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+
+  # Route everything to index.php
+  RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# Security: protect data directory
+<IfModule mod_authz_core.c>
+  <Directory "data">
+    Require all denied
+  </Directory>
+</IfModule>
+
+# Security: protect src directory
+<Files ~ "\.php$">
+  Order allow,deny
+  Allow from all
+</Files>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css             "access plus 7 days"
+  ExpiresByType application/javascript "access plus 7 days"
+  ExpiresByType image/jpeg           "access plus 30 days"
+  ExpiresByType image/png            "access plus 30 days"
+  ExpiresByType image/svg+xml        "access plus 30 days"
+  ExpiresByType image/webp           "access plus 30 days"
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options  nosniff
+  Header always set X-Frame-Options         SAMEORIGIN
+  Header always set X-XSS-Protection        "1; mode=block"
+  Header always set Referrer-Policy         "strict-origin-when-cross-origin"
+</IfModule>
+
+# Deny access to sensitive files
+<FilesMatch "\.(db|sqlite|sql|env|log|sh|bak)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
