@@ -103,3 +103,4 @@ To change colors: Admin → Settings → Theme Colors → Save.
 - `.htaccess` blocks direct access to `data/` and `*.db` files
 - CSRF tokens on all forms
 - All output HTML-escaped via `h()` helper
+# newsthemenext
