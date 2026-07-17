@@ -164,6 +164,7 @@ $_cur_lang = current_lang();
           </li>
           <?php endforeach; ?>
           <li><a href="/trending" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Trending':'ट्रेन्डिङ' ?></a></li>
+          <li><a href="/saved" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Saved Articles':'सुरक्षित समाचार' ?></a></li>
           <li><a href="/events" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Events':'कार्यक्रम' ?></a></li>
           <li><a href="/search" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Search':'खोज गर्नुस्' ?></a></li>
           <li><a href="/sitemap.xml" class="footer-link flex items-center gap-1" target="_blank"><?= icon('chevron-right','w-3 h-3') ?> Sitemap</a></li>
