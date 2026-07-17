@@ -124,6 +124,10 @@ require SRC_DIR . '/layout/header.php';
           <button class="font-btn" onclick="changeFontSize(-1)" title="Decrease font">A-</button>
           <button class="font-btn" onclick="changeFontSize(1)"  title="Increase font">A+</button>
           <button class="font-btn print-btn" onclick="window.print()" title="Print"><?= icon('printer','w-3 h-3') ?></button>
+          <button id="bookmark-btn" class="font-btn"
+                  title="सुरक्षित गर्नुस्"
+                  onclick="toggleBookmark(<?= (int)$article['id'] ?>, <?= json_encode(h($title_main)) ?>, '<?= h($article['slug']) ?>')"
+                  ><?= icon('bookmark','w-3 h-3') ?></button>
         </div>
       </div>
 
@@ -376,3 +380,4 @@ function changeFontSize(d) {
 </style>
 
 <?php require SRC_DIR . '/layout/footer.php'; ?>
+<script>initBookmark(<?= (int)$article['id'] ?>);</script>

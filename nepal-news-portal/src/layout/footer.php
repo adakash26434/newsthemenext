@@ -280,6 +280,47 @@ window.loadMore = function(btn) {
       btn.textContent = '⚠ पुनः प्रयास गर्नुस्';
     });
 };
+};
+
+// ── Back to Top ──────────────────────────────────────────
+(function(){
+  var btn = document.createElement('button');
+  btn.id = 'back-top';
+  btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><polyline points="18 15 12 9 6 15"></polyline></svg>';
+  btn.title = 'माथि जानुस्';
+  btn.setAttribute('aria-label','Back to top');
+  document.body.appendChild(btn);
+  window.addEventListener('scroll', function(){
+    btn.classList.toggle('visible', window.scrollY > 400);
+  }, {passive:true});
+  btn.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+})();
+
+// ── Article Bookmark (localStorage) ─────────────────────
+window.toggleBookmark = function(articleId, title, slug) {
+  var key = 'nnp_bookmarks';
+  var saved = JSON.parse(localStorage.getItem(key) || '[]');
+  var idx = saved.findIndex(function(b){ return b.id === articleId; });
+  var btn = document.getElementById('bookmark-btn');
+  if (idx >= 0) {
+    saved.splice(idx, 1);
+    if (btn) { btn.setAttribute('title','सुरक्षित गर्नुस्'); btn.classList.remove('bookmarked'); }
+  } else {
+    saved.push({id: articleId, title: title, slug: slug, saved_at: Date.now()});
+    if (btn) { btn.setAttribute('title','सुरक्षित गरियो'); btn.classList.add('bookmarked'); }
+  }
+  localStorage.setItem(key, JSON.stringify(saved));
+};
+window.initBookmark = function(articleId) {
+  var saved = JSON.parse(localStorage.getItem('nnp_bookmarks') || '[]');
+  var btn = document.getElementById('bookmark-btn');
+  if (btn && saved.some(function(b){ return b.id === articleId; })) {
+    btn.classList.add('bookmarked');
+    btn.setAttribute('title','सुरक्षित गरियो');
+  }
+};
 </script>
 </body>
 </html>

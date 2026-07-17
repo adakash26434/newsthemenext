@@ -59,6 +59,18 @@ foreach ($pages as $pg) {
     echo sitemap_url($base . '/page/' . $pg['slug'], $pg['updated_at'] ?? '', 'monthly', 0.5);
 }
 
+// Tag pages
+$tags = get_tags();
+foreach ($tags as $t) {
+    if ($t['usage_count'] > 0) {
+        echo sitemap_url($base . '/tag/' . $t['slug'], '', 'weekly', 0.5);
+    }
+}
+
+// Special pages
+echo sitemap_url($base . '/trending', '', 'hourly', 0.7);
+echo sitemap_url($base . '/breaking', '', 'always', 0.9);
+
 // ePaper archive
 echo sitemap_url($base . '/epaper', '', 'daily', 0.6);
 $epapers = get_epapers(50);

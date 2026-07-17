@@ -527,6 +527,23 @@ textarea.form-control { resize: vertical; min-height: 80px; }
 .article-content th { background: var(--c-surface2); font-weight: 700; }
 
 /* Article font size control */
+/* Back to Top */
+#back-top {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+  width: 2.75rem; height: 2.75rem; border-radius: 50%;
+  background: var(--c-primary); color: #fff; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s, transform .25s;
+  transform: translateY(8px);
+}
+#back-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+#back-top:hover { filter: brightness(1.1); }
+
+/* Bookmark button */
+#bookmark-btn.bookmarked svg { fill: var(--c-primary); stroke: var(--c-primary); }
+
 .font-btn {
   padding: 3px 9px; border-radius: var(--r-sm); border: 1px solid var(--c-border);
   background: var(--c-surface2); cursor: pointer; font-size: 12px; font-weight: 600; color: var(--c-text2);
