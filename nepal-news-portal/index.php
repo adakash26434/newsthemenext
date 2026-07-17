@@ -460,6 +460,111 @@ if ($meth === 'POST') {
 }
 
 // ══════════════════════════════════════════════════════════
+//  AI Chat API Routes
+// ══════════════════════════════════════════════════════════
+
+// AI Chat endpoint
+if ($uri === '/api/ai/chat' && $meth === 'POST') {
+    header('Content-Type: application/json');
+    
+    require_once __DIR__ . '/src/lib/ai_service.php';
+    
+    $input = json_decode(file_get_contents('php://input'), true);
+    $message = trim($input['message'] ?? '');
+    $action = $input['action'] ?? 'chat';
+    
+    if (empty($message)) {
+        echo json_encode(['error' => 'Message is required', 'success' => false]);
+        exit;
+    }
+    
+    $ai = get_ai_service();
+    
+    if (!ai_is_enabled()) {
+        echo json_encode([
+            'success' => false,
+            'error' => 'AI is not configured. Please contact administrator.'
+        ]);
+        exit;
+    }
+    
+    // Get site context
+    $db = get_db();
+    $cats = $db->query("SELECT name, name_np FROM categories LIMIT 10")->fetchAll(PDO::FETCH_ASSOC);
+    $categories = array_map(function($c) {
+        return $c['name_np'] ?: $c['name'];
+    }, $cats);
+    
+    $recent = $db->query("
+        SELECT a.title, c.name as category 
+        FROM articles a 
+        LEFT JOIN categories c ON a.category_id = c.id 
+        WHERE a.status = 'published' 
+        ORDER BY a.published_at DESC 
+        LIMIT 5
+    ")->fetchAll(PDO::FETCH_ASSOC);
+    
+    $context = [
+        'categories' => $categories,
+        'recent_articles' => $recent
+    ];
+    
+    // Handle different actions
+    if ($action === 'summarize' && !empty($input['content'])) {
+        $response = $ai->summarize($input['content'], $input['title'] ?? '');
+    } elseif ($action === 'search') {
+        $results = $ai->searchNews($message);
+        $response = "I found these articles for you:\n\n";
+        foreach ($results as $i => $r) {
+            $response .= ($i + 1) . ". [{$r['category']}] {$r['title']} - /article/{$r['slug']}\n";
+        }
+        if (empty($results)) {
+            $response = "I couldn't find any articles matching your search. Try different keywords.";
+        }
+    } else {
+        // Check if user is asking about news/search
+        $search_keywords = ['search', 'खोज', 'भन्', 'find', 'look for', 'को बारेमा', 'about'];
+        $is_search = false;
+        foreach ($search_keywords as $kw) {
+            if (stripos($message, $kw) !== false) {
+                $is_search = true;
+                break;
+            }
+        }
+        
+        if ($is_search) {
+            $results = $ai->searchNews($message);
+            if (!empty($results)) {
+                $response = "I found these articles for you:\n\n";
+                foreach ($results as $i => $r) {
+                    $response .= ($i + 1) . ". [{$r['category']}] {$r['title']} - /article/{$r['slug']}\n";
+                }
+            } else {
+                $response = $ai->chat($message, $context);
+            }
+        } else {
+            $response = $ai->chat($message, $context);
+        }
+    }
+    
+    echo json_encode(['success' => true, 'response' => $response]);
+    exit;
+}
+
+// AI Status endpoint
+if ($uri === '/api/ai/status' && $meth === 'GET') {
+    header('Content-Type: application/json');
+    
+    require_once __DIR__ . '/src/lib/ai_service.php';
+    
+    echo json_encode([
+        'enabled' => ai_is_enabled(),
+        'provider' => get_ai_service()->getProvider()
+    ]);
+    exit;
+}
+
+// ══════════════════════════════════════════════════════════
 //  GET routes
 // ══════════════════════════════════════════════════════════
 
@@ -495,6 +600,7 @@ if ($uri === '/admin/authors')    { admin_check(); require SRC_DIR . '/admin/aut
 if ($uri === '/admin/tags')       { admin_check(); require SRC_DIR . '/admin/tags.php'; exit; }
 if ($uri === '/admin/advertisements') { admin_check(); require SRC_DIR . '/admin/advertisements.php'; exit; }
 if ($uri === '/admin/settings')   { admin_check(); require SRC_DIR . '/admin/settings.php'; exit; }
+if ($uri === '/admin/ai_settings') { admin_check(); require SRC_DIR . '/admin/ai_settings.php'; exit; }
 if ($uri === '/admin/events')     { admin_check(); require SRC_DIR . '/admin/events.php'; exit; }
 if ($uri === '/admin/events/gallery')       { admin_check(); require SRC_DIR . '/admin/event_gallery.php'; exit; }
 if ($uri === '/admin/events/registrations') { admin_check(); require SRC_DIR . '/admin/event_registrations.php'; exit; }

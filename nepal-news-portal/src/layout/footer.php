@@ -400,5 +400,8 @@ window.initBookmark = function(articleId) {
   }
 };
 </script>
+
+<!-- AI Chat Widget -->
+<?php require_once __DIR__ . '/../components/ai_chat_widget.php'; ?>
 </body>
 </html>
