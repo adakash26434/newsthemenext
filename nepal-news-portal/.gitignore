@@ -1,0 +1,17 @@
+# SQLite database (auto-created)
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Uploaded files (user content)
+assets/uploads/*
+!assets/uploads/.gitkeep
+!assets/uploads/.htaccess
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
