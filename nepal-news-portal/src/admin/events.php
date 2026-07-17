@@ -19,7 +19,9 @@ admin_sidebar('events');
 <div class="stat-card mb-6">
   <div class="flex items-center justify-between mb-4">
     <h2 class="font-bold">कार्यक्रम सम्पादन: <?= h($edit['title']) ?></h2>
-    <a href="/admin/events" class="btn btn-secondary btn-sm">← सूचीमा फिर्ता</a>
+    <a href="/admin/events" class="btn btn-secondary btn-sm flex items-center gap-1">
+      <?= icon('arrow-left','icon-sm') ?> सूचीमा फिर्ता
+    </a>
   </div>
   <?php require __DIR__ . '/event_form.php'; ?>
 </div>
@@ -27,14 +29,18 @@ admin_sidebar('events');
 
 <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
   <h2 class="font-bold">सबै कार्यक्रमहरू (<?= count($events) ?>)</h2>
-  <a href="/admin/events?action=edit" class="btn btn-primary">+ नयाँ कार्यक्रम</a>
+  <a href="/admin/events?action=edit" class="btn btn-primary flex items-center gap-1">
+    <?= icon('plus','icon-sm') ?> नयाँ कार्यक्रम
+  </a>
 </div>
 
 <?php if (empty($events)): ?>
 <div class="stat-card text-center py-10" style="color:var(--c-muted)">
-  <div class="text-4xl mb-3">📅</div>
+  <div class="flex justify-center mb-3"><?= icon('calendar','w-12 h-12 opacity-30') ?></div>
   <p>कुनै कार्यक्रम छैन।</p>
-  <a href="/admin/events?action=edit" class="btn btn-primary mt-3">पहिलो कार्यक्रम थप्नुस्</a>
+  <a href="/admin/events?action=edit" class="btn btn-primary mt-3 inline-flex items-center gap-1">
+    <?= icon('plus','icon-sm') ?> पहिलो कार्यक्रम थप्नुस्
+  </a>
 </div>
 <?php else: ?>
 <div class="table-wrap">
@@ -74,13 +80,19 @@ admin_sidebar('events');
       </td>
       <td>
         <div class="flex gap-1 flex-wrap">
-          <a href="/admin/events?action=edit&id=<?= $ev['id'] ?>" class="btn btn-secondary btn-sm">✏️ सम्पादन</a>
-          <a href="/admin/events/gallery?event_id=<?= $ev['id'] ?>" class="btn btn-secondary btn-sm">🖼️ Gallery</a>
-          <a href="/event/<?= h($ev['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm">👁️</a>
+          <a href="/admin/events?action=edit&id=<?= $ev['id'] ?>" class="btn btn-secondary btn-sm flex items-center gap-1">
+            <?= icon('pencil','icon-sm') ?> सम्पादन
+          </a>
+          <a href="/admin/events/gallery?event_id=<?= $ev['id'] ?>" class="btn btn-secondary btn-sm flex items-center gap-1">
+            <?= icon('image','icon-sm') ?> Gallery
+          </a>
+          <a href="/event/<?= h($ev['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm" title="Public View">
+            <?= icon('eye','icon-sm') ?>
+          </a>
           <form method="POST" action="/admin/events/delete" onsubmit="return confirm('मेटाउने?')">
             <?= csrf_field() ?>
             <input type="hidden" name="id" value="<?= $ev['id'] ?>">
-            <button class="btn btn-danger btn-sm">🗑️</button>
+            <button class="btn btn-danger btn-sm" title="मेटाउनुस्"><?= icon('trash-2','icon-sm') ?></button>
           </form>
         </div>
       </td>

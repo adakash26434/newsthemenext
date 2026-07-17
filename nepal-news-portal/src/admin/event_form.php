@@ -111,7 +111,7 @@ $d = [
       <label class="form-label">Description (English)</label>
       <textarea name="description_en" class="form-control" rows="4"><?= h($d['description_en']) ?></textarea>
     </div>
-    <!-- Registration -->
+    <!-- Registration deadline -->
     <div class="form-group">
       <label class="form-label">दर्ता समयसीमा</label>
       <input type="datetime-local" name="registration_deadline" class="form-control"
@@ -135,13 +135,21 @@ $d = [
     </div>
   </div>
 
-  <div class="mt-5 flex gap-3">
-    <button type="submit" class="btn btn-primary px-8">💾 सेभ गर्नुस्</button>
+  <div class="mt-5 flex gap-3 flex-wrap">
+    <button type="submit" class="btn btn-primary px-8 flex items-center gap-2">
+      <?= icon('save','icon-sm') ?> सेभ गर्नुस्
+    </button>
     <a href="/admin/events" class="btn btn-secondary">रद्द</a>
     <?php if ($edit): ?>
-    <a href="/admin/events/registrations?event_id=<?= $edit['id'] ?>" class="btn btn-secondary">📋 दर्ताहरू</a>
-    <a href="/admin/events/gallery?event_id=<?= $edit['id'] ?>" class="btn btn-secondary">🖼️ Gallery</a>
-    <a href="/event/<?= h($edit['slug']) ?>" target="_blank" class="btn btn-secondary">👁️ Preview</a>
+    <a href="/admin/events/registrations?event_id=<?= $edit['id'] ?>" class="btn btn-secondary flex items-center gap-1">
+      <?= icon('clipboard-list','icon-sm') ?> दर्ताहरू
+    </a>
+    <a href="/admin/events/gallery?event_id=<?= $edit['id'] ?>" class="btn btn-secondary flex items-center gap-1">
+      <?= icon('image','icon-sm') ?> Gallery
+    </a>
+    <a href="/event/<?= h($edit['slug']) ?>" target="_blank" class="btn btn-secondary flex items-center gap-1">
+      <?= icon('eye','icon-sm') ?> Preview
+    </a>
     <?php endif; ?>
   </div>
 </form>

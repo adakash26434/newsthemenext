@@ -1,72 +1,95 @@
 <?php
 $q        = trim($_GET['q'] ?? '');
-$page_num = max(1, (int)($_GET['page'] ?? 1));
-$articles = [];
+$page     = max(1, (int)($_GET['page'] ?? 1));
+$per_page = ARTICLES_PER_PAGE;
+
 $total    = 0;
-$pager    = null;
+$articles = [];
+$pag      = null;
+
 if ($q !== '') {
-    $total  = count_articles(['search'=>$q,'status'=>'published']);
-    $pager  = paginate($total, ARTICLES_PER_PAGE, $page_num, "/search?q=".urlencode($q)."&page=%d");
-    $articles = get_articles(['search'=>$q,'status'=>'published','limit'=>$pager['per_page'],'offset'=>$pager['offset']]);
+    $opts     = ['status'=>'published','search'=>$q];
+    $total    = count_articles($opts);
+    $pag      = paginate($total, $per_page, $page, '/search?q='.urlencode($q).'&page={page}');
+    $articles = get_articles(array_merge($opts, ['limit'=>$per_page,'offset'=>$pag['offset']]));
 }
-$page_title = $q ? "\"$q\" खोज — " . site_name() : "खोज्नुस् — " . site_name();
-$page_desc  = $q ? "\"$q\" को खोज नतिजाहरू।" : 'समाचार खोज्नुस्।';
+
+$page_title = ($q ? '"' . h($q) . '" खोजको नतिजा' : 'समाचार खोज्नुस्') . ' — ' . site_name();
+
 require SRC_DIR . '/layout/header.php';
 ?>
-<div class="max-w-3xl mx-auto">
-  <div class="section-heading mb-4"><span>समाचार खोज्नुस्</span></div>
-  <form method="GET" action="/search" class="flex gap-2 mb-6">
-    <input type="search" name="q" value="<?= h($q) ?>"
-           placeholder="समाचार खोज्नुस्... (नेपाली वा English)"
-           class="form-control flex-1 text-base">
-    <button type="submit" class="btn btn-primary px-6">
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-      </svg>
-      खोज्नुस्
-    </button>
-  </form>
-  <?php if ($q): ?>
-    <p class="text-sm mb-4" style="color:var(--c-muted)">
-      "<strong><?= h($q) ?></strong>" को लागि <strong><?= np_number($total) ?></strong> नतिजा पाइयो।
-    </p>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="lg:col-span-2">
+    <!-- Search bar -->
+    <div class="mb-6 p-5 rounded-xl" style="background:var(--c-surface);border:1px solid var(--c-border)">
+      <h1 class="text-xl font-bold mb-4 flex items-center gap-2" style="color:var(--c-text)">
+        <?= icon('search','w-5 h-5') ?> समाचार खोज्नुस्
+      </h1>
+      <form method="GET" action="/search" class="flex gap-2">
+        <input type="search" name="q" value="<?= h($q) ?>" class="form-control flex-1"
+               placeholder="नेपाली वा English मा खोज्नुस्..." autofocus>
+        <button type="submit" class="btn btn-primary gap-1">
+          <?= icon('search','w-4 h-4') ?> खोज्नुस्
+        </button>
+      </form>
+    </div>
+
+    <?php if ($q !== ''): ?>
+    <div class="mb-4 flex items-center gap-2" style="color:var(--c-muted)">
+      <?= icon('info','w-4 h-4') ?>
+      <span class="text-sm"><strong><?= h($q) ?></strong> को लागि <strong><?= np_number($total) ?></strong> नतिजा फेला परे</span>
+    </div>
+
     <?php if (empty($articles)): ?>
-      <div class="text-center py-16 rounded" style="background:var(--c-surface);border:1px solid var(--c-border)">
-        <p class="text-lg" style="color:var(--c-muted)">कुनै नतिजा फेला परेन।</p>
-        <p class="text-sm mt-2" style="color:var(--c-muted)">अर्को शब्दले खोज्ने प्रयास गर्नुस्।</p>
-      </div>
+    <div class="stat-card text-center py-10" style="color:var(--c-muted)">
+      <?= icon('search-x','w-10 h-10 mx-auto mb-3 opacity-30') ?>
+      <p class="mb-2">कुनै नतिजा फेला परेन।</p>
+      <p class="text-sm">अर्को कीवर्ड प्रयास गर्नुस्।</p>
+    </div>
     <?php else: ?>
-      <div class="space-y-4 mb-6">
-        <?php foreach ($articles as $a): ?>
-        <a href="/article/<?= h($a['slug']) ?>" class="article-card flex gap-4 p-4 group block">
-          <div class="img-wrap flex-shrink-0 rounded-sm" style="width:110px;height:82px;aspect-ratio:unset">
-            <?php if ($a['image_url']): ?><img src="<?= h($a['image_url']) ?>" alt="" loading="lazy"><?php endif; ?>
+    <div class="space-y-4">
+      <?php foreach ($articles as $a): ?>
+      <a href="/article/<?= h($a['slug']) ?>" class="flex gap-4 p-3 rounded-lg group hover:shadow-md transition-all" style="background:var(--c-surface);border:1px solid var(--c-border)">
+        <?php if ($a['image_url']): ?>
+        <div class="flex-shrink-0 rounded-lg overflow-hidden" style="width:100px;height:75px;background:var(--c-surface2)">
+          <img src="<?= h($a['image_url']) ?>" alt="" loading="lazy" class="w-full h-full object-cover">
+        </div>
+        <?php endif; ?>
+        <div class="flex-1 min-w-0">
+          <span class="cat-badge inline-block mb-1" style="background:<?= h(category_color($a['category_color'])) ?>">
+            <?= h($a['category_name_np']?:$a['category_name']) ?>
+          </span>
+          <h2 class="font-bold leading-snug line-clamp-2 group-hover:underline"><?= h($a['title']) ?></h2>
+          <?php if ($a['summary']): ?>
+          <p class="text-sm mt-1 line-clamp-2" style="color:var(--c-text2)"><?= h(excerpt($a['summary'],15)) ?></p>
+          <?php endif; ?>
+          <div class="flex items-center gap-3 mt-1.5 text-xs" style="color:var(--c-muted)">
+            <span class="flex items-center gap-1"><?= icon('user','w-3 h-3') ?> <?= h($a['author_name']) ?></span>
+            <span class="flex items-center gap-1"><?= icon('clock','w-3 h-3') ?> <?= time_ago($a['published_at']??$a['created_at']) ?></span>
           </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-1 mb-1">
-              <span class="cat-badge" style="background:<?= h(category_color($a['category_color'])) ?>">
-                <?= h($a['category_name_np'] ?: $a['category_name']) ?>
-              </span>
-              <span class="lang-badge lang-<?= h($a['language']??'np') ?>"><?= ($a['language']??'np')==='en'?'EN':'NP' ?></span>
-            </div>
-            <h2 class="font-bold text-sm leading-snug group-hover:underline mb-1"><?= h($a['title']) ?></h2>
-            <p class="text-xs line-clamp-2 mb-1" style="color:var(--c-text2)"><?= h(excerpt($a['summary'],18)) ?></p>
-            <div class="meta"><?= h($a['author_name']) ?> &bull; <?= time_ago($a['published_at'] ?? $a['created_at']) ?></div>
-          </div>
-        </a>
+        </div>
+      </a>
+      <?php endforeach; ?>
+    </div>
+    <?php if ($pag) render_pagination($pag); ?>
+    <?php endif; ?>
+    <?php endif; ?>
+  </div>
+
+  <aside class="space-y-5">
+    <?php render_ads('sidebar-top'); ?>
+    <div class="sidebar-card">
+      <div class="section-heading mb-3">
+        <span class="flex items-center gap-2"><?= icon('hash','w-4 h-4') ?> लोकप्रिय ट्यागहरू</span>
+      </div>
+      <div class="tag-cloud">
+        <?php foreach (array_slice(get_tags(), 0, 20) as $t): ?>
+          <a href="/search?q=<?= urlencode($t['name']) ?>"><?= h($t['name']) ?></a>
         <?php endforeach; ?>
       </div>
-      <?php if ($pager && $pager['total_pages'] > 1): ?>
-      <div class="pagination mb-4">
-        <?php if ($pager['has_prev']): ?><a href="<?= sprintf($pager['url_pattern'], $pager['prev_page']) ?>">&laquo; अघिल्लो</a><?php endif; ?>
-        <?php for ($p=max(1,$pager['current']-2);$p<=min($pager['total_pages'],$pager['current']+2);$p++): ?>
-          <?php if ($p===$pager['current']): ?><span class="current"><?=$p?></span>
-          <?php else: ?><a href="<?=sprintf($pager['url_pattern'],$p)?>"><?=$p?></a><?php endif; ?>
-        <?php endfor; ?>
-        <?php if ($pager['has_next']): ?><a href="<?= sprintf($pager['url_pattern'], $pager['next_page']) ?>">अर्को &raquo;</a><?php endif; ?>
-      </div>
-      <?php endif; ?>
-    <?php endif; ?>
-  <?php endif; ?>
+    </div>
+  </aside>
 </div>
+
 <?php require SRC_DIR . '/layout/footer.php'; ?>

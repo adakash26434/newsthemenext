@@ -348,9 +348,9 @@ if ($meth === 'POST') {
         $email = trim($_POST['email'] ?? '');
         $name  = trim($_POST['name'] ?? '');
         if (save_newsletter_email($email, $name)) {
-            flash_set('success', 'न्यूजलेटर सदस्यता सफल भयो! धन्यवाद।');
+            flash_set('nl_success', 'न्यूजलेटर सदस्यता सफल भयो! धन्यवाद।');
         } else {
-            flash_set('error', 'इमेल अवैध वा पहिले नै दर्ता छ।');
+            flash_set('nl_error', 'इमेल अवैध वा पहिले नै दर्ता छ।');
         }
         redirect($_SERVER['HTTP_REFERER'] ?? '/');
     }

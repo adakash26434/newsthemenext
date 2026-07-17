@@ -13,13 +13,19 @@ admin_sidebar('events');
 <?php admin_flash(); ?>
 
 <div class="flex items-center gap-3 mb-5 flex-wrap">
-  <a href="/admin/events?action=edit&id=<?= $event['id'] ?>" class="btn btn-secondary btn-sm">← कार्यक्रममा फिर्ता</a>
-  <a href="/event/<?= h($event['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm">👁️ Public View</a>
+  <a href="/admin/events?action=edit&id=<?= $event['id'] ?>" class="btn btn-secondary btn-sm flex items-center gap-1">
+    <?= icon('arrow-left','icon-sm') ?> कार्यक्रममा फिर्ता
+  </a>
+  <a href="/event/<?= h($event['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm flex items-center gap-1">
+    <?= icon('eye','icon-sm') ?> Public View
+  </a>
 </div>
 
 <!-- Add media form -->
 <div class="stat-card mb-6" x-data="{type:'photo'}">
-  <h2 class="font-bold text-sm mb-4" style="border-bottom:1px solid var(--c-admin-border);padding-bottom:8px">📸 नयाँ मिडिया थप्नुस्</h2>
+  <h2 class="font-bold text-sm mb-4 flex items-center gap-2" style="border-bottom:1px solid var(--c-admin-border);padding-bottom:8px">
+    <?= icon('camera','icon-sm') ?> नयाँ मिडिया थप्नुस्
+  </h2>
   <form method="POST" action="/admin/events/gallery/add" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
@@ -27,8 +33,8 @@ admin_sidebar('events');
       <div class="form-group">
         <label class="form-label">प्रकार</label>
         <select name="media_type" class="form-control" x-model="type">
-          <option value="photo">📷 फोटो</option>
-          <option value="video">🎬 भिडियो (YouTube/Vimeo)</option>
+          <option value="photo">फोटो</option>
+          <option value="video">भिडियो (YouTube/Vimeo)</option>
         </select>
       </div>
       <div class="form-group">
@@ -48,14 +54,16 @@ admin_sidebar('events');
         <input type="number" name="sort_order" class="form-control" value="0" min="0">
       </div>
     </div>
-    <button type="submit" class="btn btn-primary mt-2">+ थप्नुस्</button>
+    <button type="submit" class="btn btn-primary mt-2 flex items-center gap-1">
+      <?= icon('plus','icon-sm') ?> थप्नुस्
+    </button>
   </form>
 </div>
 
 <!-- Gallery grid -->
 <?php if (empty($event['gallery'])): ?>
 <div class="stat-card text-center py-10" style="color:var(--c-muted)">
-  <div class="text-4xl mb-3">🖼️</div>
+  <div class="flex justify-center mb-3"><?= icon('image','w-12 h-12 opacity-30') ?></div>
   <p>कुनै फोटो/भिडियो थपिएको छैन।</p>
 </div>
 <?php else: ?>
@@ -71,6 +79,10 @@ admin_sidebar('events');
       <div style="aspect-ratio:16/9;background:#000">
         <iframe src="<?= h($m['video_url']) ?>" class="w-full h-full" style="border:none" allowfullscreen></iframe>
       </div>
+    <?php else: ?>
+      <div class="flex items-center justify-center" style="aspect-ratio:4/3;background:var(--c-border2)">
+        <?= icon('image','w-8 h-8 opacity-30') ?>
+      </div>
     <?php endif; ?>
     <div class="p-2">
       <?php if ($m['caption']): ?><p class="text-xs mb-2 truncate"><?= h($m['caption']) ?></p><?php endif; ?>
@@ -78,7 +90,9 @@ admin_sidebar('events');
         <?= csrf_field() ?>
         <input type="hidden" name="id" value="<?= $m['id'] ?>">
         <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
-        <button class="btn btn-danger btn-sm w-full">🗑️ मेटाउनुस्</button>
+        <button class="btn btn-danger btn-sm w-full flex items-center justify-center gap-1">
+          <?= icon('trash-2','icon-sm') ?> मेटाउनुस्
+        </button>
       </form>
     </div>
   </div>

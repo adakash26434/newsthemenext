@@ -113,12 +113,18 @@ admin_sidebar('articles');
 
       <!-- Publish box -->
       <div class="stat-card space-y-3">
-        <h3 class="font-bold text-sm">प्रकाशन</h3>
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <?= icon('send','icon-sm') ?> प्रकाशन
+        </h3>
         <div class="form-group">
           <label class="form-label">स्थिति</label>
           <select name="status" class="form-control">
-            <option value="draft"     <?= $d['status']==='draft'?'selected':'' ?>>📝 ड्राफ्ट</option>
-            <option value="published" <?= $d['status']==='published'?'selected':'' ?>>✅ प्रकाशित</option>
+            <option value="draft"     <?= $d['status']==='draft'?'selected':'' ?>>
+              ड्राफ्ट
+            </option>
+            <option value="published" <?= $d['status']==='published'?'selected':'' ?>>
+              प्रकाशित
+            </option>
           </select>
         </div>
         <div class="form-group">
@@ -129,11 +135,11 @@ admin_sidebar('articles');
         <div class="space-y-2">
           <label class="flex items-center gap-2 cursor-pointer font-medium">
             <input type="checkbox" name="featured" <?= $d['featured']?'checked':'' ?> class="rounded">
-            ⭐ Featured (मुख्य पृष्ठमा)
+            <?= icon('star','icon-sm') ?> Featured (मुख्य पृष्ठमा)
           </label>
           <label class="flex items-center gap-2 cursor-pointer font-medium">
             <input type="checkbox" name="is_breaking" <?= $d['is_breaking']?'checked':'' ?> class="rounded">
-            🔴 Breaking News (Ticker मा)
+            <?= icon('radio','icon-sm') ?> Breaking News (Ticker मा)
           </label>
         </div>
         <div class="form-group">
@@ -144,23 +150,31 @@ admin_sidebar('articles');
           </select>
         </div>
         <div class="flex gap-2 pt-2">
-          <button type="submit" class="btn btn-primary flex-1 justify-center">💾 सेभ गर्नुस्</button>
+          <button type="submit" class="btn btn-primary flex-1 justify-center flex items-center gap-1">
+            <?= icon('save','icon-sm') ?> सेभ गर्नुस्
+          </button>
           <?php if ($is_edit): ?>
-          <a href="/article/<?= h($article['slug']) ?>" target="_blank" class="btn btn-secondary" title="Preview">👁️</a>
+          <a href="/article/<?= h($article['slug']) ?>" target="_blank" class="btn btn-secondary flex items-center" title="Preview">
+            <?= icon('eye','icon-sm') ?>
+          </a>
           <?php endif; ?>
         </div>
         <?php if ($is_edit): ?>
         <form method="POST" action="/admin/articles/delete" onsubmit="return confirm('यो लेख मेटाउने?')">
           <?= csrf_field() ?>
           <input type="hidden" name="id" value="<?= $id ?>">
-          <button class="btn btn-danger w-full justify-center btn-sm">🗑️ लेख मेटाउनुस्</button>
+          <button class="btn btn-danger w-full justify-center btn-sm flex items-center gap-1">
+            <?= icon('trash-2','icon-sm') ?> लेख मेटाउनुस्
+          </button>
         </form>
         <?php endif; ?>
       </div>
 
       <!-- Category & Author -->
       <div class="stat-card space-y-3">
-        <h3 class="font-bold text-sm">श्रेणी र लेखक</h3>
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <?= icon('folder','icon-sm') ?> श्रेणी र लेखक
+        </h3>
         <div class="form-group">
           <label class="form-label">श्रेणी <span style="color:#EF4444">*</span></label>
           <select name="category_id" class="form-control" required>
@@ -187,7 +201,9 @@ admin_sidebar('articles');
 
       <!-- Featured image -->
       <div class="stat-card space-y-3">
-        <h3 class="font-bold text-sm">Featured Image</h3>
+        <h3 class="font-bold text-sm flex items-center gap-2">
+          <?= icon('image','icon-sm') ?> Featured Image
+        </h3>
         <?php if ($d['image_url']): ?>
           <div>
             <img src="<?= h($d['image_url']) ?>" alt="Current" style="width:100%;max-height:160px;object-fit:cover;border-radius:6px">
@@ -205,7 +221,9 @@ admin_sidebar('articles');
 
       <!-- Tags -->
       <div class="stat-card">
-        <h3 class="font-bold text-sm mb-3">ट्यागहरू</h3>
+        <h3 class="font-bold text-sm mb-3 flex items-center gap-2">
+          <?= icon('tag','icon-sm') ?> ट्यागहरू
+        </h3>
         <div class="max-h-48 overflow-y-auto space-y-1">
           <?php foreach ($all_tags as $tag): ?>
           <label class="flex items-center gap-2 cursor-pointer text-sm">

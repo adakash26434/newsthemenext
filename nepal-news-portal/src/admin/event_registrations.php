@@ -14,8 +14,12 @@ admin_sidebar('events');
 <?php admin_flash(); ?>
 
 <div class="flex items-center gap-3 mb-5 flex-wrap">
-  <a href="/admin/events?action=edit&id=<?= $event['id'] ?>" class="btn btn-secondary btn-sm">← कार्यक्रममा फिर्ता</a>
-  <a href="/admin/events/registrations/export?event_id=<?= $event['id'] ?>" class="btn btn-primary btn-sm">📥 CSV Export</a>
+  <a href="/admin/events?action=edit&id=<?= $event['id'] ?>" class="btn btn-secondary btn-sm flex items-center gap-1">
+    <?= icon('arrow-left','icon-sm') ?> कार्यक्रममा फिर्ता
+  </a>
+  <a href="/admin/events/registrations/export?event_id=<?= $event['id'] ?>" class="btn btn-primary btn-sm flex items-center gap-1">
+    <?= icon('download','icon-sm') ?> CSV Export
+  </a>
   <span class="text-sm" style="color:var(--c-muted)">जम्मा दर्ता: <strong><?= count($regs) ?></strong>
     <?php if ($event['capacity']): ?> / <?= $event['capacity'] ?><?php endif; ?>
   </span>
@@ -27,20 +31,24 @@ $pending   = count(array_filter($regs, fn($r)=>$r['status']==='pending'));
 $confirmed = count(array_filter($regs, fn($r)=>$r['status']==='confirmed'));
 $attended  = count(array_filter($regs, fn($r)=>$r['status']==='attended'));
 ?>
-<div class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-5">
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
   <div class="stat-card text-center py-3">
+    <div class="flex justify-center mb-1"><?= icon('users','w-5 h-5 opacity-60') ?></div>
     <div class="text-2xl font-bold"><?= count($regs) ?></div>
     <div class="text-xs" style="color:var(--c-muted)">जम्मा</div>
   </div>
   <div class="stat-card text-center py-3">
+    <div class="flex justify-center mb-1"><?= icon('clock','w-5 h-5 opacity-60') ?></div>
     <div class="text-2xl font-bold" style="color:#D97706"><?= $pending ?></div>
     <div class="text-xs" style="color:var(--c-muted)">Pending</div>
   </div>
   <div class="stat-card text-center py-3">
+    <div class="flex justify-center mb-1"><?= icon('check-circle','w-5 h-5 opacity-60') ?></div>
     <div class="text-2xl font-bold" style="color:#059669"><?= $confirmed ?></div>
     <div class="text-xs" style="color:var(--c-muted)">Confirmed</div>
   </div>
   <div class="stat-card text-center py-3">
+    <div class="flex justify-center mb-1"><?= icon('user-check','w-5 h-5 opacity-60') ?></div>
     <div class="text-2xl font-bold" style="color:#0891B2"><?= $attended ?></div>
     <div class="text-xs" style="color:var(--c-muted)">उपस्थित</div>
   </div>
@@ -48,7 +56,7 @@ $attended  = count(array_filter($regs, fn($r)=>$r['status']==='attended'));
 
 <?php if (empty($regs)): ?>
 <div class="stat-card text-center py-10" style="color:var(--c-muted)">
-  <div class="text-4xl mb-3">📋</div>
+  <div class="flex justify-center mb-3"><?= icon('clipboard-list','w-12 h-12 opacity-30') ?></div>
   <p>कुनै दर्ता छैन।</p>
 </div>
 <?php else: ?>
@@ -92,7 +100,9 @@ $attended  = count(array_filter($regs, fn($r)=>$r['status']==='attended'));
               <option value="<?= $st ?>" <?= $r['status']===$st?'selected':'' ?>><?= $st ?></option>
             <?php endforeach; ?>
           </select>
-          <button class="btn btn-primary btn-sm" title="Update">✓</button>
+          <button class="btn btn-primary btn-sm flex items-center" title="Update">
+            <?= icon('check','icon-sm') ?>
+          </button>
         </form>
       </td>
     </tr>

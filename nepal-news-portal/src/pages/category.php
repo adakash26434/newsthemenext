@@ -1,113 +1,99 @@
 <?php
-$categories_all = get_categories();
-$cat = null;
-foreach ($categories_all as $c) {
-    if ($c['slug'] === ($_cat_slug ?? '')) { $cat = $c; break; }
-}
+$slug = $_slug ?? '';
+$cat  = get_category_by_slug($slug);
 if (!$cat) { http_response_code(404); require SRC_DIR . '/pages/404.php'; exit; }
 
-$page_num = max(1, (int)($_GET['page'] ?? 1));
-$total    = count_articles(['status'=>'published','category_slug'=>$cat['slug']]);
-$pager    = paginate($total, ARTICLES_PER_PAGE, $page_num, "/category/{$cat['slug']}?page=%d");
-$articles = get_articles(['status'=>'published','category_slug'=>$cat['slug'],'limit'=>$pager['per_page'],'offset'=>$pager['offset']]);
-$latest   = get_articles(['status'=>'published','limit'=>6]);
+$lang       = current_lang();
+$cat_name   = $lang==='en' ? ($cat['name_np']?:$cat['name']) : ($cat['name']?:$cat['name_np']);
+$page       = max(1, (int)($_GET['page'] ?? 1));
+$per_page   = ARTICLES_PER_PAGE;
+$opts       = ['status'=>'published','category_slug'=>$slug];
+$total      = count_articles($opts);
+$pag        = paginate($total, $per_page, $page, "/category/$slug?page={page}");
+$articles   = get_articles(array_merge($opts, ['limit'=>$per_page,'offset'=>$pag['offset']]));
 
-$page_title = ($cat['name_np'] ?: $cat['name']) . ' — ' . site_name();
-$page_desc  = ($cat['name_np'] ?: $cat['name']) . ' बारेका ताजा समाचार।';
+$page_title = h($cat_name) . ' — ' . site_name();
+$page_desc  = "$cat_name श्रेणीका ताजा समाचार।";
+
 require SRC_DIR . '/layout/header.php';
 ?>
+
+<!-- Category header -->
+<div class="category-header mb-6" style="background:linear-gradient(135deg,<?= h($cat['color']?:primary_color()) ?>,<?= h(category_color($cat['color'])) ?>)">
+  <div class="flex items-center gap-3">
+    <?php if ($cat['icon']): ?>
+      <i data-lucide="<?= h($cat['icon']) ?>" class="w-8 h-8" style="color:#fff;opacity:.9"></i>
+    <?php endif; ?>
+    <div>
+      <h1 class="text-2xl font-extrabold text-white"><?= h($cat_name) ?></h1>
+      <p class="text-sm mt-1" style="color:rgba(255,255,255,.75)">
+        <?= np_number($total) ?> समाचार
+      </p>
+    </div>
+  </div>
+</div>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2">
-    <div class="flex items-center gap-3 mb-5 pb-3" style="border-bottom:3px solid <?= h($cat['color'] ?: accent_color()) ?>">
-      <span class="w-4 h-4 rounded-full" style="background:<?= h($cat['color'] ?: accent_color()) ?>"></span>
-      <h1 class="text-2xl font-extrabold" style="color:<?= h($cat['color'] ?: accent_color()) ?>">
-        <?= h($cat['name_np'] ?: $cat['name']) ?>
-      </h1>
-      <span class="text-sm" style="color:var(--c-muted)">(<?= np_number($total) ?> समाचार)</span>
-    </div>
-
     <?php if (empty($articles)): ?>
-      <div class="text-center py-16" style="color:var(--c-muted)">
-        <p class="text-lg">यस श्रेणीमा अहिले कुनै समाचार छैन।</p>
-      </div>
+    <div class="stat-card text-center py-10" style="color:var(--c-muted)">
+      <i data-lucide="newspaper" class="w-10 h-10 mx-auto mb-3 opacity-30"></i>
+      <p>यस श्रेणीमा कुनै समाचार छैन।</p>
+    </div>
     <?php else: ?>
-      <div class="space-y-4 mb-6">
-        <?php foreach ($articles as $a): ?>
-        <a href="/article/<?= h($a['slug']) ?>" class="article-card flex gap-4 p-4 group block">
-          <div class="img-wrap flex-shrink-0 rounded-sm" style="width:120px;height:90px;aspect-ratio:unset">
-            <?php if ($a['image_url']): ?>
-              <img src="<?= h($a['image_url']) ?>" alt="" loading="lazy">
-            <?php endif; ?>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-1 mb-1">
-              <span class="lang-badge lang-<?= h($a['language']??'np') ?>"><?= ($a['language']??'np')==='en'?'EN':'NP' ?></span>
-            </div>
-            <h2 class="font-bold text-base leading-snug group-hover:underline mb-1"><?= h($a['title']) ?></h2>
-            <p class="text-sm line-clamp-2 mb-2" style="color:var(--c-text2)"><?= h(excerpt($a['summary'], 18)) ?></p>
-            <div class="meta flex items-center gap-2">
-              <span><?= h($a['author_name']) ?></span>
-              <span>&bull;</span>
-              <span><?= time_ago($a['published_at'] ?? $a['created_at']) ?></span>
-              <span>&bull;</span>
-              <span><?= np_number((int)$a['views']) ?> पठन</span>
-            </div>
-          </div>
-        </a>
-        <?php endforeach; ?>
-      </div>
-
-      <?php if ($pager['total_pages'] > 1): ?>
-      <div class="pagination mb-6">
-        <?php if ($pager['has_prev']): ?>
-          <a href="<?= sprintf($pager['url_pattern'], $pager['prev_page']) ?>">&laquo; अघिल्लो</a>
-        <?php endif; ?>
-        <?php for ($p = max(1,$pager['current']-2); $p <= min($pager['total_pages'],$pager['current']+2); $p++): ?>
-          <?php if ($p === $pager['current']): ?>
-            <span class="current"><?= $p ?></span>
-          <?php else: ?>
-            <a href="<?= sprintf($pager['url_pattern'], $p) ?>"><?= $p ?></a>
+    <div class="space-y-4">
+      <?php foreach ($articles as $a): ?>
+      <a href="/article/<?= h($a['slug']) ?>" class="flex gap-4 p-3 rounded-lg group transition-all hover:shadow-md" style="background:var(--c-surface);border:1px solid var(--c-border)">
+        <div class="flex-shrink-0 rounded-lg overflow-hidden" style="width:120px;height:90px;background:var(--c-surface2)">
+          <?php if ($a['image_url']): ?>
+            <img src="<?= h($a['image_url']) ?>" alt="" loading="lazy" class="w-full h-full object-cover">
           <?php endif; ?>
-        <?php endfor; ?>
-        <?php if ($pager['has_next']): ?>
-          <a href="<?= sprintf($pager['url_pattern'], $pager['next_page']) ?>">अर्को &raquo;</a>
-        <?php endif; ?>
-      </div>
-      <?php endif; ?>
+        </div>
+        <div class="flex-1 min-w-0">
+          <h2 class="font-bold text-base leading-snug line-clamp-2 group-hover:underline" style="color:var(--c-text)">
+            <?= h($a['title']) ?>
+          </h2>
+          <?php if ($a['summary']): ?>
+          <p class="text-sm mt-1 line-clamp-2" style="color:var(--c-text2)"><?= h(excerpt($a['summary'],18)) ?></p>
+          <?php endif; ?>
+          <div class="flex items-center gap-3 mt-2 text-xs flex-wrap" style="color:var(--c-muted)">
+            <span class="flex items-center gap-1"><?= icon('user','w-3 h-3') ?> <?= h($a['author_name']) ?></span>
+            <span class="flex items-center gap-1"><?= icon('clock','w-3 h-3') ?> <?= time_ago($a['published_at']??$a['created_at']) ?></span>
+            <span class="flex items-center gap-1"><?= icon('eye','w-3 h-3') ?> <?= np_number((int)$a['views']) ?></span>
+          </div>
+        </div>
+      </a>
+      <?php endforeach; ?>
+    </div>
+    <?php render_pagination($pag); ?>
     <?php endif; ?>
   </div>
 
-  <aside>
+  <!-- Sidebar -->
+  <aside class="space-y-5">
     <?php render_ads('sidebar-top'); ?>
     <div class="sidebar-card">
-      <div class="section-heading mb-3"><span>ताजा समाचार</span></div>
-      <?php foreach ($latest as $la): ?>
-      <div class="sidebar-article">
-        <a href="/article/<?= h($la['slug']) ?>" class="thumb">
-          <?php if ($la['image_url']): ?><img src="<?= h($la['image_url']) ?>" alt="" loading="lazy"><?php endif; ?>
-        </a>
-        <div class="info">
-          <a href="/article/<?= h($la['slug']) ?>" class="title block hover:underline"><?= h($la['title']) ?></a>
-          <div class="meta"><?= time_ago($la['published_at'] ?? $la['created_at']) ?></div>
-        </div>
+      <div class="section-heading mb-3">
+        <span class="flex items-center gap-2"><?= icon('grid','w-4 h-4') ?> सबै श्रेणीहरू</span>
       </div>
+      <?php foreach (get_categories() as $c): ?>
+      <a href="/category/<?= h($c['slug']) ?>"
+         class="flex items-center justify-between py-2 text-sm font-semibold hover:underline"
+         style="border-bottom:1px solid var(--c-border2);<?= $c['slug']===$slug?'color:var(--c-primary-lt)':'' ?>">
+        <span class="flex items-center gap-2">
+          <?php if ($c['icon']): ?>
+            <i data-lucide="<?= h($c['icon']) ?>" class="w-3.5 h-3.5" style="color:<?= h($c['color']?:accent_color()) ?>"></i>
+          <?php else: ?>
+            <span class="w-2 h-2 rounded-full" style="background:<?= h($c['color']?:accent_color()) ?>"></span>
+          <?php endif; ?>
+          <?= h($c['name_np']?:$c['name']) ?>
+        </span>
+        <span style="color:var(--c-muted);font-size:11px"><?= np_number((int)($c['article_count']??0)) ?></span>
+      </a>
       <?php endforeach; ?>
     </div>
     <?php render_ads('sidebar-bottom'); ?>
-    <div class="sidebar-card mt-4">
-      <div class="section-heading mb-3"><span>सबै श्रेणीहरू</span></div>
-      <?php foreach ($categories_all as $cw): ?>
-        <a href="/category/<?= h($cw['slug']) ?>"
-           class="flex items-center justify-between py-2 border-b text-sm font-semibold transition-colors <?= $cw['slug']===$cat['slug']?'font-extrabold':'' ?>"
-           style="border-color:var(--c-border2);color:<?= $cw['slug']===$cat['slug']?h($cw['color']?:accent_color()):'inherit' ?>">
-          <span class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full" style="background:<?= h($cw['color']?:accent_color()) ?>"></span>
-            <?= h($cw['name_np'] ?: $cw['name']) ?>
-          </span>
-          <span class="text-xs" style="color:var(--c-muted)"><?= np_number((int)($cw['article_count']??0)) ?></span>
-        </a>
-      <?php endforeach; ?>
-    </div>
   </aside>
 </div>
+
 <?php require SRC_DIR . '/layout/footer.php'; ?>

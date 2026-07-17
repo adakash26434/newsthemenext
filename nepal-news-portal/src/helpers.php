@@ -19,16 +19,21 @@ function csrf_check(): void {
     }
 }
 
+// ── Lucide icon helper ─────────────────────────────────────
+// Usage: <?= icon('calendar') ?> or <?= icon('search', 'w-5 h-5') ?>
+function icon(string $name, string $class = 'w-4 h-4 inline-block align-middle flex-shrink-0'): string {
+    return '<i data-lucide="' . h($name) . '" class="' . h($class) . '"></i>';
+}
+
 // ── Admin auth ─────────────────────────────────────────────
 function admin_login(string $user, string $pass): bool {
     $stored_user = setting('admin_username', DEFAULT_ADMIN_USERNAME);
     $stored_hash = setting('admin_password', '');
     if ($user !== $stored_user) return false;
-    // Support legacy plain-text passwords and hashed
     if ($stored_hash && str_starts_with($stored_hash, '$2y$')) {
         return password_verify($pass, $stored_hash);
     }
-    // Fallback plain
+    // Fallback plain-text
     $plain = setting('admin_password_plain', DEFAULT_ADMIN_PASSWORD);
     return $pass === $plain || $pass === $stored_hash;
 }
@@ -60,7 +65,7 @@ function redirect(string $path): void {
 
 // ── URL helpers ────────────────────────────────────────────
 function current_url(): string {
-    return $_SERVER['REQUEST_URI'] ?? '/';
+    return strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
 }
 
 // ── String helpers ─────────────────────────────────────────
@@ -70,45 +75,50 @@ function excerpt(string $text, int $words = 20): string {
     if (count($parts) <= $words) return $text;
     return implode(' ', array_slice($parts, 0, $words)) . '…';
 }
-function slug_from_title(string $title): string {
+function slugify(string $title): string {
     $slug = mb_strtolower(trim($title));
     $slug = preg_replace('/[^\w\s-]/u', '', $slug);
     $slug = preg_replace('/[\s_]+/', '-', $slug);
     $slug = trim($slug, '-');
-    $slug = $slug ?: 'article-' . time();
-    return substr($slug, 0, 200);
+    return substr($slug ?: 'article-' . time(), 0, 200);
 }
+// Alias
+function slug_from_title(string $t): string { return slugify($t); }
+
 function np_number(int $n): string {
     return str_replace(
         ['0','1','2','3','4','5','6','7','8','9'],
         ['०','१','२','३','४','५','६','७','८','९'],
-        (string)$n);
+        (string)$n
+    );
+}
+function reading_time_label(string $content): string {
+    $words = str_word_count(strip_tags($content));
+    $mins  = max(1, (int)ceil($words / 200));
+    return np_number($mins) . ' मिनेट पठन';
 }
 
 // ── Date helpers ───────────────────────────────────────────
 function format_date(string $date, bool $time = false): string {
-    $ts   = strtotime($date);
+    $ts = strtotime($date);
     if (!$ts) return $date;
     $months_np = [
-        1=>'जनवरी',2=>'फेब्रुअरी',3=>'मार्च',4=>'अप्रिल',
-        5=>'मे',6=>'जुन',7=>'जुलाई',8=>'अगस्ट',
-        9=>'सेप्टेम्बर',10=>'अक्टोबर',11=>'नोभेम्बर',12=>'डिसेम्बर',
+        1=>'जनवरी', 2=>'फेब्रुअरी', 3=>'मार्च',     4=>'अप्रिल',
+        5=>'मे',    6=>'जुन',       7=>'जुलाई',     8=>'अगस्ट',
+        9=>'सेप्टेम्बर', 10=>'अक्टोबर', 11=>'नोभेम्बर', 12=>'डिसेम्बर',
     ];
-    $d  = date('j', $ts);
-    $m  = (int)date('n', $ts);
-    $y  = date('Y', $ts);
-    $str = np_number($d) . ' ' . $months_np[$m] . ' ' . np_number((int)$y);
+    $str = np_number((int)date('j',$ts)) . ' ' . $months_np[(int)date('n',$ts)] . ' ' . np_number((int)date('Y',$ts));
     if ($time) $str .= ', ' . date('g:i A', $ts);
     return $str;
 }
 function time_ago(string $date): string {
-    $ts   = strtotime($date);
+    $ts = strtotime($date);
     if (!$ts) return '';
     $diff = time() - $ts;
     if ($diff < 60)     return 'भर्खर';
-    if ($diff < 3600)   return np_number((int)round($diff/60)) . ' मिनेट अघि';
+    if ($diff < 3600)   return np_number((int)round($diff/60))   . ' मिनेट अघि';
     if ($diff < 86400)  return np_number((int)round($diff/3600)) . ' घण्टा अघि';
-    if ($diff < 604800) return np_number((int)round($diff/86400)) . ' दिन अघि';
+    if ($diff < 604800) return np_number((int)round($diff/86400))  . ' दिन अघि';
     return format_date($date);
 }
 function bs_date_today(): string {
@@ -116,13 +126,13 @@ function bs_date_today(): string {
     $m   = (int)date('n');
     $d   = (int)date('j');
     $days_np = ['आइतबार','सोमबार','मंगलबार','बुधबार','बिहीबार','शुक्रबार','शनिबार'];
-    $dow  = $days_np[(int)date('w')];
-    $months = NP_MONTHS;
-    return np_number($y) . ' ' . $months[$m] . ' ' . np_number($d) . ' गते ' . $dow;
+    $dow = $days_np[(int)date('w')];
+    return np_number($y) . ' ' . NP_MONTHS[$m] . ' ' . np_number($d) . ' गते, ' . $dow;
 }
 
 // ── Language helpers ───────────────────────────────────────
 function current_lang(): string {
+    if (session_status() === PHP_SESSION_NONE) session_start();
     return $_SESSION['lang'] ?? setting('default_lang', 'np');
 }
 function set_lang(string $lang): void {
@@ -138,37 +148,43 @@ function primary_color(): string  { return setting('primary_color', DEFAULT_COLO
 function nav_color(): string      { return setting('nav_color',     DEFAULT_COLOR_NAV); }
 function accent_color(): string   { return setting('accent_color',  DEFAULT_COLOR_ACCENT); }
 function site_name(): string      { return current_lang()==='en' ? setting('site_name_en', DEFAULT_SITE_NAME_EN) : setting('site_name', DEFAULT_SITE_NAME); }
-function site_name_np(): string   { return setting('site_name', DEFAULT_SITE_NAME); }
+function site_name_np(): string   { return setting('site_name',    DEFAULT_SITE_NAME); }
 function site_name_en(): string   { return setting('site_name_en', DEFAULT_SITE_NAME_EN); }
 function site_tagline(): string   { return setting('site_tagline', DEFAULT_SITE_TAGLINE); }
 function site_logo_url(): string  { return setting('site_logo_url', ''); }
 function site_logo_text(): string { return setting('site_logo_text', site_name_np()); }
-function category_color(string $color = ''): string {
-    return $color ?: accent_color();
-}
+function category_color(string $color = ''): string { return $color ?: accent_color(); }
 
 // ── Ads helpers ────────────────────────────────────────────
 function render_ad(array $ad): string {
-    $out = '<div class="ad-slot" data-pos="' . h($ad['position']) . '">';
+    // Track impression
+    static $tracked = [];
+    if (!in_array($ad['id'], $tracked)) {
+        track_ad_impression((int)$ad['id']);
+        $tracked[] = $ad['id'];
+    }
+
+    $out = '<div class="ad-item">';
     if ($ad['link_url']) {
-        $out .= '<a href="/ad/click/' . (int)$ad['id'] . '" target="_blank" rel="noopener sponsored">';
+        $out .= '<a href="/ad/click/' . (int)$ad['id'] . '" target="_blank" rel="noopener sponsored nofollow" title="' . h($ad['title']) . '">';
     }
     if ($ad['type'] === 'image' && $ad['image_url']) {
-        $out .= '<img src="' . h($ad['image_url']) . '" alt="' . h($ad['title']) . '" loading="lazy" style="max-width:100%;display:block;margin:0 auto">';
+        $out .= '<img src="' . h($ad['image_url']) . '" alt="' . h($ad['title']) . '" loading="lazy">';
     } elseif ($ad['type'] === 'code' && $ad['code']) {
         $out .= $ad['code'];
     } else {
-        $out .= '<div class="ad-placeholder"><span>विज्ञापन</span><br><small>' . h($ad['title']) . '</small></div>';
+        // Placeholder
+        $out .= '<div class="ad-placeholder"><span class="ad-label-inner">Advertisement</span><br><small>' . h($ad['title']) . '</small></div>';
     }
     if ($ad['link_url']) $out .= '</a>';
     $out .= '</div>';
     return $out;
 }
-function render_ads(string $position): void {
+function render_ads(string $position, bool $label = true): void {
     $ads = get_active_ads($position);
     if (empty($ads)) return;
     echo '<div class="ads-container ads-' . h($position) . '">';
-    echo '<span class="ad-label">विज्ञापन</span>';
+    if ($label) echo '<span class="ad-label">विज्ञापन</span>';
     foreach ($ads as $ad) echo render_ad($ad);
     echo '</div>';
 }
@@ -198,7 +214,10 @@ function render_pagination(array $pag): void {
     }
     $start = max(1, $pag['current'] - 2);
     $end   = min($pag['total_pages'], $pag['current'] + 2);
-    if ($start > 1) { echo '<a href="' . str_replace('{page}', 1, $pag['url_pattern']) . '" class="page-link">1</a>'; if ($start > 2) echo '<span class="page-dots">…</span>'; }
+    if ($start > 1) {
+        echo '<a href="' . str_replace('{page}', 1, $pag['url_pattern']) . '" class="page-link">1</a>';
+        if ($start > 2) echo '<span class="page-dots">…</span>';
+    }
     for ($i = $start; $i <= $end; $i++) {
         $cls = $i === $pag['current'] ? 'page-link active' : 'page-link';
         echo '<a href="' . str_replace('{page}', $i, $pag['url_pattern']) . '" class="' . $cls . '">' . np_number($i) . '</a>';
@@ -223,9 +242,9 @@ function handle_upload(string $field, string $sub = 'general'): string {
     if (!in_array($mime, $allowed)) return '';
     if ($file['size'] > 5 * 1024 * 1024) return ''; // 5MB max
     $ext  = match($mime) {
-        'image/jpeg' => 'jpg', 'image/png' => 'png',
-        'image/gif'  => 'gif', 'image/webp' => 'webp',
-        'image/svg+xml' => 'svg', default => 'jpg'
+        'image/jpeg'   => 'jpg', 'image/png'  => 'png',
+        'image/gif'    => 'gif', 'image/webp' => 'webp',
+        'image/svg+xml'=> 'svg', default      => 'jpg',
     };
     $dir  = BASE_DIR . '/assets/uploads/' . $sub;
     if (!is_dir($dir)) mkdir($dir, 0755, true);
