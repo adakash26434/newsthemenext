@@ -365,6 +365,69 @@ document.addEventListener('keydown', function(e){
     var form = document.querySelector('form[action="/admin/articles/save"]');
     if (form) form.submit();
   }
+// Quill Rich Text Editor Initialization
+(function(){
+ var quillNp = null, quillEn = null;
+ 
+ function initQuill(id, hiddenId, placeholder) {
+   var el = document.getElementById(id);
+   var hidden = document.getElementById(hiddenId);
+   if (!el || el.classList.contains('ql-editor')) return;
+   
+   var q = new Quill('#' + id, {
+     theme: 'snow',
+     placeholder: placeholder,
+     modules: {
+       toolbar: [
+         [{'header': [1, 2, 3, false]}],
+         ['bold', 'italic', 'underline', 'strike'],
+         ['blockquote', 'code-block'],
+         [{'list': 'ordered'}, {'list': 'bullet'}],
+         [{'color': []}, {'background': []}],
+         ['link', 'image', 'video'],
+         ['clean']
+       ]
+     }
+   });
+   
+   // Load existing content
+   if (hidden && hidden.value) {
+     q.root.innerHTML = hidden.value;
+   }
+   
+   // Sync to hidden field on change
+   q.on('text-change', function() {
+     if (hidden) hidden.value = q.root.innerHTML;
+   });
+   
+   return q;
+ }
+ 
+ // Initialize on load
+ function initAll() {
+   quillNp = initQuill('quill-np', 'content-np', 'लेखको पूरा विषयवस्तु...');
+   quillEn = initQuill('quill-en', 'content-en', 'Full article content...');
+ }
+ 
+ // Tab switching for Alpine
+ window.initQuillTabs = function(tab) {
+   setTimeout(function() {
+     if (tab === 'np' && quillNp === null) {
+       quillNp = initQuill('quill-np', 'content-np', 'लेखको पूरा विषयवस्तु...');
+     }
+     if (tab === 'en' && quillEn === null) {
+       quillEn = initQuill('quill-en', 'content-en', 'Full article content...');
+     }
+   }, 100);
+ };
+ 
+ if (document.readyState === 'loading') {
+   document.addEventListener('DOMContentLoaded', initAll);
+ } else {
+   initAll();
+ }
+})();
+
 });
 </script>
 </body></html>
