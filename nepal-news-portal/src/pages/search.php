@@ -73,7 +73,7 @@ require SRC_DIR . '/layout/header.php';
     <?php else: ?>
     <div class="space-y-4">
       <?php foreach ($articles as $a): ?>
-      <a href="/article/<?= h($a['slug']) ?>" class="flex gap-4 p-3 rounded-lg group hover:shadow-md transition-all" style="background:var(--c-surface);border:1px solid var(--c-border)">
+      <a href="/article/<?= h($a['slug']) ?>" class="article-card-compact search-result-card" style="background:var(--c-surface);border:1px solid var(--c-border)">
         <?php if ($a['image_url']): ?>
         <div class="flex-shrink-0 rounded-lg overflow-hidden" style="width:100px;height:75px;background:var(--c-surface2)">
           <img src="<?= h($a['image_url']) ?>" alt="" loading="lazy" class="w-full h-full object-cover">

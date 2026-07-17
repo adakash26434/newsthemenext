@@ -199,7 +199,7 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
       
       <!-- Dark/Light toggle — Enhanced icon button -->
       <button 
-        class="btn-icon !w-8 !h-8 !rounded-full !border"
+        class="theme-toggle btn-icon !w-9 !h-9 !rounded-full !border"
         @click="darkMode=!darkMode" 
         :title="darkMode ? 'Light Mode' : 'Dark Mode'"
         style="background:var(--c-surface);border-color:var(--c-border)">
