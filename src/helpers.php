@@ -129,11 +129,6 @@ function np_number(int $n): string {
         (string)$n
     );
 }
-function reading_time_label(string $content): string {
-    $words = str_word_count(strip_tags($content));
-    $mins  = max(1, (int)ceil($words / 200));
-    return np_number($mins) . ' मिनेट पठन';
-}
 
 // ── Date helpers ───────────────────────────────────────────
 function format_date(string $date, bool $time = false): string {
