@@ -422,6 +422,16 @@ if ($meth === 'POST') {
         $email = trim($_POST['email'] ?? '');
         $name  = trim($_POST['name'] ?? '');
         if (save_newsletter_email($email, $name)) {
+            // Send welcome email with unsubscribe link
+            $sub = db_fetch("SELECT token FROM newsletter_subscribers WHERE email=?", [strtolower(trim($email))]);
+            if ($sub && $sub['token'] && setting('contact_email','')) {
+                $site   = site_name();
+                $base   = rtrim(setting('site_url','https://localhost'),'/');
+                $unsub  = $base . '/newsletter/unsubscribe?token=' . urlencode($sub['token']);
+                $msg    = "$name जी, {$site} न्यूजलेटरमा स्वागत छ!\n\nआफ्नो सदस्यता रद्द गर्न: $unsub\n\n— {$site} टिम";
+                $hdrs   = "From: {$site} <" . setting('contact_email','') . ">\r\nContent-Type: text/plain; charset=UTF-8\r\n";
+                @mail($email, "{$site} — न्यूजलेटर स्वागत", $msg, $hdrs);
+            }
             flash_set('nl_success', 'न्यूजलेटर सदस्यता सफल भयो! धन्यवाद।');
         } else {
             flash_set('nl_error', 'इमेल अवैध वा पहिले नै दर्ता छ।');
