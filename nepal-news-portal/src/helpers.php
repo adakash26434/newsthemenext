@@ -308,6 +308,9 @@ function reading_time(string $content, int $wpm = 200): int {
 
 function reading_time_label(string $content): string {
     $minutes = reading_time($content);
+    if (current_lang() === 'np') {
+        return np_number($minutes) . ' मिनेट पढ्नुस्';
+    }
     return $minutes . ' ' . ($minutes == 1 ? 'min read' : 'mins read');
 }
 
