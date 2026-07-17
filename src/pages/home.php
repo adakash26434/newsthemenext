@@ -159,7 +159,7 @@ require SRC_DIR . '/layout/header.php';
         <a href="/live-data" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg" style="background: linear-gradient(135deg, #059669, #047857); color: white;">
             <span class="text-2xl">💱</span>
             <div>
-                <div class="font-bold text-lg">$ <?= number_format($forex_widgets[0]['value'] ?? 0) ?></div>
+                <div class="font-bold text-lg">$ <?= number_format((float)($forex_widgets[0]['value'] ?? 0)) ?></div>
                 <div class="text-xs opacity-80">अमेरिकी डलर</div>
             </div>
         </a>

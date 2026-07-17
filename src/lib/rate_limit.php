@@ -103,3 +103,8 @@ function rate_limit_or_die(string $action, int $max = 5, int $window = 300, stri
         exit;
     }
 }
+
+// Alias for convenience
+function check_rate_limit(string $action, string $ip, int $max = 5, int $window = 300): bool {
+    return rate_limit_check($action, $max, $window);
+}
