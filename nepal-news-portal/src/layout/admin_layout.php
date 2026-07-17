@@ -189,6 +189,7 @@ $links = [
   ['subscribers',    '/admin/subscribers',   'mail',             'न्यूजलेटर'],
   ['epaper',         '/admin/epaper',        'newspaper',        'ई-पेपर'],
   ['market',         '/admin/market',        'bar-chart-2',      'बजार दर'],
+  ['horoscope',      '/admin/horoscope',     'sparkles',         'ज्योतिष'],
   ['redirects',      '/admin/redirects',     'corner-right-down','रिडाइरेक्ट'],
   ['settings',       '/admin/settings',      'settings',         'सेटिङ्स'],
   ['ai_settings',    '/admin/ai_settings',   'bot',              'AI Chat'],
