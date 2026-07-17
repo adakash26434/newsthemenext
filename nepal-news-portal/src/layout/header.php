@@ -184,6 +184,13 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
             <span><?= $_cur_lang==='en'?'Trending':'ट्रेन्डिङ' ?></span>
           </a>
         </li>
+        <!-- Breaking -->
+        <li>
+          <a href="/breaking" class="<?= $_current_path==='/breaking'?'active':'' ?>">
+            <?= icon('zap','w-3.5 h-3.5') ?>
+            <span><?= $_cur_lang==='en'?'Breaking':'ब्रेकिङ' ?></span>
+          </a>
+        </li>
 
         <!-- Events dropdown -->
         <li x-data="{open:false}" class="has-dropdown">

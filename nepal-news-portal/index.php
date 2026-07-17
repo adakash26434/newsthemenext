@@ -536,6 +536,9 @@ if ($m = route_match('/tag/{slug}', $uri)) {
 if ($uri === '/trending') {
     require SRC_DIR . '/pages/trending.php'; exit;
 }
+if ($uri === '/breaking') {
+    require SRC_DIR . '/pages/breaking.php'; exit;
+}
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }
