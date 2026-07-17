@@ -394,6 +394,44 @@ require SRC_DIR . '/layout/header.php';
     </div>
     <?php endif; ?>
     <?php render_ads('sidebar-bottom'); ?>
+
+    <!-- Most commented -->
+    <?php $most_commented_side = get_most_commented_articles(5); ?>
+    <?php if (!empty($most_commented_side)): ?>
+    <div class="sidebar-card">
+      <div class="section-heading mb-3">
+        <span class="flex items-center gap-2"><?= icon('message-circle','w-4 h-4') ?> सर्वाधिक टिप्पणी</span>
+      </div>
+      <?php foreach ($most_commented_side as $i => $mc): ?>
+      <div class="popular-item">
+        <span class="popular-num"><?= $i+1 ?></span>
+        <div>
+          <a href="/article/<?= h($mc['slug']) ?>" class="ptitle block hover:underline"><?= h($mc['title']) ?></a>
+          <div class="pmeta flex items-center gap-1">
+            <?= icon('message-circle','w-2.5 h-2.5') ?> <?= np_number((int)$mc['comment_count']) ?>
+            &nbsp;<?= icon('eye','w-2.5 h-2.5') ?> <?= np_number((int)$mc['views']) ?>
+          </div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
+    <!-- Tags cloud -->
+    <?php $article_tags = $article['tags'] ?? []; ?>
+    <?php if (!empty($article_tags)): ?>
+    <div class="sidebar-card">
+      <div class="section-heading mb-3">
+        <span class="flex items-center gap-2"><?= icon('tags','w-4 h-4') ?> ट्यागहरू</span>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <?php foreach ($article_tags as $at): ?>
+        <a href="/tag/<?= h($at['slug'] ?? slug_from_title($at['name'])) ?>" class="tag-cloud-item">#<?= h($at['name']) ?></a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+    <?php endif; ?>
+
   </aside>
 </div>
 
