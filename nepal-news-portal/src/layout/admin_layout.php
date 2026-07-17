@@ -19,6 +19,9 @@ function admin_html_start(string $title = 'Admin'): void { ?>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= h($title) ?> — <?= h(site_name_np()) ?> Admin</title>
 <link rel="stylesheet" href="/assets/style.css">
+<!-- Quill.js for WYSIWYG editor -->
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" onload="lucide.createIcons()"></script>
@@ -30,9 +33,144 @@ function admin_html_start(string $title = 'Admin'): void { ?>
     --c-primary-lt: <?= h(accent_color()) ?>;
   }
   [x-cloak]{display:none!important}
+  
+  /* Toast Notifications */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--c-admin-surface);
+    border: 1px solid var(--c-admin-border);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 280px;
+    max-width: 400px;
+    animation: toastIn 0.3s ease-out;
+    pointer-events: auto;
+  }
+  .toast.success { border-left: 4px solid var(--c-success); }
+  .toast.error { border-left: 4px solid var(--c-error); }
+  .toast.warning { border-left: 4px solid var(--c-warning); }
+  .toast.info { border-left: 4px solid var(--c-info); }
+  .toast-icon { flex-shrink: 0; }
+  .toast.success .toast-icon { color: var(--c-success); }
+  .toast.error .toast-icon { color: var(--c-error); }
+  .toast.warning .toast-icon { color: var(--c-warning); }
+  .toast.info .toast-icon { color: var(--c-info); }
+  .toast-content { flex: 1; }
+  .toast-title { font-weight: 600; font-size: 0.85rem; color: var(--c-text); }
+  .toast-message { font-size: 0.8rem; color: var(--c-muted); margin-top: 2px; }
+  .toast-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--c-muted);
+    padding: 4px;
+    border-radius: var(--r-sm);
+    transition: color 0.15s, background 0.15s;
+  }
+  .toast-close:hover { color: var(--c-text); background: var(--c-admin-bg); }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes toastOut {
+    from { opacity: 1; transform: translateX(0); }
+    to { opacity: 0; transform: translateX(100%); }
+  }
+  
+  /* Quill Editor Customization */
+  .ql-toolbar.ql-snow {
+    border: 1px solid var(--c-admin-border);
+    border-bottom: none;
+    border-radius: var(--r-md) var(--r-md) 0 0;
+    background: var(--c-admin-bg);
+  }
+  .ql-container.ql-snow {
+    border: 1px solid var(--c-admin-border);
+    border-radius: 0 0 var(--r-md) var(--r-md);
+    font-family: inherit;
+    font-size: 0.95rem;
+  }
+  .ql-editor { min-height: 250px; }
+  .ql-snow .ql-stroke { stroke: var(--c-text2); }
+  .ql-snow .ql-fill { fill: var(--c-text2); }
+  .ql-snow .ql-picker { color: var(--c-text2); }
+  [data-theme="dark"] .ql-toolbar.ql-snow,
+  [data-theme="dark"] .ql-container.ql-snow {
+    border-color: var(--c-admin-border);
+  }
 </style>
 </head>
 <body>
+
+<!-- Toast Notifications Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+window.showToast = function(type, title, message, duration = 5000) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const icons = {
+        success: 'check-circle',
+        error: 'alert-circle',
+        warning: 'alert-triangle',
+        info: 'info'
+    };
+    
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <i data-lucide="${icons[type] || 'info'}" class="toast-icon w-5 h-5"></i>
+        <div class="toast-content">
+            <div class="toast-title">${title}</div>
+            ${message ? `<div class="toast-message">${message}</div>` : ''}
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    `;
+    
+    container.appendChild(toast);
+    if (window.lucide) lucide.createIcons();
+    
+    if (duration > 0) {
+        setTimeout(() => {
+            toast.style.animation = 'toastOut 0.3s ease-in forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
+}
+
+// Auto-show flash messages as toasts
+document.addEventListener('DOMContentLoaded', function() {
+    const flashSuccess = document.querySelector('.flash-success');
+    const flashError = document.querySelector('.flash-error');
+    
+    if (flashSuccess) {
+        const text = flashSuccess.textContent.trim();
+        showToast('success', 'सफल', text);
+        flashSuccess.remove();
+    }
+    if (flashError) {
+        const text = flashError.textContent.trim();
+        showToast('error', 'त्रुटि', text);
+        flashError.remove();
+    }
+});
+</script>
 <script>document.addEventListener('DOMContentLoaded',function(){if(window.lucide)lucide.createIcons();});</script>
 <?php }
 

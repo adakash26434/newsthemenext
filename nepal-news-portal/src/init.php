@@ -76,6 +76,7 @@ if ($mysql) {
         category_id  INT          NOT NULL,
         author_id    INT          NOT NULL,
         published_at DATETIME     DEFAULT CURRENT_TIMESTAMP,
+        scheduled_at DATETIME     DEFAULT NULL,
         created_at   DATETIME     DEFAULT CURRENT_TIMESTAMP,
         updated_at   DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
@@ -337,6 +338,7 @@ if ($mysql) {
         category_id  INTEGER NOT NULL REFERENCES categories(id),
         author_id    INTEGER NOT NULL REFERENCES authors(id),
         published_at TEXT DEFAULT (CURRENT_TIMESTAMP),
+        scheduled_at TEXT DEFAULT NULL,
         created_at   TEXT DEFAULT (CURRENT_TIMESTAMP),
         updated_at   TEXT DEFAULT (CURRENT_TIMESTAMP)
     );

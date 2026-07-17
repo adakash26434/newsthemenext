@@ -69,6 +69,15 @@ if ($meth === 'POST') {
         $id  = (int)($_POST['id'] ?? 0) ?: null;
         $pub = $_POST['published_at'] ?? null;
         if ($pub) $pub = date('Y-m-d H:i:s', strtotime($pub));
+        
+        // Handle scheduled publishing
+        $status = $_POST['status'] ?? 'draft';
+        $scheduled_at = null;
+        if ($status === 'scheduled') {
+            $scheduled_at = $_POST['scheduled_at'] ?? null;
+            if ($scheduled_at) $scheduled_at = date('Y-m-d H:i:s', strtotime($scheduled_at));
+        }
+        
         // Handle image upload
         $image_url = trim($_POST['image_url'] ?? '');
         $uploaded  = handle_upload('image_file', 'articles');
@@ -82,7 +91,7 @@ if ($meth === 'POST') {
             'summary'      => trim($_POST['summary'] ?? ''),
             'summary_np'   => trim($_POST['summary_np'] ?? ''),
             'language'     => in_array($_POST['language']??'',['np','en']) ? $_POST['language'] : 'np',
-            'status'       => in_array($_POST['status']??'',['draft','published']) ? $_POST['status'] : 'draft',
+            'status'       => in_array($status,['draft','scheduled','published']) ? $status : 'draft',
             'featured'     => isset($_POST['featured']) ? 1 : 0,
             'is_breaking'  => isset($_POST['is_breaking']) ? 1 : 0,
             'image_url'    => $image_url,
@@ -90,6 +99,7 @@ if ($meth === 'POST') {
             'category_id'  => (int)($_POST['category_id'] ?? 0),
             'author_id'    => (int)($_POST['author_id'] ?? 0),
             'published_at' => $pub ?: date('Y-m-d H:i:s'),
+            'scheduled_at' => $scheduled_at,
             'tag_ids'      => array_map('intval', $_POST['tag_ids'] ?? []),
             'seo_title'    => trim($_POST['seo_title'] ?? ''),
             'seo_desc'     => trim($_POST['seo_desc'] ?? ''),
@@ -108,7 +118,13 @@ if ($meth === 'POST') {
             $data['slug'] = $base_slug . '-' . $i++;
         }
         $new_id = save_article($data, $id);
-        flash_set('success', $id ? 'लेख सफलतापूर्वक अपडेट भयो।' : 'नयाँ लेख प्रकाशित भयो।');
+        
+        // Show appropriate message based on status
+        if ($status === 'scheduled') {
+            flash_set('success', 'लेख अनुसूचित गरिएको छ। ' . ($scheduled_at ? date('Y-m-d H:i', strtotime($scheduled_at)) : '') . ' मा प्रकाशित हुनेछ।');
+        } else {
+            flash_set('success', $id ? 'लेख सफलतापूर्वक अपडेट भयो।' : 'नयाँ लेख प्रकाशित भयो।');
+        }
         redirect("admin/articles?action=edit&id=$new_id");
     }
 
