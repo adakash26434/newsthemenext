@@ -59,6 +59,20 @@ require SRC_DIR . '/layout/header.php';
     </div>
 
     <?php if ($q !== ''): ?>
+    <!-- Search Filters -->
+    <div class="search-filters">
+      <span style="font-size:13px;font-weight:600;color:var(--c-text)"><?= icon('filter','w-4 h-4 inline') ?> फिल्टर:</span>
+      <a href="/search?q=<?= urlencode($q) ?>&sort=relevance" class="filter-chip <?= ($_GET['sort'] ?? 'relevance') === 'relevance' ? 'active' : '' ?>">
+        <?= icon('sparkles','w-3 h-3') ?> सबैभन्दा मिल्ने
+      </a>
+      <a href="/search?q=<?= urlencode($q) ?>&sort=newest" class="filter-chip <?= ($_GET['sort'] ?? '') === 'newest' ? 'active' : '' ?>">
+        <?= icon('clock','w-3 h-3') ?> नयाँ पहिले
+      </a>
+      <a href="/search?q=<?= urlencode($q) ?>&sort=popular" class="filter-chip <?= ($_GET['sort'] ?? '') === 'popular' ? 'active' : '' ?>">
+        <?= icon('eye','w-3 h-3') ?> धेरै हेरिएको
+      </a>
+    </div>
+    
     <div class="mb-4 flex items-center gap-2" style="color:var(--c-muted)">
       <?= icon('info','w-4 h-4') ?>
       <span class="text-sm"><strong><?= h($q) ?></strong> को लागि <strong><?= np_number($total) ?></strong> नतिजा फेला परे</span>

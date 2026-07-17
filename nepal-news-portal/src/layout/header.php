@@ -80,7 +80,11 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
 <meta name="twitter:image"       content="<?= h($og_image) ?>">
 <?php endif; ?>
 <meta name="twitter:site"        content="@<?= h(setting('social_twitter_handle','')) ?>">
+<link rel="canonical" href="<?= 'https://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'] ?>">
 <link rel="icon" href="<?= h($_favicon) ?>" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="<?= h($_site_name_en) ?> RSS" href="/rss">
+<link rel="alternate" hreflang="ne" href="<?= 'https://'.$_SERVER['HTTP_HOST'].str_replace('?lang=np','',$_SERVER['REQUEST_URI']).'?lang=np' ?>">
+<link rel="alternate" hreflang="en" href="<?= 'https://'.$_SERVER['HTTP_HOST'].str_replace('?lang=np','',$_SERVER['REQUEST_URI']).'?lang=en' ?>">
 <link rel="stylesheet" href="/assets/style.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

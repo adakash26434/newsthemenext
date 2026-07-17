@@ -3061,3 +3061,40 @@ img.lazy.loaded {
   border-color: var(--c-primary);
   color: #fff;
 }
+
+/* ── Reading Time Badge ── */
+.reading-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: var(--c-surface2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-full);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-text2);
+}
+.reading-time svg {
+  color: var(--c-primary);
+}
+
+/* ── Error Pages ── */
+.page-404 {
+  min-height: 60vh;
+  padding: 40px 20px;
+  text-align: center;
+}
+.page-404 .code {
+  font-size: 100px;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--c-primary), var(--c-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.page-404 .icon {
+  color: var(--c-muted);
+  opacity: 0.5;
+}

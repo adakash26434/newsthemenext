@@ -48,10 +48,12 @@ $json_ld = json_encode([
         'name'  => site_name_en(),
         'logo'  => ['@type' => 'ImageObject', 'url' => $_base_url . site_logo_url()],
     ],
-    'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $canonical_url],
+    'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $_base_url . '/article/' . $article['slug']],
     'inLanguage'       => current_lang() === 'en' ? 'en-NP' : 'ne-NP',
     'articleSection'   => $article['category_name_np'] ?: $article['category_name'],
     'keywords'         => implode(', ', array_column($article['tags'] ?? [], 'name')),
+    'wordCount'        => str_word_count(strip_tags($article['content'] ?? '')),
+    'timeRequired'     => 'PT' . reading_time($article['content'] ?? '') . 'M',
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
 require SRC_DIR . '/layout/header.php';
