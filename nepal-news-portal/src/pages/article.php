@@ -89,39 +89,39 @@ require SRC_DIR . '/layout/header.php';
         <?php endif; ?>
       </div>
 
-      <!-- Title -->
-      <h1 class="text-2xl sm:text-3xl font-extrabold mb-3 leading-tight" style="color:var(--c-text)">
+      <!-- Title — karobardaily style: large, prominent, centered on desktop -->
+      <h1 class="article-main-title mb-4 leading-tight" style="color:var(--c-text)">
         <?= h($title_main) ?>
       </h1>
 
-      <!-- Meta bar -->
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mb-4 pb-4 text-xs" style="color:var(--c-muted);border-bottom:1px solid var(--c-border)">
+      <!-- Author + meta row -->
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 pb-4 text-sm" style="color:var(--c-muted);border-bottom:1px solid var(--c-border)">
         <?php if ($article['author_name']): ?>
-        <a href="/author/<?= h($article['author_slug']) ?>" class="flex items-center gap-1.5 font-semibold hover:underline" style="color:var(--c-text2)">
+        <a href="/author/<?= h($article['author_slug']) ?>" class="flex items-center gap-2 font-bold hover:underline" style="color:var(--c-text)">
           <?php if ($article['author_avatar']): ?>
-            <img src="<?= h($article['author_avatar']) ?>" alt="" class="w-6 h-6 rounded-full object-cover">
+            <img src="<?= h($article['author_avatar']) ?>" alt="" class="w-8 h-8 rounded-full object-cover ring-2" style="ring-color:var(--c-border)">
           <?php else: ?>
-            <?= icon('user-round','w-4 h-4') ?>
+            <span class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold" style="background:var(--c-primary)"><?= mb_substr($article['author_name'],0,1) ?></span>
           <?php endif; ?>
           <?= h($article['author_name']) ?>
         </a>
         <?php endif; ?>
-        <span class="flex items-center gap-1">
-          <?= icon('calendar','w-3.5 h-3.5') ?>
-          <?= format_date($article['published_at']??$article['created_at'], false) ?>
+        <span class="flex items-center gap-1 text-xs">
+          <?= icon('clock','w-3.5 h-3.5') ?>
+          <?= time_ago_np($article['published_at']??$article['created_at']) ?>
         </span>
-        <span class="flex items-center gap-1" title="बिक्रम सम्वत्">
+        <span class="flex items-center gap-1 text-xs" title="बिक्रम सम्वत्">
           <?= icon('calendar-days','w-3 h-3') ?>
           <?= format_bs_date($article['published_at'] ?? $article['created_at']) ?>
         </span>
-        <span class="flex items-center gap-1">
+        <span class="flex items-center gap-1 text-xs">
           <?= icon('eye','w-3.5 h-3.5') ?> <?= np_number((int)$article['views']) ?> दृश्य
         </span>
-        <span class="flex items-center gap-1 reading-time">
+        <span class="flex items-center gap-1 text-xs reading-time">
           <?= icon('book-open','w-3.5 h-3.5') ?> <?= reading_time_label($article['content']??'') ?>
         </span>
-        <!-- Font size controls -->
-        <div class="flex items-center gap-1 ml-auto">
+        <!-- Font size + action controls -->
+        <div class="flex items-center gap-1 ml-auto flex-wrap">
           <button class="font-btn" onclick="changeFontSize(-1)" title="Decrease font">A-</button>
           <button class="font-btn" onclick="changeFontSize(1)"  title="Increase font">A+</button>
           <button class="font-btn print-btn" onclick="window.print()" title="Print"><?= icon('printer','w-3 h-3') ?></button>
@@ -134,18 +134,21 @@ require SRC_DIR . '/layout/header.php';
         </div>
       </div>
 
-      <!-- Summary box -->
-      <?php if ($summary_main): ?>
-      <div class="p-4 mb-5 rounded-lg text-sm italic font-medium" style="background:var(--c-surface2);border-left:3px solid var(--c-primary-lt);color:var(--c-text2)">
-        <?= h($summary_main) ?>
-      </div>
-      <?php endif; ?>
-
-      <!-- Featured image -->
+      <!-- Featured image — BEFORE summary, full-width like karobardaily -->
       <?php if ($article['image_url']): ?>
       <div class="mb-5 rounded-lg overflow-hidden">
         <img src="<?= h($article['image_url']) ?>" alt="<?= h($title_main) ?>"
-             class="w-full object-cover" style="max-height:480px">
+             class="w-full object-cover" style="max-height:520px">
+        <?php if ($article['image_credit']): ?>
+        <p class="text-xs px-2 pt-1" style="color:var(--c-muted)">फोटो: <?= h($article['image_credit']) ?></p>
+        <?php endif; ?>
+      </div>
+      <?php endif; ?>
+
+      <!-- Summary box — after image -->
+      <?php if ($summary_main): ?>
+      <div class="p-4 mb-5 rounded-lg text-sm font-medium leading-relaxed" style="background:var(--c-surface2);border-left:4px solid var(--c-primary-lt);color:var(--c-text2)">
+        <?= h($summary_main) ?>
       </div>
       <?php endif; ?>
 

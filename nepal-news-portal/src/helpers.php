@@ -124,6 +124,8 @@ function time_ago(string $date): string {
     if ($diff < 604800) return np_number((int)round($diff/86400))  . ' दिन अघि';
     return format_date($date);
 }
+// Alias — Nepali time ago (same output, kept for template clarity)
+function time_ago_np(string $date): string { return time_ago($date); }
 function bs_date_today(): string {
     return \BsDate::today();
 }

@@ -2,6 +2,12 @@
 $page_title = site_name() . ' — ' . site_tagline();
 $page_desc  = 'नेपालको ताजा समाचार — राजनीति, अर्थतन्त्र, खेलकुद, प्रविधि र थप।';
 
+// Auto-refresh live market data (max once every 6 hours)
+try {
+    $mf = BASE_DIR . '/market_fetch.php';   // BASE_DIR = /…/nepal-news-portal
+    if (file_exists($mf)) { require_once $mf; maybe_refresh_market(6); }
+} catch (\Throwable $e) { /* silent — market data not critical */ }
+
 $featured       = get_articles(['status'=>'published','featured'=>true,'limit'=>5]);
 if (empty($featured))
     $featured   = get_articles(['status'=>'published','limit'=>5]);
@@ -233,55 +239,42 @@ require SRC_DIR . '/layout/header.php';
     <!-- Market widgets (Forex / Gold / NEPSE) -->
     <?php if (!empty($forex_widgets) || !empty($gold_widgets) || !empty($nepse_widgets)): ?>
     <div class="market-widget-card mb-5">
+      <?php
+      // Helper: render one market section
+      function _mw_section(array $rows, string $icon_name, string $label): void {
+          if (empty($rows)) return;
+          echo '<div class="market-widget-header">' . icon($icon_name,'w-3 h-3') . ' ' . h($label) . '</div>';
+          foreach ($rows as $mw) {
+              $chg = $mw['change_pct'] !== null ? (float)$mw['change_pct'] : null;
+              $cls = $chg === null ? '' : ($chg > 0 ? 'up' : ($chg < 0 ? 'down' : 'flat'));
+              $val = h($mw['value']); // value already has रू prefix from live fetch
+              echo '<div class="market-row">';
+              echo '<span class="market-label">' . h($mw['label']) . '</span>';
+              echo '<div class="flex items-center gap-2">';
+              echo '<span class="market-value">' . $val . '</span>';
+              if ($chg !== null && $chg != 0) {
+                  echo '<span class="market-change ' . $cls . '">' . ($chg > 0 ? '+' : '') . number_format($chg, 2) . '%</span>';
+              }
+              echo '</div></div>';
+          }
+      }
+      ?>
       <?php if (!empty($forex_widgets)): ?>
-      <div class="market-widget-header"><?= icon('globe','w-3 h-3') ?> विदेशी मुद्रा दर</div>
-      <?php foreach ($forex_widgets as $mw): ?>
-      <div class="market-row">
-        <span class="market-label"><?= h($mw['label']) ?></span>
-        <div class="flex items-center gap-2">
-          <span class="market-value">रू <?= h($mw['value']) ?></span>
-          <?php if ($mw['change_pct'] !== null): ?>
-          <?php $chg = (float)$mw['change_pct']; $cls = $chg>0?'up':($chg<0?'down':'flat'); ?>
-          <span class="market-change <?= $cls ?>"><?= $chg>0?'+':'' ?><?= number_format($chg,2) ?>%</span>
-          <?php endif; ?>
-        </div>
-      </div>
-      <?php endforeach; ?>
+      <?php _mw_section($forex_widgets, 'globe', 'विदेशी मुद्रा दर'); ?>
       <?php endif; ?>
-
       <?php if (!empty($gold_widgets)): ?>
-      <div class="market-widget-header"><?= icon('gem','w-3 h-3') ?> सुन / चाँदी</div>
-      <?php foreach ($gold_widgets as $mw): ?>
-      <div class="market-row">
-        <span class="market-label"><?= h($mw['label']) ?></span>
-        <div class="flex items-center gap-2">
-          <span class="market-value"><?= h($mw['value']) ?></span>
-          <?php if ($mw['change_pct'] !== null): ?>
-          <?php $chg = (float)$mw['change_pct']; $cls = $chg>0?'up':($chg<0?'down':'flat'); ?>
-          <span class="market-change <?= $cls ?>"><?= $chg>0?'+':'' ?><?= number_format($chg,2) ?>%</span>
-          <?php endif; ?>
-        </div>
-      </div>
-      <?php endforeach; ?>
+      <?php _mw_section($gold_widgets, 'gem', 'सुन / चाँदी'); ?>
       <?php endif; ?>
-
       <?php if (!empty($nepse_widgets)): ?>
-      <div class="market-widget-header"><?= icon('trending-up','w-3 h-3') ?> नेप्से</div>
-      <?php foreach ($nepse_widgets as $mw): ?>
-      <div class="market-row">
-        <span class="market-label"><?= h($mw['label']) ?></span>
-        <div class="flex items-center gap-2">
-          <span class="market-value"><?= h($mw['value']) ?></span>
-          <?php if ($mw['change_pct'] !== null): ?>
-          <?php $chg = (float)$mw['change_pct']; $cls = $chg>0?'up':($chg<0?'down':'flat'); ?>
-          <span class="market-change <?= $cls ?>"><?= $chg>0?'+':'' ?><?= number_format($chg,2) ?>%</span>
-          <?php endif; ?>
-        </div>
-      </div>
-      <?php endforeach; ?>
+      <?php _mw_section($nepse_widgets, 'trending-up', 'नेप्से'); ?>
       <?php endif; ?>
+      <?php
+      $mf_last = setting('market_last_fetch','');
+      $mf_ago  = $mf_last ? time_ago_np($mf_last) : '';
+      ?>
       <div class="text-center py-2" style="font-size:10px;color:var(--c-muted)">
-        दर सांकेतिक मात्र · स्रोत: नेपाल राष्ट्र बैंक
+        दर सांकेतिक मात्र · स्रोत: <a href="https://www.nrb.org.np" target="_blank" style="color:inherit;text-decoration:underline">नेपाल राष्ट्र बैंक</a>
+        <?php if ($mf_ago): ?>&nbsp;· <?= h($mf_ago) ?> अपडेट<?php endif; ?>
       </div>
     </div>
     <?php endif; ?>
