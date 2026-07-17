@@ -8,7 +8,7 @@ echo "========================================"
 # Check if public_html exists
 if [ ! -d "../public_html" ]; then
     echo "❌ Error: public_html folder not found!"
-    echo "   Create it in parent directory or modify DEPLOY_DIR"
+    echo "   Run this from your server's parent directory of public_html"
     exit 1
 fi
 
