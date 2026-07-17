@@ -732,3 +732,104 @@ function get_dashboard_stats(): array {
     return compact('total','published','draft','views','cats','auths','ads_total','ads_active',
                    'subscribers','events_total','events_reg','bycat','recent');
 }
+
+// ── Comments ───────────────────────────────────────────────────────────────────
+
+function get_comments(int $article_id): array {
+    return db_fetchAll(
+        "SELECT * FROM comments WHERE article_id=? AND status='approved' ORDER BY created_at ASC",
+        [$article_id]
+    );
+}
+
+function get_comment_count(int $article_id): int {
+    return db_count("SELECT COUNT(*) FROM comments WHERE article_id=? AND status='approved'", [$article_id]);
+}
+
+function save_comment(array $data): bool {
+    $db = db();
+    $stmt = $db->prepare(
+        "INSERT INTO comments (article_id,parent_id,name,email,website,content,status,ip,created_at)
+         VALUES (:article_id,:parent_id,:name,:email,:website,:content,:status,:ip,CURRENT_TIMESTAMP)"
+    );
+    return $stmt->execute([
+        ':article_id' => (int)($data['article_id'] ?? 0),
+        ':parent_id'  => $data['parent_id'] ?? null,
+        ':name'       => substr(trim($data['name'] ?? ''), 0, 100),
+        ':email'      => substr(trim($data['email'] ?? ''), 0, 200),
+        ':website'    => substr(trim($data['website'] ?? ''), 0, 200),
+        ':content'    => substr(trim($data['content'] ?? ''), 0, 2000),
+        ':status'     => $data['status'] ?? 'pending',
+        ':ip'         => $data['ip'] ?? '',
+    ]);
+}
+
+function approve_comment(int $id): void {
+    db()->prepare("UPDATE comments SET status='approved' WHERE id=?")->execute([$id]);
+}
+
+function spam_comment(int $id): void {
+    db()->prepare("UPDATE comments SET status='spam' WHERE id=?")->execute([$id]);
+}
+
+function delete_comment(int $id): void {
+    db()->prepare("DELETE FROM comments WHERE id=?")->execute([$id]);
+}
+
+function get_all_comments(array $opts = []): array {
+    $status = $opts['status'] ?? '';
+    $limit  = (int)($opts['limit'] ?? 50);
+    $offset = (int)($opts['offset'] ?? 0);
+    $where  = $status ? "WHERE c.status=?" : "WHERE 1=1";
+    $params = $status ? [$status] : [];
+    $params[] = $limit;
+    $params[] = $offset;
+    return db_fetchAll(
+        "SELECT c.*, a.title AS article_title, a.slug AS article_slug
+         FROM comments c
+         LEFT JOIN articles a ON a.id = c.article_id
+         $where ORDER BY c.created_at DESC LIMIT ? OFFSET ?",
+        $params
+    );
+}
+
+function count_comments(string $status = ''): int {
+    if ($status) {
+        return db_count("SELECT COUNT(*) FROM comments WHERE status=?", [$status]);
+    }
+    return db_count("SELECT COUNT(*) FROM comments");
+}
+
+// ── Reactions ─────────────────────────────────────────────────────────────────
+
+function get_reaction_counts(int $article_id): array {
+    $rows = db_fetchAll(
+        "SELECT type, count FROM reaction_counts WHERE article_id=?",
+        [$article_id]
+    );
+    $counts = ['like'=>0,'love'=>0,'wow'=>0,'sad'=>0,'helpful'=>0];
+    foreach ($rows as $r) {
+        $counts[$r['type']] = (int)$r['count'];
+    }
+    return $counts;
+}
+
+function add_reaction(int $article_id, string $type): array {
+    $allowed = ['like','love','wow','sad','helpful'];
+    if (!in_array($type, $allowed, true)) {
+        return get_reaction_counts($article_id);
+    }
+    $driver = db_driver();
+    if ($driver === 'sqlite') {
+        db()->prepare(
+            "INSERT INTO reaction_counts (article_id, type, count) VALUES (?,?,1)
+             ON CONFLICT(article_id, type) DO UPDATE SET count = count + 1"
+        )->execute([$article_id, $type]);
+    } else {
+        db()->prepare(
+            "INSERT INTO reaction_counts (article_id, type, count) VALUES (?,?,1)
+             ON DUPLICATE KEY UPDATE count = count + 1"
+        )->execute([$article_id, $type]);
+    }
+    return get_reaction_counts($article_id);
+}
