@@ -93,9 +93,12 @@ admin_sidebar('articles');
               <textarea name="summary" class="form-control" rows="3" required placeholder="संक्षिप्त विवरण..."><?= h($d['summary']) ?></textarea>
             </div>
             <div class="form-group">
-              <label class="form-label">विषयवस्तु (नेपाली) <span style="color:#EF4444">*</span></label>
-              <textarea name="content" class="form-control" rows="14" required placeholder="लेखको पूरा विषयवस्तु..."><?= h($d['content']) ?></textarea>
-              <p class="form-hint">HTML tags प्रयोग गर्न मिल्छ।</p>
+              <label class="form-label flex items-center justify-between">
+                <span>विषयवस्तु (नेपाली) <span style="color:#EF4444">*</span></span>
+                <span id="wc-np" class="text-xs font-normal" style="color:var(--c-muted)"></span>
+              </label>
+              <textarea name="content" id="content-np" class="form-control" rows="14" required placeholder="लेखको पूरा विषयवस्तु..."><?= h($d['content']) ?></textarea>
+              <p class="form-hint">HTML tags प्रयोग गर्न मिल्छ। <kbd style="padding:1px 5px;border-radius:3px;font-size:11px;border:1px solid var(--admin-border)">Ctrl+S</kbd> — तुरुन्त सेभ</p>
             </div>
           </div>
           <div x-show="tab==='en'" x-cloak>
@@ -104,8 +107,11 @@ admin_sidebar('articles');
               <textarea name="summary_np" class="form-control" rows="3" placeholder="Brief summary..."><?= h($d['summary_np']) ?></textarea>
             </div>
             <div class="form-group">
-              <label class="form-label">Content (English)</label>
-              <textarea name="content_np" class="form-control" rows="14" placeholder="Full article content..."><?= h($d['content_np']) ?></textarea>
+              <label class="form-label flex items-center justify-between">
+                <span>Content (English)</span>
+                <span id="wc-en" class="text-xs font-normal" style="color:var(--c-muted)"></span>
+              </label>
+              <textarea name="content_np" id="content-en" class="form-control" rows="14" placeholder="Full article content..."><?= h($d['content_np']) ?></textarea>
             </div>
           </div>
         </div>
@@ -334,5 +340,31 @@ function pickMedia(url) {
   if (previews.length) previews[0].src = url;
 }
 document.getElementById('media-picker-modal').addEventListener('click', function(e){ if(e.target===this) closeMediaPicker(); });
+
+// ── Word count ───────────────────────────────────────────
+function countWords(text) {
+  return text.replace(/<[^>]+>/g,'').trim().split(/\s+/).filter(Boolean).length;
+}
+function updateWC(taId, wcId) {
+  var ta = document.getElementById(taId), wc = document.getElementById(wcId);
+  if (!ta || !wc) return;
+  function update() {
+    var n = countWords(ta.value);
+    wc.textContent = n + ' शब्द · ~' + Math.ceil(n/200) + ' मि पठन';
+  }
+  ta.addEventListener('input', update);
+  update();
+}
+updateWC('content-np','wc-np');
+updateWC('content-en','wc-en');
+
+// ── Ctrl+S to save ──────────────────────────────────────
+document.addEventListener('keydown', function(e){
+  if ((e.ctrlKey||e.metaKey) && e.key==='s') {
+    e.preventDefault();
+    var form = document.querySelector('form[action="/admin/articles/save"]');
+    if (form) form.submit();
+  }
+});
 </script>
 </body></html>
