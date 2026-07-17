@@ -554,6 +554,25 @@ if ($uri === '/privacy') {
 if ($uri === '/terms') {
     require SRC_DIR . '/pages/terms.php'; exit;
 }
+if ($uri === '/newsletter/unsubscribe') {
+    $token = trim($_GET['token'] ?? '');
+    if ($token && newsletter_unsubscribe($token)) {
+        $_flash_success = 'तपाईंको इमेल न्यूजलेटरबाट हटाइयो।';
+    } else {
+        $_flash_error = 'अमान्य लिंक। पहिले नै Unsubscribe भइसकेको हुन सक्छ।';
+    }
+    $page_title = 'Unsubscribe — ' . site_name();
+    require SRC_DIR . '/layout/header.php';
+    echo '<div class="stat-card max-w-md mx-auto text-center py-10">';
+    if (isset($_flash_success)) {
+        echo '<div class="text-green-600 text-base font-semibold mb-3">✓ ' . h($_flash_success) . '</div>';
+    } else {
+        echo '<div class="text-red-600 text-base font-semibold mb-3">⚠ ' . h($_flash_error) . '</div>';
+    }
+    echo '<a href="/" class="btn btn-primary mt-2">गृहपृष्ठमा जानुस्</a></div>';
+    require SRC_DIR . '/layout/footer.php';
+    exit;
+}
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }

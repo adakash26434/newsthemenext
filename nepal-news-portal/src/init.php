@@ -275,6 +275,10 @@ if ($mysql) {
         "ALTER TABLE articles ADD COLUMN image_credit VARCHAR(200) DEFAULT ''",
         "ALTER TABLE articles ADD COLUMN KEY idx_art_trending (trending_score DESC)",
         "ALTER TABLE article_translations ADD FULLTEXT INDEX ft_search (title, summary, body)",
+        "ALTER TABLE authors ADD COLUMN IF NOT EXISTS twitter_url VARCHAR(300) DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN IF NOT EXISTS facebook_url VARCHAR(300) DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN IF NOT EXISTS linkedin_url VARCHAR(300) DEFAULT ''",
+        "ALTER TABLE newsletter_subscribers ADD COLUMN IF NOT EXISTS token VARCHAR(64) DEFAULT ''",
     ];
     foreach ($migrations as $m) {
         try { $db->exec($m); } catch (Exception $e) { /* column already exists */ }
@@ -487,6 +491,10 @@ if ($mysql) {
         "ALTER TABLE articles ADD COLUMN trending_score REAL DEFAULT 0",
         "ALTER TABLE articles ADD COLUMN type TEXT DEFAULT 'news'",
         "ALTER TABLE articles ADD COLUMN image_credit TEXT DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN twitter_url TEXT DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN facebook_url TEXT DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN linkedin_url TEXT DEFAULT ''",
+        "ALTER TABLE newsletter_subscribers ADD COLUMN token TEXT DEFAULT ''",
     ];
     foreach ($migrations as $m) {
         try { $db->exec($m); } catch (Exception $e) { /* already exists */ }

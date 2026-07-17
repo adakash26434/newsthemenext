@@ -31,8 +31,25 @@ require SRC_DIR . '/layout/header.php';
         <h1 class="text-xl font-extrabold mb-1" style="color:var(--c-text)"><?= h($author['name']) ?></h1>
         <?php if ($author['name_np']): ?><p class="text-sm mb-2" style="color:var(--c-muted)"><?= h($author['name_np']) ?></p><?php endif; ?>
         <?php if ($author['bio']): ?><p class="text-sm leading-relaxed" style="color:var(--c-text2)"><?= h($author['bio']) ?></p><?php endif; ?>
-        <div class="mt-2 text-xs flex items-center gap-1" style="color:var(--c-muted)">
-          <?= icon('newspaper','w-3.5 h-3.5') ?> <?= np_number($total) ?> समाचार
+        <div class="mt-2 flex flex-wrap items-center gap-3">
+          <span class="text-xs flex items-center gap-1" style="color:var(--c-muted)">
+            <?= icon('newspaper','w-3.5 h-3.5') ?> <?= np_number($total) ?> समाचार
+          </span>
+          <?php if ($author['twitter_url'] ?? ''): ?>
+          <a href="<?= h($author['twitter_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-xs flex items-center gap-1 hover:underline" style="color:var(--c-primary)">
+            <?= icon('twitter','w-3.5 h-3.5') ?> Twitter
+          </a>
+          <?php endif; ?>
+          <?php if ($author['facebook_url'] ?? ''): ?>
+          <a href="<?= h($author['facebook_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-xs flex items-center gap-1 hover:underline" style="color:var(--c-primary)">
+            <?= icon('facebook','w-3.5 h-3.5') ?> Facebook
+          </a>
+          <?php endif; ?>
+          <?php if ($author['linkedin_url'] ?? ''): ?>
+          <a href="<?= h($author['linkedin_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-xs flex items-center gap-1 hover:underline" style="color:var(--c-primary)">
+            <?= icon('linkedin','w-3.5 h-3.5') ?> LinkedIn
+          </a>
+          <?php endif; ?>
         </div>
       </div>
     </div>

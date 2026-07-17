@@ -32,6 +32,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         redirect('admin/articles');
     }
+    // ── Bulk actions ──────────────────────────────────────
+    if (($_POST['action']??'') === 'bulk') {
+        $bulk_op  = $_POST['bulk_op'] ?? '';
+        $bulk_ids = array_map('intval', (array)($_POST['bulk_ids'] ?? []));
+        $bulk_ids = array_filter($bulk_ids);
+        if ($bulk_ids && in_array($bulk_op, ['publish','draft','delete'])) {
+            foreach ($bulk_ids as $bid) {
+                if ($bulk_op === 'delete') {
+                    delete_article($bid);
+                } else {
+                    db_query("UPDATE articles SET status=? WHERE id=?", [$bulk_op === 'publish' ? 'published' : 'draft', $bid]);
+                }
+            }
+            $n = count($bulk_ids);
+            flash_set('success', np_number($n) . ' लेखहरूमा कार्य सम्पन्न भयो।');
+        }
+        redirect('admin/articles');
+    }
 }
 
 admin_html_start('लेखहरू');
@@ -76,14 +94,34 @@ admin_sidebar('articles');
   <a href="/admin/articles?action=new" class="btn btn-primary gap-1"><?= icon('plus','w-4 h-4') ?> नयाँ लेख थप्नुस्</a>
 </div>
 <?php else: ?>
+<!-- Bulk action bar -->
+<form method="POST" action="/admin/articles" id="bulk-form">
+  <?= csrf_field() ?>
+  <input type="hidden" name="action" value="bulk">
+  <div class="flex items-center gap-2 mb-3 p-2 rounded-lg" style="background:var(--c-surface2);border:1px solid var(--c-border)">
+    <input type="checkbox" id="bulk-all" onchange="document.querySelectorAll('.bulk-chk').forEach(c=>c.checked=this.checked)"
+           class="w-4 h-4 cursor-pointer">
+    <label for="bulk-all" class="text-xs cursor-pointer" style="color:var(--c-muted)">सबै छान्नुस्</label>
+    <select name="bulk_op" class="form-control" style="width:auto;font-size:12px">
+      <option value="">-- कार्य छान्नुस् --</option>
+      <option value="publish">प्रकाशित गर्नुस्</option>
+      <option value="draft">ड्राफ्ट गर्नुस्</option>
+      <option value="delete">मेटाउनुस्</option>
+    </select>
+    <button type="submit" class="btn btn-secondary btn-sm"
+            onclick="var s=document.querySelector('[name=bulk_op]').value;if(s==='delete')return confirm('चयनित लेखहरू मेटाउने?');return s!==''"><?= icon('check','w-3.5 h-3.5') ?> लागू गर्नुस्</button>
+  </div>
+
 <div class="table-wrap">
   <table class="admin-table">
     <thead><tr>
+      <th style="width:30px"></th>
       <th>शीर्षक</th><th>श्रेणी</th><th>लेखक</th><th>स्थिति</th><th>दृश्य</th><th>मिति</th><th>कार्यहरू</th>
     </tr></thead>
     <tbody>
     <?php foreach ($articles as $a): ?>
     <tr>
+      <td><input type="checkbox" name="bulk_ids[]" value="<?= $a['id'] ?>" class="bulk-chk w-4 h-4"></td>
       <td>
         <div class="font-semibold text-sm" style="max-width:280px">
           <?= h(mb_substr($a['title'],0,55)) ?><?= mb_strlen($a['title'])>55?'…':'' ?>
@@ -135,6 +173,7 @@ admin_sidebar('articles');
   </table>
 </div>
 <?php render_pagination($pag); ?>
+</form>
 <?php endif; ?>
 </div>
 </div>

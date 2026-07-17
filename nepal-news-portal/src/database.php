@@ -526,9 +526,20 @@ function delete_static_page(int $id): void {
 function save_newsletter_email(string $email, string $name = ''): bool {
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) return false;
     try {
-        db_insert_ignore('newsletter_subscribers', ['email','name'], [$email, $name]);
+        $token = bin2hex(random_bytes(16));
+        db_insert_ignore('newsletter_subscribers', ['email','name','token'], [$email, $name, $token]);
         return true;
     } catch (Exception $e) { return false; }
+}
+function newsletter_unsubscribe(string $token): bool {
+    if (!preg_match('/^[0-9a-f]{32}$/', $token)) return false;
+    $sub = db_fetch("SELECT id FROM newsletter_subscribers WHERE token = ?", [$token]);
+    if (!$sub) return false;
+    db_query("DELETE FROM newsletter_subscribers WHERE token = ?", [$token]);
+    return true;
+}
+function get_subscriber_by_email(string $email): ?array {
+    return db_fetch("SELECT * FROM newsletter_subscribers WHERE email = ?", [strtolower(trim($email))]);
 }
 function get_subscribers(int $limit = 100, int $offset = 0): array {
     return db_fetchAll(
