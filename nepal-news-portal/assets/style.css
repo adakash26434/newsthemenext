@@ -1069,6 +1069,31 @@ i[data-lucide] { display: inline-flex; flex-shrink: 0; }
 [data-theme="dark"] .market-change.up   { background: #065f46; color: #d1fae5; }
 [data-theme="dark"] .market-change.down { background: #7f1d1d; color: #fee2e2; }
 
+/* ── Live Data Banner ─────────────────────────────────── */
+.live-data-banner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 12px;
+    background: var(--c-surface);
+    border-radius: 12px;
+    border: 1px solid var(--c-border);
+}
+.live-widget {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.live-widget:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 /* ── Bulletin Ticker ────────────────────────────────────── */
 .bulletin-ticker-wrap {
   background: var(--c-surface);
