@@ -46,6 +46,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['media']['name'])) {
     redirect('admin/media');
 }
 
+// AJAX: list files as JSON (for media picker in article form)
+if (isset($_GET['ajax']) && $_GET['ajax'] === 'list') {
+    $out = [];
+    if (is_dir($upload_dir)) {
+        foreach (glob($upload_dir . '/*') as $f) {
+            if (is_file($f) && preg_match('/\.(jpe?g|png|gif|webp|svg)$/i', $f)) {
+                $out[] = ['name' => basename($f), 'url' => $upload_url . '/' . basename($f)];
+            }
+        }
+        usort($out, fn($a,$b) => strcmp($b['name'],$a['name']));
+    }
+    header('Content-Type: application/json');
+    echo json_encode($out);
+    exit;
+}
+
 // List files
 $files = [];
 if (is_dir($upload_dir)) {

@@ -316,7 +316,7 @@ function get_article_by_id(int $id): ?array {
 function save_article(array $data, ?int $id = null): int {
     $fields = ['title','title_np','slug','content','content_np','summary','summary_np',
                'language','status','featured','is_breaking','image_url','category_id','author_id',
-               'published_at','seo_title','seo_desc','type','image_credit'];
+               'published_at','seo_title','seo_desc','type','image_credit','correction_note'];
     if ($id) {
         // Auto-redirect when slug changes
         $old_art = db_fetch("SELECT slug FROM articles WHERE id = ?", [$id]);

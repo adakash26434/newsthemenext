@@ -254,6 +254,17 @@ require SRC_DIR . '/layout/header.php';
       </div>
       <?php endif; ?>
 
+      <!-- Correction Notice -->
+      <?php if (!empty($article['correction_note'])): ?>
+      <div class="mt-5 p-4 rounded-lg flex gap-3" style="background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.3)">
+        <?= icon('alert-triangle','w-4 h-4 flex-shrink-0','w-4 h-4 inline-block align-middle flex-shrink-0','color:rgba(180,120,0,1)') ?>
+        <div>
+          <p class="font-bold text-xs mb-0.5" style="color:rgba(180,120,0,1)"><?= lang_label('सुधार नोट','Correction Notice') ?></p>
+          <p class="text-sm" style="color:var(--c-text2)"><?= nl2br(h($article['correction_note'])) ?></p>
+        </div>
+      </div>
+      <?php endif; ?>
+
       <!-- Comments Section -->
       <div class="mt-8 pt-5" id="comments" style="border-top:1px solid var(--c-border)">
         <h3 class="font-extrabold text-base mb-5 flex items-center gap-2">

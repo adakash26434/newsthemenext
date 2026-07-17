@@ -280,6 +280,7 @@ if ($mysql) {
         "ALTER TABLE authors ADD COLUMN IF NOT EXISTS linkedin_url VARCHAR(300) DEFAULT ''",
         "ALTER TABLE newsletter_subscribers ADD COLUMN IF NOT EXISTS token VARCHAR(64) DEFAULT ''",
         "ALTER TABLE categories ADD COLUMN IF NOT EXISTS description TEXT DEFAULT ''",
+        "ALTER TABLE articles ADD COLUMN IF NOT EXISTS correction_note TEXT DEFAULT NULL",
     ];
     foreach ($migrations as $m) {
         try { $db->exec($m); } catch (Exception $e) { /* column already exists */ }
@@ -488,6 +489,7 @@ if ($mysql) {
         "ALTER TABLE articles ADD COLUMN is_breaking INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE newsletter_subscribers ADD COLUMN name TEXT DEFAULT ''",
         "ALTER TABLE categories ADD COLUMN description TEXT DEFAULT ''",
+        "ALTER TABLE articles ADD COLUMN correction_note TEXT DEFAULT NULL",
         "ALTER TABLE articles ADD COLUMN seo_title TEXT DEFAULT ''",
         "ALTER TABLE articles ADD COLUMN seo_desc TEXT DEFAULT ''",
         "ALTER TABLE articles ADD COLUMN trending_score REAL DEFAULT 0",

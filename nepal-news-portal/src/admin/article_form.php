@@ -244,13 +244,28 @@ admin_sidebar('articles');
         </div>
         <div class="form-group">
           <label class="form-label">अथवा Image URL</label>
-          <input type="url" name="image_url" class="form-control" value="<?= h($d['image_url']) ?>" placeholder="https://...">
+          <div class="flex gap-2">
+            <input type="url" name="image_url" id="image_url_field" class="form-control flex-1" value="<?= h($d['image_url']) ?>" placeholder="https://...">
+            <button type="button" class="btn btn-secondary btn-sm whitespace-nowrap" onclick="openMediaPicker()">
+              <?= icon('images','w-3.5 h-3.5') ?> मिडिया
+            </button>
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Image Credit / स्रोत</label>
           <input type="text" name="image_credit" class="form-control" value="<?= h($d['image_credit']) ?>" placeholder="फोटो स्रोत (जस्तै: AP, Reuters)">
         </div>
       </div>
+
+      <!-- Correction Note -->
+      <?php if ($is_edit): ?>
+      <div class="stat-card space-y-2">
+        <h3 class="font-bold text-sm flex items-center gap-2"><?= icon('alert-triangle','icon-sm') ?> सुधार / Correction Notice</h3>
+        <textarea name="correction_note" class="form-control" rows="2"
+                  placeholder="यदि सुधार भएको छ भने यहाँ उल्लेख गर्नुस्..."><?= h($article['correction_note'] ?? '') ?></textarea>
+        <p class="form-hint">लेखमा अन्तमा बोक्स भित्र देखिन्छ। खाली राख्नुस् भने देखिँदैन।</p>
+      </div>
+      <?php endif; ?>
 
       <!-- Tags -->
       <div class="stat-card">
@@ -276,4 +291,48 @@ admin_sidebar('articles');
 </form>
 </div>
 </div>
+
+<!-- Media Library Picker Modal -->
+<div id="media-picker-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);align-items:center;justify-content:center">
+  <div style="background:var(--admin-card);border-radius:10px;width:min(700px,95vw);max-height:80vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.4)">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--admin-border);display:flex;align-items:center;justify-content:between;gap:2px">
+      <span style="font-weight:700;font-size:14px">मिडिया लाइब्रेरी</span>
+      <button onclick="closeMediaPicker()" style="margin-left:auto;background:none;border:none;font-size:22px;cursor:pointer;color:var(--admin-muted)">&times;</button>
+    </div>
+    <div id="media-picker-grid" style="overflow-y:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">
+      <div style="color:var(--admin-muted);grid-column:1/-1;text-align:center;padding:20px">लोड हुँदैछ...</div>
+    </div>
+    <div style="padding:10px 18px;border-top:1px solid var(--admin-border);font-size:12px;color:var(--admin-muted)">
+      छवि क्लिक गर्नुस् — URL field मा सेट हुन्छ
+    </div>
+  </div>
+</div>
+<script>
+function openMediaPicker() {
+  var m = document.getElementById('media-picker-modal');
+  m.style.display = 'flex';
+  var g = document.getElementById('media-picker-grid');
+  g.innerHTML = '<div style="color:var(--admin-muted);grid-column:1/-1;text-align:center;padding:20px">लोड हुँदैछ...</div>';
+  fetch('/admin/media?ajax=list')
+    .then(function(r){ return r.json(); })
+    .then(function(files){
+      if (!files.length) { g.innerHTML='<div style="color:var(--admin-muted);grid-column:1/-1;text-align:center;padding:20px">मिडिया छैन।</div>'; return; }
+      g.innerHTML = files.map(function(f){
+        return '<div onclick="pickMedia(\''+f.url+'\')" style="cursor:pointer;border-radius:6px;overflow:hidden;background:#111;aspect-ratio:1;border:2px solid transparent;transition:border-color .15s" onmouseover="this.style.borderColor=\'var(--admin-primary)\'" onmouseout="this.style.borderColor=\'transparent\'">'
+          + '<img src="'+f.url+'" alt="" style="width:100%;height:100%;object-fit:cover">'
+          + '</div>';
+      }).join('');
+    })
+    .catch(function(){ g.innerHTML='<div style="color:red;grid-column:1/-1;text-align:center;padding:20px">लोड गर्न सकिएन।</div>'; });
+}
+function closeMediaPicker() { document.getElementById('media-picker-modal').style.display='none'; }
+function pickMedia(url) {
+  document.getElementById('image_url_field').value = url;
+  closeMediaPicker();
+  // show preview
+  var previews = document.querySelectorAll('[data-img-preview]');
+  if (previews.length) previews[0].src = url;
+}
+document.getElementById('media-picker-modal').addEventListener('click', function(e){ if(e.target===this) closeMediaPicker(); });
+</script>
 </body></html>
