@@ -21,7 +21,10 @@ $related = get_articles([
     'exclude_id'  => $article['id'],
     'limit'       => 4,
 ]);
-$popular = get_popular_articles(5);
+$popular         = get_popular_articles(5);
+$reaction_counts = get_reaction_counts((int)$article['id']);
+$comments        = get_comments((int)$article['id']);
+$comment_count   = count($comments);
 
 // ── JSON-LD Structured Data (schema.org/NewsArticle) ──────
 $_base_url    = rtrim(setting('site_url', ''), '/');
@@ -189,6 +192,25 @@ require SRC_DIR . '/layout/header.php';
         </div>
       </div>
 
+      <!-- Reactions -->
+      <div class="reactions-bar mt-5 pt-4" style="border-top:1px solid var(--c-border)"
+           x-data="reactionBox(<?= (int)$article['id'] ?>, <?= htmlspecialchars(json_encode($reaction_counts), ENT_QUOTES, 'UTF-8') ?>)">
+        <p class="text-xs font-bold mb-2.5 flex items-center gap-1.5" style="color:var(--c-muted)">
+          <?= icon('smile','w-3.5 h-3.5') ?> तपाईंलाई कस्तो लाग्यो?
+        </p>
+        <div class="flex flex-wrap gap-2">
+          <?php foreach (['like'=>'👍','love'=>'❤️','wow'=>'😮','sad'=>'😢','helpful'=>'🙏'] as $rtype=>$emoji): ?>
+          <button @click="react('<?= $rtype ?>')"
+                  :class="voted==='<?= $rtype ?>' ? 'reacted' : ''"
+                  :disabled="!!voted"
+                  class="reaction-btn">
+            <span><?= $emoji ?></span>
+            <span class="reaction-count" x-text="counts['<?= $rtype ?>'] || 0"></span>
+          </button>
+          <?php endforeach; ?>
+        </div>
+      </div>
+
       <!-- Author bio -->
       <?php if ($article['author_bio'] || $article['author_avatar']): ?>
       <div class="mt-6 p-4 rounded-lg flex gap-4" style="background:var(--c-surface2);border:1px solid var(--c-border)">
@@ -209,6 +231,82 @@ require SRC_DIR . '/layout/header.php';
         </div>
       </div>
       <?php endif; ?>
+
+      <!-- Comments Section -->
+      <div class="mt-8 pt-5" id="comments" style="border-top:1px solid var(--c-border)">
+        <h3 class="font-extrabold text-base mb-5 flex items-center gap-2">
+          <?= icon('message-circle','w-4 h-4') ?> टिप्पणीहरू
+          <?php if ($comment_count > 0): ?>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                style="background:var(--c-primary);color:#fff">
+            <?= np_number($comment_count) ?>
+          </span>
+          <?php endif; ?>
+        </h3>
+        <?php if (!empty($comments)): ?>
+        <div class="space-y-4 mb-6">
+          <?php foreach ($comments as $cmt): ?>
+          <div class="comment-item">
+            <div class="comment-avatar"><?= mb_strtoupper(mb_substr($cmt['name'],0,1)) ?></div>
+            <div class="comment-body flex-1">
+              <div class="comment-meta">
+                <span class="comment-name"><?= h($cmt['name']) ?></span>
+                <?php if ($cmt['website']): ?>
+                <a href="<?= h($cmt['website']) ?>" target="_blank" rel="nofollow noopener"
+                   style="color:var(--c-primary-lt)" class="text-xs hover:underline">
+                  <?= icon('external-link','w-3 h-3') ?>
+                </a>
+                <?php endif; ?>
+                <span class="comment-date"><?= time_ago($cmt['created_at']) ?></span>
+              </div>
+              <p class="comment-text"><?= nl2br(h($cmt['content'])) ?></p>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <?php endif; ?>
+        <?php
+        $flash_cmt_ok = flash_get('comment_success');
+        $flash_cmt_er = flash_get('comment_error');
+        if (setting('comments_enabled','1') !== '0'):
+        ?>
+        <div class="comment-form-wrap">
+          <h4 class="flex items-center gap-1.5 mb-4">
+            <?= icon('edit-3','w-4 h-4') ?> टिप्पणी लेख्नुस्
+          </h4>
+          <?php if ($flash_cmt_ok): ?>
+          <div class="comment-pending-notice flex items-center gap-1.5 mb-3">
+            <?= icon('check-circle','w-4 h-4') ?> <?= h($flash_cmt_ok) ?>
+          </div>
+          <?php endif; ?>
+          <?php if ($flash_cmt_er): ?>
+          <div class="p-3 rounded text-sm bg-red-50 border border-red-200 text-red-700 mb-3">
+            <?= h($flash_cmt_er) ?>
+          </div>
+          <?php endif; ?>
+          <form method="POST" action="/comment/<?= (int)$article['id'] ?>">
+            <?= csrf_field() ?>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+              <input type="text" name="name" placeholder="नाम *" required maxlength="100"
+                     class="admin-input text-sm" value="<?= h($_POST['name'] ?? '') ?>">
+              <input type="email" name="email" placeholder="इमेल (वैकल्पिक)" maxlength="200"
+                     class="admin-input text-sm" value="<?= h($_POST['email'] ?? '') ?>">
+            </div>
+            <input type="url" name="website" placeholder="वेबसाइट (वैकल्पिक)" maxlength="200"
+                   class="admin-input text-sm w-full mb-3" value="<?= h($_POST['website'] ?? '') ?>">
+            <textarea name="content" rows="4" required maxlength="2000"
+                      placeholder="तपाईंको टिप्पणी लेख्नुस् *"
+                      class="admin-input text-sm w-full mb-3 resize-none"><?= h($_POST['content'] ?? '') ?></textarea>
+            <button type="submit" class="btn btn-primary flex items-center gap-2">
+              <?= icon('send','w-4 h-4') ?> टिप्पणी पठाउनुस्
+            </button>
+            <p class="text-xs mt-2 flex items-center gap-1" style="color:var(--c-muted)">
+              <?= icon('info','w-3 h-3') ?> टिप्पणी समीक्षा पछि प्रकाशित हुन्छ।
+            </p>
+          </form>
+        </div>
+        <?php endif; ?>
+      </div>
 
       <!-- Related articles -->
       <?php if (!empty($related)): ?>
