@@ -248,11 +248,11 @@ require SRC_DIR . '/layout/header.php';
         </div>
       </div>
 
-      <!-- Author bio -->
+      <!-- Author bio - Enhanced -->
       <?php if ($article['author_bio'] || $article['author_avatar']): ?>
-      <div class="mt-6 p-4 rounded-lg flex gap-4" style="background:var(--c-surface2);border:1px solid var(--c-border)">
+      <div class="author-box">
         <?php if ($article['author_avatar']): ?>
-          <img src="<?= h($article['author_avatar']) ?>" alt="" class="w-14 h-14 rounded-full object-cover flex-shrink-0">
+          <div class="author-avatar"><img src="<?= h($article['author_avatar']) ?>" alt=""></div>
         <?php else: ?>
           <div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center" style="background:var(--c-primary)">
             <?= icon('user','w-6 h-6 text-white') ?>
@@ -408,7 +408,7 @@ require SRC_DIR . '/layout/header.php';
         <div class="section-heading mb-4">
           <span class="flex items-center gap-2"><?= icon('layers','w-4 h-4') ?> सम्बन्धित समाचार</span>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="related-grid">
           <?php foreach (array_slice($related,0,4) as $ra): ?>
           <a href="/article/<?= h($ra['slug']) ?>" class="article-card flex gap-3 p-3 group">
             <?php if ($ra['image_url']): ?>
