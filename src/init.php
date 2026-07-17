@@ -43,7 +43,9 @@ if ($mysql) {
         name       VARCHAR(120) NOT NULL,
         name_np    VARCHAR(120),
         slug       VARCHAR(140) NOT NULL,
+        email      VARCHAR(200) DEFAULT '',
         bio        TEXT,
+        role       VARCHAR(100) DEFAULT '',
         avatar_url VARCHAR(500) DEFAULT '',
         created_at DATETIME     DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
@@ -279,6 +281,8 @@ if ($mysql) {
         "ALTER TABLE authors ADD COLUMN IF NOT EXISTS twitter_url VARCHAR(300) DEFAULT ''",
         "ALTER TABLE authors ADD COLUMN IF NOT EXISTS facebook_url VARCHAR(300) DEFAULT ''",
         "ALTER TABLE authors ADD COLUMN IF NOT EXISTS linkedin_url VARCHAR(300) DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN IF NOT EXISTS email VARCHAR(200) DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN IF NOT EXISTS role VARCHAR(100) DEFAULT ''",
         "ALTER TABLE newsletter_subscribers ADD COLUMN IF NOT EXISTS token VARCHAR(64) DEFAULT ''",
         "ALTER TABLE categories ADD COLUMN IF NOT EXISTS description TEXT DEFAULT ''",
         "ALTER TABLE articles ADD COLUMN IF NOT EXISTS correction_note TEXT DEFAULT NULL",
@@ -311,7 +315,9 @@ if ($mysql) {
         name       TEXT NOT NULL,
         name_np    TEXT,
         slug       TEXT NOT NULL UNIQUE,
+        email      TEXT DEFAULT '',
         bio        TEXT,
+        role       TEXT DEFAULT '',
         avatar_url TEXT DEFAULT '',
         created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     );
@@ -500,6 +506,8 @@ if ($mysql) {
         "ALTER TABLE authors ADD COLUMN twitter_url TEXT DEFAULT ''",
         "ALTER TABLE authors ADD COLUMN facebook_url TEXT DEFAULT ''",
         "ALTER TABLE authors ADD COLUMN linkedin_url TEXT DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN email TEXT DEFAULT ''",
+        "ALTER TABLE authors ADD COLUMN role TEXT DEFAULT ''",
         "ALTER TABLE newsletter_subscribers ADD COLUMN token TEXT DEFAULT ''",
     ];
     foreach ($migrations as $m) {
