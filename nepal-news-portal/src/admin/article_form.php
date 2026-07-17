@@ -97,8 +97,9 @@ admin_sidebar('articles');
                 <span>विषयवस्तु (नेपाली) <span style="color:#EF4444">*</span></span>
                 <span id="wc-np" class="text-xs font-normal" style="color:var(--c-muted)"></span>
               </label>
-              <textarea name="content" id="content-np" class="form-control" rows="14" required placeholder="लेखको पूरा विषयवस्तु..."><?= h($d['content']) ?></textarea>
-              <p class="form-hint">HTML tags प्रयोग गर्न मिल्छ। <kbd style="padding:1px 5px;border-radius:3px;font-size:11px;border:1px solid var(--admin-border)">Ctrl+S</kbd> — तुरुन्त सेभ</p>
+              <input type="hidden" name="content" id="content-np" value="<?= h($d['content']) ?>">
+              <div id="quill-np" class="bg-white text-gray-900"><?= $d['content'] ?></div>
+              <p class="form-hint">Rich text editor प्रयोग गर्नुस्। <kbd style="padding:1px 5px;border-radius:3px;font-size:11px;border:1px solid var(--admin-border)">Ctrl+S</kbd> — तुरुन्त सेभ</p>
             </div>
           </div>
           <div x-show="tab==='en'" x-cloak>
@@ -111,7 +112,8 @@ admin_sidebar('articles');
                 <span>Content (English)</span>
                 <span id="wc-en" class="text-xs font-normal" style="color:var(--c-muted)"></span>
               </label>
-              <textarea name="content_np" id="content-en" class="form-control" rows="14" placeholder="Full article content..."><?= h($d['content_np']) ?></textarea>
+              <input type="hidden" name="content_np" id="content-en" value="<?= h($d['content_np']) ?>">
+              <div id="quill-en" class="bg-white text-gray-900"><?= $d['content_np'] ?></div>
             </div>
           </div>
         </div>
@@ -129,12 +131,9 @@ admin_sidebar('articles');
         <div class="form-group">
           <label class="form-label">स्थिति</label>
           <select name="status" class="form-control">
-            <option value="draft"     <?= $d['status']==='draft'?'selected':'' ?>>
-              ड्राफ्ट
-            </option>
-            <option value="published" <?= $d['status']==='published'?'selected':'' ?>>
-              प्रकाशित
-            </option>
+            <option value="draft"     <?= $d['status']==='draft'?'selected':'' ?>>ड्राफ्ट</option>
+            <option value="scheduled" <?= $d['status']==='scheduled'?'selected':'' ?>>अनुसूचित (Scheduled)</option>
+            <option value="published" <?= $d['status']==='published'?'selected':'' ?>>प्रकाशित</option>
           </select>
         </div>
         <div class="form-group">
@@ -338,25 +337,22 @@ function pickMedia(url) {
   // show preview
   var previews = document.querySelectorAll('[data-img-preview]');
   if (previews.length) previews[0].src = url;
-}
 document.getElementById('media-picker-modal').addEventListener('click', function(e){ if(e.target===this) closeMediaPicker(); });
 
-// ── Word count ───────────────────────────────────────────
+// ── Word count for Quill ─────────────────────────────────
 function countWords(text) {
   return text.replace(/<[^>]+>/g,'').trim().split(/\s+/).filter(Boolean).length;
 }
-function updateWC(taId, wcId) {
-  var ta = document.getElementById(taId), wc = document.getElementById(wcId);
-  if (!ta || !wc) return;
+function updateQuillWC(quill, wcId) {
+  var wc = document.getElementById(wcId);
+  if (!wc) return;
   function update() {
-    var n = countWords(ta.value);
+    var n = countWords(quill.getText());
     wc.textContent = n + ' शब्द · ~' + Math.ceil(n/200) + ' मि पठन';
   }
-  ta.addEventListener('input', update);
+  quill.on('text-change', update);
   update();
 }
-updateWC('content-np','wc-np');
-updateWC('content-en','wc-en');
 
 // ── Ctrl+S to save ──────────────────────────────────────
 document.addEventListener('keydown', function(e){
@@ -365,69 +361,70 @@ document.addEventListener('keydown', function(e){
     var form = document.querySelector('form[action="/admin/articles/save"]');
     if (form) form.submit();
   }
-// Quill Rich Text Editor Initialization
-(function(){
- var quillNp = null, quillEn = null;
- 
- function initQuill(id, hiddenId, placeholder) {
-   var el = document.getElementById(id);
-   var hidden = document.getElementById(hiddenId);
-   if (!el || el.classList.contains('ql-editor')) return;
-   
-   var q = new Quill('#' + id, {
-     theme: 'snow',
-     placeholder: placeholder,
-     modules: {
-       toolbar: [
-         [{'header': [1, 2, 3, false]}],
-         ['bold', 'italic', 'underline', 'strike'],
-         ['blockquote', 'code-block'],
-         [{'list': 'ordered'}, {'list': 'bullet'}],
-         [{'color': []}, {'background': []}],
-         ['link', 'image', 'video'],
-         ['clean']
-       ]
-     }
-   });
-   
-   // Load existing content
-   if (hidden && hidden.value) {
-     q.root.innerHTML = hidden.value;
-   }
-   
-   // Sync to hidden field on change
-   q.on('text-change', function() {
-     if (hidden) hidden.value = q.root.innerHTML;
-   });
-   
-   return q;
- }
- 
- // Initialize on load
- function initAll() {
-   quillNp = initQuill('quill-np', 'content-np', 'लेखको पूरा विषयवस्तु...');
-   quillEn = initQuill('quill-en', 'content-en', 'Full article content...');
- }
- 
- // Tab switching for Alpine
- window.initQuillTabs = function(tab) {
-   setTimeout(function() {
-     if (tab === 'np' && quillNp === null) {
-       quillNp = initQuill('quill-np', 'content-np', 'लेखको पूरा विषयवस्तु...');
-     }
-     if (tab === 'en' && quillEn === null) {
-       quillEn = initQuill('quill-en', 'content-en', 'Full article content...');
-     }
-   }, 100);
- };
- 
- if (document.readyState === 'loading') {
-   document.addEventListener('DOMContentLoaded', initAll);
- } else {
-   initAll();
- }
-})();
-
 });
+
+// ── Quill Rich Text Editor Initialization ───────────────
+(function(){
+  var quillNp = null, quillEn = null;
+
+  function initQuill(containerId, hiddenId, placeholder) {
+    var container = document.getElementById(containerId);
+    var hidden = document.getElementById(hiddenId);
+    if (!container) return null;
+    if (container.querySelector('.ql-editor')) return null;
+
+    var q = new Quill('#' + containerId, {
+      theme: 'snow',
+      placeholder: placeholder,
+      modules: {
+        toolbar: [
+          [{'header': [1, 2, 3, false]}],
+          ['bold', 'italic', 'underline', 'strike'],
+          ['blockquote', 'code-block'],
+          [{'list': 'ordered'}, {'list': 'bullet'}],
+          [{'color': []}, {'background': []}],
+          ['link', 'image'],
+          ['clean']
+        ]
+      }
+    });
+
+    if (hidden && hidden.value) {
+      q.root.innerHTML = hidden.value;
+    }
+
+    q.on('text-change', function() {
+      if (hidden) hidden.value = q.root.innerHTML;
+    });
+
+    return q;
+  }
+
+  function initAll() {
+    quillNp = initQuill('quill-np', 'content-np', 'लेखको पूरा विषयवस्तु...');
+    quillEn = initQuill('quill-en', 'content-en', 'Full article content...');
+    if (quillNp) updateQuillWC(quillNp, 'wc-np');
+    if (quillEn) updateQuillWC(quillEn, 'wc-en');
+  }
+
+  window.initQuillTabs = function(tab) {
+    setTimeout(function() {
+      if (tab === 'np' && !quillNp) {
+        quillNp = initQuill('quill-np', 'content-np', 'लेखको पूरा विषयवस्तु...');
+        if (quillNp) updateQuillWC(quillNp, 'wc-np');
+      }
+      if (tab === 'en' && !quillEn) {
+        quillEn = initQuill('quill-en', 'content-en', 'Full article content...');
+        if (quillEn) updateQuillWC(quillEn, 'wc-en');
+      }
+    }, 100);
+  };
+
+  if (document.querySelector('[x-data]')) {
+    initAll();
+  } else {
+    document.addEventListener('DOMContentLoaded', initAll);
+  }
+})();
 </script>
 </body></html>

@@ -60,6 +60,33 @@ require SRC_DIR . '/layout/header.php';
 <script type="application/ld+json"><?= $json_ld ?></script>
 <?php endif; ?>
 
+<!-- BreadcrumbList Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "गृहपृष्ठ",
+      "item": "<?= $_base_url ?>"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "<?= h($article['category_name_np'] ?: $article['category_name']) ?>",
+      "item": "<?= $_base_url ?>/category/<?= h($article['category_slug']) ?>"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "<?= h(mb_substr($title_main, 0, 60)) ?><?php if (mb_strlen($title_main) > 60) echo '...'; ?>"
+    }
+  ]
+}
+</script>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
   <!-- ── Main article ── -->

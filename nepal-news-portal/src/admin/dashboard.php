@@ -83,46 +83,81 @@ admin_sidebar('dashboard');
     </table>
   </div>
 
-  <!-- Category breakdown -->
+  <!-- Category breakdown with better chart -->
   <div class="rounded-lg" style="border:1px solid var(--c-admin-border);background:var(--c-admin-surface)">
     <div class="px-5 py-3 flex items-center gap-2" style="border-bottom:1px solid var(--c-admin-border)">
-      <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+      <i data-lucide="pie-chart" class="w-4 h-4"></i>
       <h2 class="font-bold text-sm">श्रेणी अनुसार</h2>
     </div>
-    <div class="p-4 space-y-3">
-      <?php $max_cnt = max(array_column($stats['bycat'], 'cnt') ?: [1]); ?>
-      <?php foreach ($stats['bycat'] as $bc): ?>
-      <div>
-        <div class="flex justify-between text-xs mb-1">
-          <span class="font-semibold"><?= h($bc['name_np'] ?: $bc['name']) ?></span>
-          <span style="color:var(--c-muted)"><?= np_number((int)$bc['cnt']) ?></span>
+    <div class="p-4">
+      <?php if (!empty($stats['bycat'])): ?>
+      <div class="flex items-center gap-6">
+        <!-- Simple doughnut chart -->
+        <div class="relative flex-shrink-0" style="width:100px;height:100px">
+          <svg viewBox="0 0 100 100" style="transform:rotate(-90deg)">
+            <?php 
+              $total = array_sum(array_column($stats['bycat'], 'cnt'));
+              $start = 0;
+              foreach ($stats['bycat'] as $i => $bc):
+                $pct = $total > 0 ? ($bc['cnt'] / $total) * 100 : 0;
+                $dash = ($pct / 100) * 251.2;
+                $color = $bc['color'] ?: sprintf('#%06X', mt_rand(0x333333, 0xFFFFFF));
+            ?>
+            <circle cx="50" cy="50" r="40" fill="none" stroke="<?= h($color) ?>" stroke-width="12"
+                    stroke-dasharray="<?= $dash ?> 251.2" stroke-dashoffset="<?= -$start ?>"
+                    style="transition:stroke-dasharray 0.5s ease" />
+            <?php $start += $dash; endforeach; ?>
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center">
+            <span class="text-xs font-bold" style="color:var(--c-text)"><?= np_number((int)$total) ?></span>
+          </div>
         </div>
-        <div class="rounded-full h-1.5" style="background:var(--c-border2)">
-          <div class="rounded-full h-1.5 transition-all" style="background:<?= h($bc['color']?:accent_color()) ?>;width:<?= $max_cnt>0?round(($bc['cnt']/$max_cnt)*100):0 ?>%"></div>
+        <!-- Legend -->
+        <div class="flex-1 space-y-2 max-h-48 overflow-y-auto">
+          <?php foreach ($stats['bycat'] as $bc): ?>
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:<?= h($bc['color']?:accent_color()) ?>"></span>
+              <span class="text-xs truncate"><?= h($bc['name_np'] ?: $bc['name']) ?></span>
+            </div>
+            <span class="text-xs font-semibold flex-shrink-0" style="color:var(--c-muted)"><?= np_number((int)$bc['cnt']) ?></span>
+          </div>
+          <?php endforeach; ?>
         </div>
       </div>
-      <?php endforeach; ?>
+      <?php else: ?>
+      <p class="text-sm text-center" style="color:var(--c-muted)">कुनै श्रेणी छैन</p>
+      <?php endif; ?>
     </div>
   </div>
 </div>
 
-<!-- View chart (last 7 days) -->
+<!-- View chart (last 14 days) - improved -->
 <?php if (!empty($stats['view_chart'])): ?>
 <div class="mt-6 rounded-lg p-5" style="border:1px solid var(--c-admin-border);background:var(--c-admin-surface)">
   <h2 class="font-bold text-sm mb-4 flex items-center gap-2">
-    <i data-lucide="trending-up" class="w-4 h-4"></i> पछिल्लो ७ दिन — दैनिक दृश्य
+    <i data-lucide="trending-up" class="w-4 h-4"></i> पछिल्लो १४ दिन — दैनिक दृश्य
   </h2>
   <?php
     $max_v = max(array_column($stats['view_chart'], 'views') ?: [1]);
     $max_v = max($max_v, 1);
+    $total_views = array_sum(array_column($stats['view_chart'], 'views'));
+    $avg_views = count($stats['view_chart']) > 0 ? round($total_views / count($stats['view_chart'])) : 0;
   ?>
-  <div class="flex items-end gap-2" style="height:80px">
+  <div class="flex gap-4 mb-4 text-xs" style="color:var(--c-muted)">
+    <span>जम्मा: <strong style="color:var(--c-text)"><?= np_number($total_views) ?></strong></span>
+    <span>औसत: <strong style="color:var(--c-text)"><?= np_number($avg_views) ?>/दिन</strong></span>
+  </div>
+  <div class="flex items-end gap-1" style="height:120px">
     <?php foreach ($stats['view_chart'] as $vc): ?>
     <?php $pct = round(($vc['views'] / $max_v) * 100); $pct = max($pct, 2); ?>
-    <div class="flex-1 flex flex-col items-center gap-1" title="<?= $vc['date'] ?>: <?= $vc['views'] ?> दृश्य">
-      <div class="text-center text-xs" style="color:var(--c-muted);font-size:9px"><?= np_number((int)$vc['views']) ?></div>
-      <div class="w-full rounded-t-sm" style="height:<?= $pct ?>%;background:var(--c-primary);opacity:0.8;min-height:3px;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8"></div>
-      <div class="text-center" style="font-size:9px;color:var(--c-muted)"><?= date('D', strtotime($vc['date'])) ?></div>
+    <div class="flex-1 flex flex-col items-center gap-1 group cursor-pointer" title="<?= $vc['date'] ?>: <?= $vc['views'] ?> दृश्य">
+      <div class="text-center text-xs font-medium px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity" 
+           style="background:var(--c-admin-surface);color:var(--c-text);font-size:10px;white-space:nowrap">
+        <?= np_number((int)$vc['views']) ?>
+      </div>
+      <div class="w-full rounded-t-sm" style="height:<?= $pct ?>%;background:linear-gradient(to top,var(--c-primary),var(--c-primary-lt));min-height:4px;transition:height 0.3s ease"></div>
+      <div class="text-center" style="font-size:9px;color:var(--c-muted)"><?= date('d', strtotime($vc['date'])) ?></div>
     </div>
     <?php endforeach; ?>
   </div>
