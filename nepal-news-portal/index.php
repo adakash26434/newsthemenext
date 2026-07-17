@@ -509,7 +509,7 @@ if ($uri === '/sitemap.xml') {
 }
 
 // ── RSS / Google News ─────────────────────────────────────
-if ($uri === '/rss.xml' || $uri === '/rss' || preg_match('#^/rss/[^/]+$#', $uri) || $uri === '/google-news-sitemap.xml') {
+if ($uri === '/rss.xml' || $uri === '/rss' || preg_match('#^/rss(/[^?]+)?$#', $uri) || $uri === '/google-news-sitemap.xml') {
     require __DIR__ . '/rss.php'; exit;
 }
 

@@ -25,6 +25,7 @@ $popular         = get_popular_articles(5);
 $reaction_counts = get_reaction_counts((int)$article['id']);
 $comments        = get_comments((int)$article['id']);
 $comment_count   = count($comments);
+$prev_next       = get_prev_next_articles((int)$article['id'], $article['published_at'] ?? $article['created_at']);
 
 // ── JSON-LD Structured Data (schema.org/NewsArticle) ──────
 $_base_url    = rtrim(setting('site_url', ''), '/');
@@ -313,6 +314,37 @@ require SRC_DIR . '/layout/header.php';
         </div>
         <?php endif; ?>
       </div>
+
+      <!-- Prev / Next navigation -->
+      <?php if ($prev_next['prev'] || $prev_next['next']): ?>
+      <div class="flex items-stretch gap-3 mt-6 mb-2">
+        <?php if ($prev_next['prev']): ?>
+        <a href="/article/<?= h($prev_next['prev']['slug']) ?>"
+           class="flex-1 flex flex-col gap-1 p-3 rounded-lg hover:shadow-md transition-all"
+           style="background:var(--c-surface);border:1px solid var(--c-border)">
+          <span class="text-xs flex items-center gap-1" style="color:var(--c-muted)">
+            <?= icon('arrow-left','w-3 h-3') ?> अघिल्लो
+          </span>
+          <span class="text-sm font-semibold line-clamp-2 hover:underline" style="color:var(--c-text)">
+            <?= h($prev_next['prev']['title']) ?>
+          </span>
+        </a>
+        <?php else: ?><div class="flex-1"></div><?php endif; ?>
+
+        <?php if ($prev_next['next']): ?>
+        <a href="/article/<?= h($prev_next['next']['slug']) ?>"
+           class="flex-1 flex flex-col gap-1 p-3 rounded-lg hover:shadow-md transition-all text-right"
+           style="background:var(--c-surface);border:1px solid var(--c-border)">
+          <span class="text-xs flex items-center gap-1 justify-end" style="color:var(--c-muted)">
+            अर्को <?= icon('arrow-right','w-3 h-3') ?>
+          </span>
+          <span class="text-sm font-semibold line-clamp-2 hover:underline" style="color:var(--c-text)">
+            <?= h($prev_next['next']['title']) ?>
+          </span>
+        </a>
+        <?php else: ?><div class="flex-1"></div><?php endif; ?>
+      </div>
+      <?php endif; ?>
 
       <!-- Related articles -->
       <?php if (!empty($related)): ?>

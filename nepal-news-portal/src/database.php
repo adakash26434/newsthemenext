@@ -180,6 +180,17 @@ function get_all_tags(): array { return get_tags(); }
 function get_tag_by_slug(string $slug): ?array {
     return db_fetch("SELECT * FROM tags WHERE slug = ?", [$slug]);
 }
+function get_prev_next_articles(int $article_id, string $published_at): array {
+    $prev = db_fetch(
+        "SELECT id, title, slug FROM articles WHERE status='published' AND (published_at < ? OR (published_at = ? AND id < ?)) ORDER BY published_at DESC, id DESC LIMIT 1",
+        [$published_at, $published_at, $article_id]
+    );
+    $next = db_fetch(
+        "SELECT id, title, slug FROM articles WHERE status='published' AND (published_at > ? OR (published_at = ? AND id > ?)) ORDER BY published_at ASC, id ASC LIMIT 1",
+        [$published_at, $published_at, $article_id]
+    );
+    return ['prev' => $prev, 'next' => $next];
+}
 function get_most_commented_articles(int $limit = 5): array {
     return db_fetchAll(
         "SELECT a.id, a.title, a.slug, a.image_url, a.published_at, a.views,
