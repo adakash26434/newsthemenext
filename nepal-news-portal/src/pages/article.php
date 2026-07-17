@@ -23,8 +23,38 @@ $related = get_articles([
 ]);
 $popular = get_popular_articles(5);
 
+// ── JSON-LD Structured Data (schema.org/NewsArticle) ──────
+$_base_url    = rtrim(setting('site_url', ''), '/');
+$canonical_url = $_base_url . '/article/' . $article['slug'];
+$json_ld = json_encode([
+    '@context'         => 'https://schema.org',
+    '@type'            => 'NewsArticle',
+    'headline'         => strip_tags($title_main),
+    'description'      => $page_desc,
+    'image'            => $article['image_url'] ? [$_base_url . $article['image_url']] : [],
+    'datePublished'    => date('c', strtotime($article['published_at'] ?? $article['created_at'])),
+    'dateModified'     => date('c', strtotime($article['updated_at'] ?? $article['published_at'] ?? $article['created_at'])),
+    'author'           => [
+        '@type' => 'Person',
+        'name'  => $article['author_name'] ?? 'संवाददाता',
+        'url'   => $article['author_slug'] ? $_base_url . '/author/' . $article['author_slug'] : '',
+    ],
+    'publisher'        => [
+        '@type' => 'Organization',
+        'name'  => site_name_en(),
+        'logo'  => ['@type' => 'ImageObject', 'url' => $_base_url . site_logo_url()],
+    ],
+    'mainEntityOfPage' => ['@type' => 'WebPage', '@id' => $canonical_url],
+    'inLanguage'       => current_lang() === 'en' ? 'en-NP' : 'ne-NP',
+    'articleSection'   => $article['category_name_np'] ?: $article['category_name'],
+    'keywords'         => implode(', ', array_column($article['tags'] ?? [], 'name')),
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
 require SRC_DIR . '/layout/header.php';
 ?>
+<?php if (!empty($json_ld)): ?>
+<script type="application/ld+json"><?= $json_ld ?></script>
+<?php endif; ?>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -75,6 +105,10 @@ require SRC_DIR . '/layout/header.php';
         <span class="flex items-center gap-1">
           <?= icon('calendar','w-3.5 h-3.5') ?>
           <?= format_date($article['published_at']??$article['created_at'], false) ?>
+        </span>
+        <span class="flex items-center gap-1" title="बिक्रम सम्वत्">
+          <?= icon('calendar-days','w-3 h-3') ?>
+          <?= format_bs_date($article['published_at'] ?? $article['created_at']) ?>
         </span>
         <span class="flex items-center gap-1">
           <?= icon('eye','w-3.5 h-3.5') ?> <?= np_number((int)$article['views']) ?> दृश्य

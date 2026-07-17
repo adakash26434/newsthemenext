@@ -28,6 +28,7 @@ try {
 }
 
 $uri  = strtok($_SERVER['REQUEST_URI'], '?');
+$uri  = rawurldecode($uri);          // decode Nepali/Unicode slugs
 $uri  = rtrim($uri, '/') ?: '/';
 $meth = $_SERVER['REQUEST_METHOD'];
 
@@ -85,10 +86,15 @@ if ($meth === 'POST') {
             'featured'     => isset($_POST['featured']) ? 1 : 0,
             'is_breaking'  => isset($_POST['is_breaking']) ? 1 : 0,
             'image_url'    => $image_url,
+            'image_credit' => trim($_POST['image_credit'] ?? ''),
             'category_id'  => (int)($_POST['category_id'] ?? 0),
             'author_id'    => (int)($_POST['author_id'] ?? 0),
             'published_at' => $pub ?: date('Y-m-d H:i:s'),
             'tag_ids'      => array_map('intval', $_POST['tag_ids'] ?? []),
+            'seo_title'    => trim($_POST['seo_title'] ?? ''),
+            'seo_desc'     => trim($_POST['seo_desc'] ?? ''),
+            'type'         => in_array($_POST['type']??'',['news','video','photo-gallery','opinion'])
+                              ? $_POST['type'] : 'news',
         ];
         if (!$data['title'] || !$data['category_id'] || !$data['author_id']) {
             flash_set('error', 'शीर्षक, श्रेणी र लेखक अनिवार्य छ।');
@@ -342,6 +348,74 @@ if ($meth === 'POST') {
         redirect('admin/pages');
     }
 
+    // ── ePaper (admin) ───────────────────────────────────
+    if ($uri === '/admin/epaper/save') {
+        admin_check(); csrf_check();
+        $id     = (int)($_POST['id'] ?? 0) ?: null;
+        $cover  = trim($_POST['cover_image'] ?? '');
+        $up     = handle_upload('cover_file', 'epapers');
+        if ($up) $cover = $up;
+        $pdf    = trim($_POST['pdf_path'] ?? '');
+        $pdf_up = handle_pdf_upload('pdf_file');
+        if ($pdf_up) $pdf = $pdf_up;
+        $data = [
+            'edition_date' => trim($_POST['edition_date'] ?? date('Y-m-d')),
+            'headline'     => trim($_POST['headline'] ?? ''),
+            'cover_image'  => $cover,
+            'pdf_path'     => $pdf,
+        ];
+        save_epaper($data, $id);
+        flash_set('success', 'ई-पेपर सेभ गरियो।');
+        redirect('admin/epaper');
+    }
+    if ($uri === '/admin/epaper/delete') {
+        admin_check(); csrf_check();
+        delete_epaper((int)($_POST['id'] ?? 0));
+        flash_set('success', 'ई-पेपर मेटाइयो।');
+        redirect('admin/epaper');
+    }
+
+    // ── Market Widgets (admin) ───────────────────────────
+    if ($uri === '/admin/market/save') {
+        admin_check(); csrf_check();
+        $id = (int)($_POST['id'] ?? 0) ?: null;
+        $data = [
+            'widget_type' => trim($_POST['widget_type'] ?? 'forex'),
+            'label'       => trim($_POST['label'] ?? ''),
+            'value'       => trim($_POST['value'] ?? ''),
+            'change_pct'  => $_POST['change_pct'] !== '' ? (float)($_POST['change_pct'] ?? 0) : null,
+            'sort_order'  => (int)($_POST['sort_order'] ?? 0),
+        ];
+        if (!$data['label']) { flash_set('error', 'लेबल अनिवार्य छ।'); redirect('admin/market'); }
+        save_market_widget($data, $id);
+        flash_set('success', 'मार्केट डेटा सेभ गरियो।');
+        redirect('admin/market');
+    }
+    if ($uri === '/admin/market/delete') {
+        admin_check(); csrf_check();
+        delete_market_widget((int)($_POST['id'] ?? 0));
+        flash_set('success', 'मार्केट डेटा मेटाइयो।');
+        redirect('admin/market');
+    }
+
+    // ── Redirect Manager (admin) ─────────────────────────
+    if ($uri === '/admin/redirects/save') {
+        admin_check(); csrf_check();
+        $old = trim($_POST['old_path'] ?? '');
+        $new = trim($_POST['new_path'] ?? '');
+        $code = (int)($_POST['status_code'] ?? 301);
+        if (!$old || !$new) { flash_set('error', 'दुवै URL अनिवार्य छ।'); redirect('admin/redirects'); }
+        save_redirect($old, $new, $code);
+        flash_set('success', 'रिडाइरेक्ट सेभ गरियो।');
+        redirect('admin/redirects');
+    }
+    if ($uri === '/admin/redirects/delete') {
+        admin_check(); csrf_check();
+        delete_redirect((int)($_POST['id'] ?? 0));
+        flash_set('success', 'रिडाइरेक्ट मेटाइयो।');
+        redirect('admin/redirects');
+    }
+
     // ── Newsletter subscribe ──────────────────────────────
     if ($uri === '/newsletter/subscribe') {
         csrf_check();
@@ -398,8 +472,11 @@ if ($uri === '/admin/settings')   { admin_check(); require SRC_DIR . '/admin/set
 if ($uri === '/admin/events')     { admin_check(); require SRC_DIR . '/admin/events.php'; exit; }
 if ($uri === '/admin/events/gallery')       { admin_check(); require SRC_DIR . '/admin/event_gallery.php'; exit; }
 if ($uri === '/admin/events/registrations') { admin_check(); require SRC_DIR . '/admin/event_registrations.php'; exit; }
-if ($uri === '/admin/pages')      { admin_check(); require SRC_DIR . '/admin/static_pages.php'; exit; }
-if ($uri === '/admin/subscribers'){ admin_check(); require SRC_DIR . '/admin/subscribers.php'; exit; }
+if ($uri === '/admin/pages')        { admin_check(); require SRC_DIR . '/admin/static_pages.php'; exit; }
+if ($uri === '/admin/subscribers')  { admin_check(); require SRC_DIR . '/admin/subscribers.php'; exit; }
+if ($uri === '/admin/epaper')       { admin_check(); require SRC_DIR . '/admin/epaper.php'; exit; }
+if ($uri === '/admin/market')       { admin_check(); require SRC_DIR . '/admin/market_widgets.php'; exit; }
+if ($uri === '/admin/redirects')    { admin_check(); require SRC_DIR . '/admin/redirects.php'; exit; }
 
 // CSV export registrations
 if ($uri === '/admin/events/registrations/export') {
@@ -424,6 +501,11 @@ if ($uri === '/sitemap.xml') {
     require __DIR__ . '/sitemap.php'; exit;
 }
 
+// ── RSS / Google News ─────────────────────────────────────
+if ($uri === '/rss.xml' || $uri === '/rss' || preg_match('#^/rss/[^/]+$#', $uri) || $uri === '/google-news-sitemap.xml') {
+    require __DIR__ . '/rss.php'; exit;
+}
+
 // ── Public routes ─────────────────────────────────────────
 if ($uri === '/') {
     require SRC_DIR . '/pages/home.php'; exit;
@@ -443,6 +525,9 @@ if ($m = route_match('/author/{slug}', $uri)) {
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }
+if ($uri === '/epaper' || $uri === '/epaper/') {
+    require SRC_DIR . '/pages/epaper.php'; exit;
+}
 if ($uri === '/events' || $uri === '/events/') {
     require SRC_DIR . '/pages/events.php'; exit;
 }
@@ -459,6 +544,17 @@ if ($m = route_match('/page/{slug}', $uri)) {
     $_slug = $m[0];
     require SRC_DIR . '/pages/static_page.php'; exit;
 }
+
+// ── Redirect lookup (before 404) ─────────────────────────
+try {
+    $redir = find_redirect($uri);
+    if ($redir) {
+        increment_redirect_hit((int)$redir['id']);
+        http_response_code((int)$redir['status_code'] ?: 301);
+        header('Location: ' . $redir['new_path']);
+        exit;
+    }
+} catch (\Exception $e) { /* redirects table not yet created */ }
 
 // 404
 http_response_code(404);

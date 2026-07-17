@@ -8,10 +8,15 @@ $articles = [];
 $pag      = null;
 
 if ($q !== '') {
-    $opts     = ['status'=>'published','search'=>$q];
+    // Use advanced FTS-style search and log the query
+    $offset   = ($page - 1) * $per_page;
+    $articles = search_articles_advanced($q, ['limit' => $per_page, 'offset' => $offset]);
+    // For total count, fall back to count_articles (advanced search returns all matching rows)
+    $opts     = ['status' => 'published', 'search' => $q];
     $total    = count_articles($opts);
     $pag      = paginate($total, $per_page, $page, '/search?q='.urlencode($q).'&page={page}');
-    $articles = get_articles(array_merge($opts, ['limit'=>$per_page,'offset'=>$pag['offset']]));
+    // Log search query and result count
+    try { log_search($q, $total); } catch (Exception $_e) {}
 }
 
 $page_title = ($q ? '"' . h($q) . '" खोजको नतिजा' : 'समाचार खोज्नुस्') . ' — ' . site_name();

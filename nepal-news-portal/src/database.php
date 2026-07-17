@@ -269,8 +269,15 @@ function get_article_by_id(int $id): ?array {
 }
 function save_article(array $data, ?int $id = null): int {
     $fields = ['title','title_np','slug','content','content_np','summary','summary_np',
-               'language','status','featured','is_breaking','image_url','category_id','author_id','published_at'];
+               'language','status','featured','is_breaking','image_url','category_id','author_id',
+               'published_at','seo_title','seo_desc','type','image_credit'];
     if ($id) {
+        // Auto-redirect when slug changes
+        $old_art = db_fetch("SELECT slug FROM articles WHERE id = ?", [$id]);
+        if ($old_art && isset($data['slug']) && trim($old_art['slug']) !== trim($data['slug'])) {
+            try { save_redirect('/article/' . $old_art['slug'], '/article/' . $data['slug']); }
+            catch (\Exception $e) { /* graceful — redirects table may not exist yet */ }
+        }
         $sets = implode(',', array_map(fn($f) => "$f=?", $fields));
         $vals = array_map(fn($f) => $data[$f] ?? null, $fields);
         $vals[] = date('Y-m-d H:i:s');
@@ -290,6 +297,10 @@ function save_article(array $data, ?int $id = null): int {
         $st = get_db()->prepare("$ignore INTO article_tags (article_id, tag_id) VALUES (?, ?)");
         foreach ($data['tag_ids'] as $tid) $st->execute([$new_id, (int)$tid]);
     }
+    // Recalculate trending scores when article is published
+    if (($data['status'] ?? '') === 'published') {
+        try { recalculate_trending_scores(); } catch (\Exception $e) {}
+    }
     return $new_id;
 }
 function delete_article(int $id): void {
@@ -297,6 +308,7 @@ function delete_article(int $id): void {
 }
 function increment_views(int $id): void {
     db_query("UPDATE articles SET views = views + 1 WHERE id = ?", [$id]);
+    try { log_article_view($id); } catch (\Exception $e) {}
 }
 function get_popular_articles(int $limit = 5): array {
     return get_articles(['status'=>'published', 'limit'=>$limit, 'order'=>'a.views DESC']);
@@ -481,6 +493,220 @@ function get_subscribers(int $limit = 100, int $offset = 0): array {
 }
 function count_subscribers(): int {
     return db_count("SELECT COUNT(*) FROM newsletter_subscribers");
+}
+
+// ── ePaper ─────────────────────────────────────────────────
+function get_epapers(int $limit = 50, int $offset = 0): array {
+    return db_fetchAll(
+        "SELECT * FROM epapers ORDER BY edition_date DESC LIMIT ? OFFSET ?",
+        [$limit, $offset]
+    );
+}
+function get_epaper_latest(): ?array {
+    return db_fetch("SELECT * FROM epapers ORDER BY edition_date DESC LIMIT 1");
+}
+function get_epapers_by_month(int $year, int $month): array {
+    $from = sprintf('%04d-%02d-01', $year, $month);
+    $to   = date('Y-m-t', strtotime($from));
+    return db_fetchAll(
+        "SELECT * FROM epapers WHERE edition_date BETWEEN ? AND ? ORDER BY edition_date DESC",
+        [$from, $to]
+    );
+}
+function get_epaper_by_id(int $id): ?array {
+    return db_fetch("SELECT * FROM epapers WHERE id = ?", [$id]);
+}
+function save_epaper(array $data, ?int $id = null): int {
+    $fields = ['edition_date','headline','pdf_path','cover_image'];
+    if ($id) {
+        $sets = implode(',', array_map(fn($f) => "$f=?", $fields));
+        $vals = array_map(fn($f) => $data[$f] ?? null, $fields);
+        $vals[] = $id;
+        db_query("UPDATE epapers SET $sets WHERE id=?", $vals);
+        return $id;
+    }
+    $cols = implode(',', $fields);
+    $phs  = implode(',', array_fill(0, count($fields), '?'));
+    return db_insert(
+        "INSERT INTO epapers ($cols) VALUES ($phs)",
+        array_map(fn($f) => $data[$f] ?? null, $fields)
+    );
+}
+function delete_epaper(int $id): void {
+    db_query("DELETE FROM epapers WHERE id = ?", [$id]);
+}
+function handle_pdf_upload(string $field): string {
+    if (empty($_FILES[$field]['name'])) return '';
+    $file = $_FILES[$field];
+    if ($file['error'] !== UPLOAD_ERR_OK) return '';
+    $mime = mime_content_type($file['tmp_name']);
+    if ($mime !== 'application/pdf') return '';
+    if ($file['size'] > 50 * 1024 * 1024) return ''; // 50MB max
+    $dir  = BASE_DIR . '/assets/uploads/epapers';
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+    $name = 'epaper-' . date('Y-m-d') . '-' . uniqid() . '.pdf';
+    $dest = $dir . '/' . $name;
+    if (!move_uploaded_file($file['tmp_name'], $dest)) return '';
+    return '/assets/uploads/epapers/' . $name;
+}
+
+// ── Market Widgets ──────────────────────────────────────────
+function get_market_widgets(string $type = ''): array {
+    if ($type) {
+        return db_fetchAll(
+            "SELECT * FROM market_widgets WHERE widget_type = ? ORDER BY sort_order, id",
+            [$type]
+        );
+    }
+    return db_fetchAll("SELECT * FROM market_widgets ORDER BY widget_type, sort_order, id");
+}
+function save_market_widget(array $data, ?int $id = null): int {
+    $fields = ['widget_type','label','value','change_pct','sort_order'];
+    if ($id) {
+        $sets = implode(',', array_map(fn($f) => "$f=?", $fields));
+        $vals = array_map(fn($f) => ($data[$f] !== '' && $data[$f] !== null) ? $data[$f] : null, $fields);
+        $vals[] = $id;
+        db_query("UPDATE market_widgets SET $sets WHERE id=?", $vals);
+        return $id;
+    }
+    $cols = implode(',', $fields);
+    $phs  = implode(',', array_fill(0, count($fields), '?'));
+    return db_insert(
+        "INSERT INTO market_widgets ($cols) VALUES ($phs)",
+        array_map(fn($f) => ($data[$f] !== '' && $data[$f] !== null) ? $data[$f] : null, $fields)
+    );
+}
+function delete_market_widget(int $id): void {
+    db_query("DELETE FROM market_widgets WHERE id = ?", [$id]);
+}
+
+// ── Redirects ──────────────────────────────────────────────
+function get_redirects(): array {
+    return db_fetchAll("SELECT * FROM redirects ORDER BY created_at DESC");
+}
+function find_redirect(string $path): ?array {
+    return db_fetch("SELECT * FROM redirects WHERE old_path = ?", [$path]);
+}
+function save_redirect(string $old_path, string $new_path, int $code = 301): void {
+    if (trim($old_path) === '' || trim($new_path) === '' || $old_path === $new_path) return;
+    try {
+        if (db_driver() === 'mysql') {
+            db_query(
+                "INSERT INTO redirects (old_path, new_path, status_code) VALUES (?, ?, ?)
+                 ON DUPLICATE KEY UPDATE new_path = VALUES(new_path), status_code = VALUES(status_code)",
+                [$old_path, $new_path, $code]
+            );
+        } else {
+            db_query(
+                "INSERT INTO redirects (old_path, new_path, status_code) VALUES (?, ?, ?)
+                 ON CONFLICT(old_path) DO UPDATE SET new_path = excluded.new_path, status_code = excluded.status_code",
+                [$old_path, $new_path, $code]
+            );
+        }
+    } catch (\Exception $e) { /* ignore */ }
+}
+function delete_redirect(int $id): void {
+    db_query("DELETE FROM redirects WHERE id = ?", [$id]);
+}
+function increment_redirect_hit(int $id): void {
+    db_query("UPDATE redirects SET hit_count = hit_count + 1 WHERE id = ?", [$id]);
+}
+
+// ── Article Views Log (trending) ───────────────────────────
+function log_article_view(int $article_id): void {
+    $today = date('Y-m-d');
+    try {
+        if (db_driver() === 'mysql') {
+            db_query(
+                "INSERT INTO article_views_log (article_id, viewed_date, view_count)
+                 VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE view_count = view_count + 1",
+                [$article_id, $today]
+            );
+        } else {
+            db_query(
+                "INSERT INTO article_views_log (article_id, viewed_date, view_count)
+                 VALUES (?, ?, 1) ON CONFLICT(article_id, viewed_date)
+                 DO UPDATE SET view_count = view_count + 1",
+                [$article_id, $today]
+            );
+        }
+    } catch (\Exception $e) { /* table might not exist yet */ }
+}
+function recalculate_trending_scores(): void {
+    try {
+        if (db_driver() === 'mysql') {
+            db_query(
+                "UPDATE articles a SET trending_score = (
+                     SELECT COALESCE(SUM(
+                         CASE WHEN avl.viewed_date >= DATE_SUB(CURDATE(),INTERVAL 1 DAY)  THEN avl.view_count*3
+                              WHEN avl.viewed_date >= DATE_SUB(CURDATE(),INTERVAL 7 DAY)  THEN avl.view_count
+                              ELSE 0 END), 0)
+                     FROM article_views_log avl WHERE avl.article_id = a.id
+                 ) WHERE a.status = 'published'"
+            );
+        } else {
+            db_query(
+                "UPDATE articles SET trending_score = (
+                     SELECT COALESCE(SUM(
+                         CASE WHEN avl.viewed_date >= date('now','-1 day')  THEN avl.view_count*3
+                              WHEN avl.viewed_date >= date('now','-7 days') THEN avl.view_count
+                              ELSE 0 END), 0)
+                     FROM article_views_log avl WHERE avl.article_id = articles.id
+                 ) WHERE articles.status = 'published'"
+            );
+        }
+    } catch (\Exception $e) { /* ignore */ }
+}
+function get_trending_articles(int $limit = 6): array {
+    return get_articles(['status'=>'published','limit'=>$limit,'order'=>'a.trending_score DESC, a.views DESC']);
+}
+
+// ── Search ─────────────────────────────────────────────────
+function search_articles_advanced(string $q, array $opts = []): array {
+    $limit  = (int)($opts['limit']  ?? ARTICLES_PER_PAGE);
+    $offset = (int)($opts['offset'] ?? 0);
+    $q      = trim($q);
+    if ($q === '') return [];
+
+    if (db_driver() === 'mysql') {
+        try {
+            $rows = db_fetchAll(
+                "SELECT a.*, c.name AS category_name, c.name_np AS category_name_np,
+                        c.slug AS category_slug, c.color AS category_color,
+                        au.name AS author_name, au.name_np AS author_name_np,
+                        au.slug AS author_slug, au.avatar_url AS author_avatar,
+                        MATCH(a.title, a.summary, a.content) AGAINST(? IN BOOLEAN MODE) AS _rel
+                 FROM articles a
+                 JOIN categories c  ON c.id = a.category_id
+                 JOIN authors    au ON au.id = a.author_id
+                 WHERE a.status = 'published'
+                   AND (MATCH(a.title, a.summary, a.content) AGAINST(? IN BOOLEAN MODE)
+                        OR a.title LIKE ? OR a.title_np LIKE ?)
+                 ORDER BY _rel DESC, a.published_at DESC
+                 LIMIT ? OFFSET ?",
+                [$q, $q, '%'.$q.'%', '%'.$q.'%', $limit, $offset]
+            );
+            if (!empty($rows)) return $rows;
+        } catch (\Exception $e) { /* FULLTEXT not yet ready, fallback */ }
+    }
+    return get_articles(array_merge($opts, ['search'=>$q,'status'=>'published','limit'=>$limit,'offset'=>$offset]));
+}
+function log_search(string $term, int $result_count): void {
+    try {
+        db_query(
+            "INSERT INTO search_logs (term, result_count) VALUES (?, ?)",
+            [mb_substr(trim($term), 0, 150), $result_count]
+        );
+    } catch (\Exception $e) { /* ignore */ }
+}
+function get_popular_searches(int $limit = 10): array {
+    try {
+        return db_fetchAll(
+            "SELECT term, COUNT(*) AS cnt FROM search_logs
+             WHERE term != '' GROUP BY term ORDER BY cnt DESC LIMIT ?",
+            [$limit]
+        );
+    } catch (\Exception $e) { return []; }
 }
 
 // ── Dashboard stats ────────────────────────────────────────

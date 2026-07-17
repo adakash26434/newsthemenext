@@ -197,6 +197,68 @@ if ($mysql) {
         PRIMARY KEY (id),
         UNIQUE KEY uq_pg_slug (slug)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    CREATE TABLE IF NOT EXISTS epapers (
+        id           INT NOT NULL AUTO_INCREMENT,
+        edition_date DATE,
+        headline     VARCHAR(300) DEFAULT '',
+        pdf_path     VARCHAR(500) DEFAULT '',
+        cover_image  VARCHAR(500) DEFAULT '',
+        created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_ep_date (edition_date)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    CREATE TABLE IF NOT EXISTS article_views_log (
+        id          INT NOT NULL AUTO_INCREMENT,
+        article_id  INT NOT NULL,
+        viewed_date DATE NOT NULL,
+        view_count  INT DEFAULT 1,
+        PRIMARY KEY (id),
+        UNIQUE KEY uniq_art_day (article_id, viewed_date),
+        KEY idx_avl_date (viewed_date)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS market_widgets (
+        id          INT NOT NULL AUTO_INCREMENT,
+        widget_type VARCHAR(30) NOT NULL,
+        label       VARCHAR(100) NOT NULL,
+        value       VARCHAR(100) NOT NULL DEFAULT '',
+        change_pct  DECIMAL(6,2) NULL,
+        sort_order  INT DEFAULT 0,
+        updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_mw_type (widget_type)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    CREATE TABLE IF NOT EXISTS redirects (
+        id          INT NOT NULL AUTO_INCREMENT,
+        old_path    VARCHAR(500) NOT NULL,
+        new_path    VARCHAR(500) NOT NULL,
+        status_code INT DEFAULT 301,
+        hit_count   INT DEFAULT 0,
+        created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_redir_old (old_path(250))
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS search_logs (
+        id           INT NOT NULL AUTO_INCREMENT,
+        term         VARCHAR(200),
+        result_count INT DEFAULT 0,
+        searched_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_sl_term (term(100))
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+    CREATE TABLE IF NOT EXISTS rate_limits (
+        id         INT NOT NULL AUTO_INCREMENT,
+        action_key VARCHAR(200) NOT NULL,
+        attempts   INT DEFAULT 0,
+        expires_at DATETIME,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_rl_key (action_key)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ");
 
     // Migrations for existing MySQL installs
@@ -206,6 +268,13 @@ if ($mysql) {
         "ALTER TABLE advertisements ADD COLUMN end_date DATETIME DEFAULT NULL",
         "ALTER TABLE advertisements ADD COLUMN impressions INT DEFAULT 0",
         "ALTER TABLE articles ADD COLUMN is_breaking TINYINT(1) NOT NULL DEFAULT 0",
+        "ALTER TABLE articles ADD COLUMN seo_title VARCHAR(300) DEFAULT ''",
+        "ALTER TABLE articles ADD COLUMN seo_desc VARCHAR(500) DEFAULT ''",
+        "ALTER TABLE articles ADD COLUMN trending_score FLOAT DEFAULT 0",
+        "ALTER TABLE articles ADD COLUMN type VARCHAR(20) DEFAULT 'news'",
+        "ALTER TABLE articles ADD COLUMN image_credit VARCHAR(200) DEFAULT ''",
+        "ALTER TABLE articles ADD COLUMN KEY idx_art_trending (trending_score DESC)",
+        "ALTER TABLE article_translations ADD FULLTEXT INDEX ft_search (title, summary, body)",
     ];
     foreach ($migrations as $m) {
         try { $db->exec($m); } catch (Exception $e) { /* column already exists */ }
@@ -348,6 +417,51 @@ if ($mysql) {
         updated_at     TEXT DEFAULT (CURRENT_TIMESTAMP)
     );
 
+    CREATE TABLE IF NOT EXISTS epapers (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        edition_date TEXT,
+        headline     TEXT DEFAULT '',
+        pdf_path     TEXT DEFAULT '',
+        cover_image  TEXT DEFAULT '',
+        created_at   TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+    CREATE TABLE IF NOT EXISTS article_views_log (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        article_id  INTEGER NOT NULL,
+        viewed_date TEXT NOT NULL,
+        view_count  INTEGER DEFAULT 1,
+        UNIQUE (article_id, viewed_date)
+    );
+    CREATE TABLE IF NOT EXISTS market_widgets (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        widget_type TEXT NOT NULL,
+        label       TEXT NOT NULL,
+        value       TEXT NOT NULL DEFAULT '',
+        change_pct  REAL NULL,
+        sort_order  INTEGER DEFAULT 0,
+        updated_at  TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+    CREATE TABLE IF NOT EXISTS redirects (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        old_path    TEXT NOT NULL UNIQUE,
+        new_path    TEXT NOT NULL,
+        status_code INTEGER DEFAULT 301,
+        hit_count   INTEGER DEFAULT 0,
+        created_at  TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+    CREATE TABLE IF NOT EXISTS search_logs (
+        id           INTEGER PRIMARY KEY AUTOINCREMENT,
+        term         TEXT,
+        result_count INTEGER DEFAULT 0,
+        searched_at  TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+    CREATE TABLE IF NOT EXISTS rate_limits (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        action_key TEXT NOT NULL UNIQUE,
+        attempts   INTEGER DEFAULT 0,
+        expires_at TEXT
+    );
+
     CREATE INDEX IF NOT EXISTS idx_art_status   ON articles(status);
     CREATE INDEX IF NOT EXISTS idx_art_featured ON articles(featured);
     CREATE INDEX IF NOT EXISTS idx_art_breaking ON articles(is_breaking);
@@ -356,6 +470,8 @@ if ($mysql) {
     CREATE INDEX IF NOT EXISTS idx_ads_pos      ON advertisements(position, active);
     CREATE INDEX IF NOT EXISTS idx_evt_status   ON events(status);
     CREATE INDEX IF NOT EXISTS idx_ereg_evt     ON event_registrations(event_id);
+    CREATE INDEX IF NOT EXISTS idx_ep_date      ON epapers(edition_date);
+    CREATE INDEX IF NOT EXISTS idx_mw_type      ON market_widgets(widget_type);
     ");
 
     // SQLite migrations for existing installs
@@ -366,6 +482,11 @@ if ($mysql) {
         "ALTER TABLE advertisements ADD COLUMN impressions INTEGER DEFAULT 0",
         "ALTER TABLE articles ADD COLUMN is_breaking INTEGER NOT NULL DEFAULT 0",
         "ALTER TABLE newsletter_subscribers ADD COLUMN name TEXT DEFAULT ''",
+        "ALTER TABLE articles ADD COLUMN seo_title TEXT DEFAULT ''",
+        "ALTER TABLE articles ADD COLUMN seo_desc TEXT DEFAULT ''",
+        "ALTER TABLE articles ADD COLUMN trending_score REAL DEFAULT 0",
+        "ALTER TABLE articles ADD COLUMN type TEXT DEFAULT 'news'",
+        "ALTER TABLE articles ADD COLUMN image_credit TEXT DEFAULT ''",
     ];
     foreach ($migrations as $m) {
         try { $db->exec($m); } catch (Exception $e) { /* already exists */ }
@@ -516,6 +637,25 @@ if ($pg_count === 0) {
     ];
     $sp = $db->prepare("INSERT INTO static_pages (slug,title,title_en,body,body_en,show_in_footer,sort_order) VALUES (?,?,?,?,?,?,?)");
     foreach ($pages as $p) $sp->execute($p);
+}
+
+// ── Seed Market Widgets ────────────────────────────────────
+$mw_count = (int)$db->query("SELECT COUNT(*) FROM market_widgets")->fetchColumn();
+if ($mw_count === 0) {
+    $ignore = $mysql ? 'INSERT IGNORE' : 'INSERT OR IGNORE';
+    $db->exec("$ignore INTO market_widgets (widget_type, label, value, change_pct, sort_order) VALUES
+        ('forex',    'USD / NPR', '134.25', 0.15,  1),
+        ('forex',    'EUR / NPR', '145.60', -0.30, 2),
+        ('forex',    'GBP / NPR', '169.80', 0.20,  3),
+        ('forex',    'AUD / NPR', '86.50',  -0.10, 4),
+        ('forex',    'INR / NPR', '1.60',   0.00,  5),
+        ('gold',     'सुन (१० ग्राम)', '१,१२,५००', 0.80, 1),
+        ('gold',     'चाँदी (किलो)',   '१,३२,०००', -0.50, 2),
+        ('nepse',    'नेप्से',    '2,356.14', 1.25, 1),
+        ('nepse',    'Turnover',  'रू. ५.२ अर्ब', 0.00, 2),
+        ('fuel',     'पेट्रोल',  '१८१ प्रतिलिटर',  0.00, 1),
+        ('fuel',     'डिजेल',   '१६९ प्रतिलिटर',  0.00, 2)
+    ");
 }
 
 if (php_sapi_name() === 'cli') {

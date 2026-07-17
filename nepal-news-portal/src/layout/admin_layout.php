@@ -47,6 +47,9 @@ $links = [
   ['events',         '/admin/events',        'calendar-days',    'कार्यक्रम'],
   ['pages',          '/admin/pages',         'file-text',        'पृष्ठहरू'],
   ['subscribers',    '/admin/subscribers',   'mail',             'न्यूजलेटर'],
+  ['epaper',         '/admin/epaper',        'newspaper',        'ई-पेपर'],
+  ['market',         '/admin/market',        'bar-chart-2',      'बजार दर'],
+  ['redirects',      '/admin/redirects',     'corner-right-down','रिडाइरेक्ट'],
   ['settings',       '/admin/settings',      'settings',         'सेटिङ्स'],
 ]; ?>
 <aside class="admin-sidebar" :class="sidebarOpen ? '' : '-translate-x-full'">
@@ -95,6 +98,11 @@ function admin_topbar(string $title = ''): void { ?>
     </span>
   </div>
 </header>
+<?php }
+
+function admin_html_end(): void { ?>
+</div></div>
+</body></html>
 <?php }
 
 function admin_flash(): void {

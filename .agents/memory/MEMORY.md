@@ -1,0 +1,3 @@
+- [Nepal News Portal stack](nepal-news-portal-stack.md) — PHP 8.2 + SQLite(dev)/MySQL(prod), no Composer, Tailwind/Alpine/Lucide CDN, port 3000.
+- [Nepal News Portal URL decode fix](nepal-url-decode.md) — Nepali slug routes need rawurldecode; article JSON-LD must be output in page body (not header.php).
+- [Nepal News Portal DB migrations](nepal-db-migrations.md) — New columns on existing DB: run ALTER TABLE manually via PHP CLI; init.php only runs on fresh DB.

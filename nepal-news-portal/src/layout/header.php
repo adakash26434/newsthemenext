@@ -75,6 +75,8 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
 <script async src="https://www.googletagmanager.com/gtag/js?id=<?= h(setting('google_analytics')) ?>"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','<?= h(setting('google_analytics')) ?>');</script>
 <?php endif; ?>
+<link rel="canonical" href="<?= h(isset($canonical_url) ? $canonical_url : (rtrim(setting('site_url',''), '/') . strtok($_SERVER['REQUEST_URI'] ?? '/', '?'))) ?>">
+<link rel="alternate" type="application/rss+xml" title="<?= h(site_name()) ?> RSS" href="/rss.xml">
 </head>
 <body class="min-h-screen">
 
@@ -93,6 +95,9 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
         TV
       </a>
       <?php endif; ?>
+      <a href="/epaper" class="utility-link flex items-center gap-1">
+        <?= icon('newspaper','w-3 h-3') ?> ई-पेपर
+      </a>
       <a href="/admin" class="utility-link flex items-center gap-1">
         <?= icon('lock','w-3 h-3') ?> Admin
       </a>

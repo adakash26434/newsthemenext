@@ -22,9 +22,13 @@ $d = [
     'featured'     => $article['featured']     ?? 0,
     'is_breaking'  => $article['is_breaking']  ?? 0,
     'image_url'    => $article['image_url']    ?? '',
+    'image_credit' => $article['image_credit'] ?? '',
     'category_id'  => $article['category_id']  ?? '',
     'author_id'    => $article['author_id']    ?? '',
     'published_at' => $article['published_at'] ?? date('Y-m-d H:i:s'),
+    'type'         => $article['type']         ?? 'news',
+    'seo_title'    => $article['seo_title']    ?? '',
+    'seo_desc'     => $article['seo_desc']     ?? '',
 ];
 
 admin_html_start($form_title);
@@ -199,6 +203,31 @@ admin_sidebar('articles');
         </div>
       </div>
 
+      <!-- Article Type -->
+      <div class="stat-card">
+        <h3 class="font-bold text-sm mb-3 flex items-center gap-2"><?= icon('tag','icon-sm') ?> प्रकार</h3>
+        <select name="type" class="form-control">
+          <?php foreach (['news'=>'समाचार (News)','video'=>'भिडिओ (Video)','photo-gallery'=>'फोटो ग्यालेरी','opinion'=>'विचार (Opinion)'] as $tv=>$tl): ?>
+          <option value="<?= $tv ?>" <?= $d['type']===$tv?'selected':'' ?>><?= h($tl) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
+      <!-- SEO fields -->
+      <div class="stat-card space-y-3">
+        <h3 class="font-bold text-sm flex items-center gap-2"><?= icon('search','icon-sm') ?> SEO / मेटाडाटा</h3>
+        <div class="form-group">
+          <label class="form-label">SEO शीर्षक <span class="text-xs" style="color:var(--c-muted)">(खाली छाड्न सक्नुहुन्छ — मुख्य शीर्षक प्रयोग हुनेछ)</span></label>
+          <input type="text" name="seo_title" class="form-control" maxlength="300"
+                 value="<?= h($d['seo_title']) ?>" placeholder="Google/Facebook मा देखिने शीर्षक">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Meta Description <span class="text-xs" style="color:var(--c-muted)">(१५०-१६० अक्षर)</span></label>
+          <textarea name="seo_desc" class="form-control" rows="2" maxlength="500"
+                    placeholder="Google search परिणाममा देखिने विवरण"><?= h($d['seo_desc']) ?></textarea>
+        </div>
+      </div>
+
       <!-- Featured image -->
       <div class="stat-card space-y-3">
         <h3 class="font-bold text-sm flex items-center gap-2">
@@ -216,6 +245,10 @@ admin_sidebar('articles');
         <div class="form-group">
           <label class="form-label">अथवा Image URL</label>
           <input type="url" name="image_url" class="form-control" value="<?= h($d['image_url']) ?>" placeholder="https://...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Image Credit / स्रोत</label>
+          <input type="text" name="image_credit" class="form-control" value="<?= h($d['image_credit']) ?>" placeholder="फोटो स्रोत (जस्तै: AP, Reuters)">
         </div>
       </div>
 

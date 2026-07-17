@@ -11,6 +11,10 @@ $popular        = get_popular_articles(6);
 $all_tags       = get_tags();
 $categories_all = get_categories();
 $upcoming_evts  = get_upcoming_events(4);
+$trending       = get_trending_articles(6);
+$forex_widgets  = get_market_widgets('forex');
+$gold_widgets   = get_market_widgets('gold');
+$nepse_widgets  = get_market_widgets('nepse');
 
 // Per-category article blocks
 $cat_articles = [];
@@ -32,6 +36,30 @@ require SRC_DIR . '/layout/header.php';
 
   <!-- ════ Main column ════ -->
   <div class="lg:col-span-2">
+
+    <!-- ── Bulletin ticker (2nd headline strip) ── -->
+    <?php
+    $bulletin_items = get_articles(['status'=>'published','is_breaking'=>false,'limit'=>10,'order'=>'a.published_at DESC']);
+    if (!empty($bulletin_items)):
+    ?>
+    <div class="bulletin-ticker-wrap mb-5">
+      <div class="bulletin-label">
+        <?= icon('radio','w-3 h-3') ?> बुलेटिन
+      </div>
+      <div class="bulletin-scroll">
+        <div class="bulletin-scroll-inner">
+          <?php for ($bi=0; $bi<2; $bi++): // duplicate for seamless loop ?>
+          <?php foreach ($bulletin_items as $bi_art): ?>
+          <a href="/article/<?= h($bi_art['slug']) ?>" class="bulletin-item">
+            <?= h(mb_substr($bi_art['title'], 0, 60)) ?><?= mb_strlen($bi_art['title'])>60?'…':'' ?>
+          </a>
+          <span class="bulletin-sep">◆</span>
+          <?php endforeach; ?>
+          <?php endfor; ?>
+        </div>
+      </div>
+    </div>
+    <?php endif; ?>
 
     <!-- Top Stories horizontal scroll -->
     <?php if (!empty($top_stories)): ?>
@@ -201,6 +229,87 @@ require SRC_DIR . '/layout/header.php';
 
     <!-- Sidebar top ad -->
     <?php render_ads('sidebar-top'); ?>
+
+    <!-- Market widgets (Forex / Gold / NEPSE) -->
+    <?php if (!empty($forex_widgets) || !empty($gold_widgets) || !empty($nepse_widgets)): ?>
+    <div class="market-widget-card mb-5">
+      <?php if (!empty($forex_widgets)): ?>
+      <div class="market-widget-header"><?= icon('globe','w-3 h-3') ?> विदेशी मुद्रा दर</div>
+      <?php foreach ($forex_widgets as $mw): ?>
+      <div class="market-row">
+        <span class="market-label"><?= h($mw['label']) ?></span>
+        <div class="flex items-center gap-2">
+          <span class="market-value">रू <?= h($mw['value']) ?></span>
+          <?php if ($mw['change_pct'] !== null): ?>
+          <?php $chg = (float)$mw['change_pct']; $cls = $chg>0?'up':($chg<0?'down':'flat'); ?>
+          <span class="market-change <?= $cls ?>"><?= $chg>0?'+':'' ?><?= number_format($chg,2) ?>%</span>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php endforeach; ?>
+      <?php endif; ?>
+
+      <?php if (!empty($gold_widgets)): ?>
+      <div class="market-widget-header"><?= icon('gem','w-3 h-3') ?> सुन / चाँदी</div>
+      <?php foreach ($gold_widgets as $mw): ?>
+      <div class="market-row">
+        <span class="market-label"><?= h($mw['label']) ?></span>
+        <div class="flex items-center gap-2">
+          <span class="market-value"><?= h($mw['value']) ?></span>
+          <?php if ($mw['change_pct'] !== null): ?>
+          <?php $chg = (float)$mw['change_pct']; $cls = $chg>0?'up':($chg<0?'down':'flat'); ?>
+          <span class="market-change <?= $cls ?>"><?= $chg>0?'+':'' ?><?= number_format($chg,2) ?>%</span>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php endforeach; ?>
+      <?php endif; ?>
+
+      <?php if (!empty($nepse_widgets)): ?>
+      <div class="market-widget-header"><?= icon('trending-up','w-3 h-3') ?> नेप्से</div>
+      <?php foreach ($nepse_widgets as $mw): ?>
+      <div class="market-row">
+        <span class="market-label"><?= h($mw['label']) ?></span>
+        <div class="flex items-center gap-2">
+          <span class="market-value"><?= h($mw['value']) ?></span>
+          <?php if ($mw['change_pct'] !== null): ?>
+          <?php $chg = (float)$mw['change_pct']; $cls = $chg>0?'up':($chg<0?'down':'flat'); ?>
+          <span class="market-change <?= $cls ?>"><?= $chg>0?'+':'' ?><?= number_format($chg,2) ?>%</span>
+          <?php endif; ?>
+        </div>
+      </div>
+      <?php endforeach; ?>
+      <?php endif; ?>
+      <div class="text-center py-2" style="font-size:10px;color:var(--c-muted)">
+        दर सांकेतिक मात्र · स्रोत: नेपाल राष्ट्र बैंक
+      </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- Trending articles -->
+    <?php if (!empty($trending)): ?>
+    <div class="sidebar-card mb-5">
+      <div class="section-heading mb-3">
+        <span class="flex items-center gap-2"><?= icon('trending-up','w-4 h-4') ?> ट्रेन्डिङ</span>
+      </div>
+      <?php foreach ($trending as $ti => $tr): ?>
+      <div class="popular-item">
+        <span class="popular-num" style="background:linear-gradient(135deg,var(--c-primary),var(--c-primary-lt));color:#fff"><?= $ti+1 ?></span>
+        <div>
+          <a href="/article/<?= h($tr['slug']) ?>" class="ptitle block hover:underline">
+            <?= h(mb_substr($tr['title'],0,65)) ?><?= mb_strlen($tr['title'])>65?'…':'' ?>
+          </a>
+          <div class="pmeta flex items-center gap-1 flex-wrap">
+            <span class="inline-block px-1.5 py-0 rounded" style="background:<?= h(category_color($tr['category_color'])) ?>;color:#fff;font-size:0.6rem;font-weight:700">
+              <?= h($tr['category_name_np']?:$tr['category_name']) ?>
+            </span>
+            <?= icon('flame','w-2.5 h-2.5') ?> <?= np_number((int)$tr['views']) ?>
+          </div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
 
     <!-- Most popular -->
     <?php if (!empty($popular)): ?>

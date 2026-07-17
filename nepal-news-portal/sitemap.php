@@ -59,4 +59,14 @@ foreach ($pages as $pg) {
     echo sitemap_url($base . '/page/' . $pg['slug'], $pg['updated_at'] ?? '', 'monthly', 0.5);
 }
 
+// ePaper archive
+echo sitemap_url($base . '/epaper', '', 'daily', 0.6);
+$epapers = get_epapers(50);
+foreach ($epapers as $ep) {
+    if (!empty($ep['pdf_path'])) {
+        echo sitemap_url($base . '/epaper', $ep['edition_date'] ?? '', 'never', 0.4);
+        break; // archive page already listed; one entry is enough
+    }
+}
+
 echo '</urlset>';

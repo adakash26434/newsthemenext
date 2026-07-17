@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/lib/bs_date.php';
+require_once __DIR__ . '/lib/rate_limit.php';
+
 // ── Security helpers ───────────────────────────────────────
 function h(mixed $v): string {
     return htmlspecialchars((string)($v ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -122,12 +125,10 @@ function time_ago(string $date): string {
     return format_date($date);
 }
 function bs_date_today(): string {
-    $y   = (int)date('Y') + 57;
-    $m   = (int)date('n');
-    $d   = (int)date('j');
-    $days_np = ['आइतबार','सोमबार','मंगलबार','बुधबार','बिहीबार','शुक्रबार','शनिबार'];
-    $dow = $days_np[(int)date('w')];
-    return np_number($y) . ' ' . NP_MONTHS[$m] . ' ' . np_number($d) . ' गते, ' . $dow;
+    return \BsDate::today();
+}
+function format_bs_date(string $adDate, bool $full = false): string {
+    return $full ? \BsDate::formatFull($adDate) : \BsDate::formatShort($adDate);
 }
 
 // ── Language helpers ───────────────────────────────────────

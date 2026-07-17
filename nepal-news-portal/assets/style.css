@@ -696,3 +696,124 @@ i[data-lucide] { display: inline-flex; flex-shrink: 0; }
   background: linear-gradient(135deg, var(--c-primary), var(--c-primary-lt));
   color: #fff;
 }
+
+/* ── Market Widgets ─────────────────────────────────────── */
+.market-widget-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.market-widget-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  background: var(--c-primary);
+  color: #fff;
+}
+.market-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--c-border);
+  font-size: 12px;
+}
+.market-row:last-of-type { border-bottom: none; }
+.market-label { color: var(--c-text2); }
+.market-value { font-weight: 700; color: var(--c-text); }
+.market-change { font-size: 10px; font-weight: 600; padding: 1px 5px; border-radius: 4px; }
+.market-change.up   { background: #d1fae5; color: #065f46; }
+.market-change.down { background: #fee2e2; color: #991b1b; }
+.market-change.flat { background: var(--c-border); color: var(--c-muted); }
+[data-theme="dark"] .market-change.up   { background: #065f46; color: #d1fae5; }
+[data-theme="dark"] .market-change.down { background: #7f1d1d; color: #fee2e2; }
+
+/* ── Bulletin Ticker ────────────────────────────────────── */
+.bulletin-ticker-wrap {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: stretch;
+}
+.bulletin-label {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--c-primary);
+  color: #fff;
+  white-space: nowrap;
+}
+.bulletin-scroll {
+  flex: 1;
+  overflow: hidden;
+  height: 36px;
+  position: relative;
+}
+.bulletin-scroll-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  animation: bulletinScroll 50s linear infinite;
+  white-space: nowrap;
+}
+.bulletin-scroll-inner:hover { animation-play-state: paused; }
+.bulletin-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 18px;
+  font-size: 12.5px;
+  color: var(--c-text2);
+  text-decoration: none;
+  transition: color .2s;
+}
+.bulletin-item:hover { color: var(--c-primary); text-decoration: underline; }
+.bulletin-sep { color: var(--c-border); font-size: 10px; flex-shrink: 0; }
+@keyframes bulletinScroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ── ePaper Grid ─────────────────────────────────────────── */
+.epaper-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+}
+.epaper-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.12); transform: translateY(-2px); }
+.epaper-cover { aspect-ratio: 3/4; overflow: hidden; background: var(--c-bg2); }
+.epaper-cover img { width:100%; height:100%; object-fit:cover; transition: transform .3s; }
+.epaper-card:hover .epaper-cover img { transform: scale(1.04); }
+
+/* ── Misc badges ─────────────────────────────────────────── */
+.badge-blue   { background:#dbeafe; color:#1e40af; }
+.badge-yellow { background:#fef9c3; color:#713f12; }
+.btn-outline  {
+  border: 1.5px solid var(--c-primary);
+  color: var(--c-primary);
+  background: transparent;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background .18s, color .18s;
+  cursor: pointer;
+}
+.btn-outline:hover { background: var(--c-primary); color: #fff; }
+[data-theme="dark"] .badge-blue   { background:#1e3a5f; color:#93c5fd; }
+[data-theme="dark"] .badge-yellow { background:#3d2c00; color:#fde68a; }
