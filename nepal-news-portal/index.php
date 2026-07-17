@@ -539,6 +539,9 @@ if ($uri === '/trending') {
 if ($uri === '/breaking') {
     require SRC_DIR . '/pages/breaking.php'; exit;
 }
+if ($uri === '/saved') {
+    require SRC_DIR . '/pages/saved.php'; exit;
+}
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }
