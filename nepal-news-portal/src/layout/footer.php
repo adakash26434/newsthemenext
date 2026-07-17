@@ -205,14 +205,80 @@ $_cur_lang = current_lang();
 </footer>
 
 <script>
-// Re-run Lucide after Alpine.js mutations
+// Lucide icons init + re-run after Alpine mutations
 document.addEventListener('DOMContentLoaded', function() {
   if (window.lucide) lucide.createIcons();
-  // Re-scan on nav open (mobile)
-  document.addEventListener('alpine:initialized', function() {
-    if (window.lucide) lucide.createIcons();
-  });
 });
+document.addEventListener('alpine:initialized', function() {
+  if (window.lucide) lucide.createIcons();
+});
+
+// ── Service Worker ────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/assets/sw.js').catch(function(){});
+  });
+}
+
+// ── Reaction component (must be global before Alpine init) ─
+window.reactionBox = function(articleId, initial) {
+  return {
+    counts: Object.assign({like:0,love:0,wow:0,sad:0,helpful:0}, initial || {}),
+    voted: localStorage.getItem('react_' + articleId),
+    react: function(type) {
+      if (this.voted) return;
+      var self = this;
+      var form = document.getElementById('csrf-form');
+      var token = form ? form.querySelector('[name=csrf_token]') : document.querySelector('[name=csrf_token]');
+      fetch('/react/' + articleId, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: 'type=' + encodeURIComponent(type) + (token ? '&csrf_token=' + encodeURIComponent(token.value) : '')
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d.counts) {
+          self.counts = d.counts;
+          self.voted  = type;
+          localStorage.setItem('react_' + articleId, type);
+        }
+      })
+      .catch(function(){});
+    }
+  };
+};
+
+// ── AJAX Load More ────────────────────────────────────────
+window.loadMore = function(btn) {
+  var url    = btn.dataset.url;
+  var offset = parseInt(btn.dataset.offset || 0, 10);
+  var grid   = document.getElementById('more-articles-grid') ||
+               document.getElementById('cat-more-grid');
+  if (!grid) return;
+  btn.disabled = true;
+  btn.textContent = 'लोड हुँदैछ…';
+  fetch(url + '&offset=' + offset)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.html) {
+        var tmp = document.createElement('div');
+        tmp.innerHTML = d.html;
+        while (tmp.firstChild) grid.appendChild(tmp.firstChild);
+        if (window.lucide) lucide.createIcons();
+      }
+      if (d.has_more) {
+        btn.dataset.offset = d.next_offset;
+        btn.disabled = false;
+        btn.textContent = '+ थप समाचार';
+      } else {
+        btn.parentElement.remove();
+      }
+    })
+    .catch(function(){
+      btn.disabled = false;
+      btn.textContent = '⚠ पुनः प्रयास गर्नुस्';
+    });
+};
 </script>
 </body>
 </html>
