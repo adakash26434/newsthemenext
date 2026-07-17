@@ -19,6 +19,35 @@ $_cur_lang = current_lang();
 ?>
 </main>
 
+<!-- Reading Progress Bar -->
+<div class="reading-progress" id="reading-progress">
+  <div class="reading-progress-bar" id="reading-progress-bar"></div>
+</div>
+<script>
+(function(){
+  var progress = document.getElementById('reading-progress-bar');
+  if (!progress) return;
+  
+  function updateProgress() {
+    var article = document.querySelector('.article-content');
+    if (!article) {
+      progress.style.display = 'none';
+      return;
+    }
+    
+    var rect = article.getBoundingClientRect();
+    var totalHeight = rect.height;
+    var scrolled = Math.max(0, -rect.top);
+    var progress_pct = Math.min(100, (scrolled / totalHeight) * 100);
+    progress.style.width = progress_pct + '%';
+  }
+  
+  window.addEventListener('scroll', updateProgress, {passive: true});
+  updateProgress();
+})();
+</script>
+
+
 <!-- Footer banner ad -->
 <?php render_ads('footer-banner', false); ?>
 

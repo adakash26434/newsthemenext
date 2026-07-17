@@ -292,3 +292,20 @@ function handle_upload(string $field, string $sub = 'general'): string {
     if (!move_uploaded_file($file['tmp_name'], $dest)) return '';
     return '/assets/uploads/' . $sub . '/' . $name;
 }
+
+
+// ── Reading Time Calculator ─────────────────────────────
+function reading_time(string $content, int $wpm = 200): int {
+    // Strip HTML tags
+    $text = strip_tags($content);
+    // Count words
+    $word_count = str_word_count($text);
+    // Calculate reading time in minutes
+    $minutes = ceil($word_count / $wpm);
+    return max(1, $minutes);
+}
+
+function reading_time_label(string $content): string {
+    $minutes = reading_time($content);
+    return $minutes . ' ' . ($minutes == 1 ? 'min read' : 'mins read');
+}
