@@ -8,7 +8,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id     = (int)($_POST['id'] ?? 0);
     $ids    = array_map('intval', $_POST['ids'] ?? []);
 
-    if ($action === 'approve' && $id)  { approve_comment($id); flash_set('success', 'टिप्पणी स्वीकृत गरियो।'); }
+    if ($action === 'approve' && $id)  {
+        approve_comment($id);
+        // Email commenter if contact_email is configured
+        $cmt = db_fetch("SELECT * FROM comments WHERE id=?", [$id]);
+        if ($cmt && !empty($cmt['email']) && setting('contact_email','')) {
+            $art = db_fetch("SELECT title, slug FROM articles WHERE id=?", [(int)$cmt['article_id']]);
+            if ($art) {
+                $site   = site_name();
+                $art_url = rtrim(setting('site_url','https://localhost'),'/') . '/article/' . $art['slug'];
+                $msg    = h($cmt['name']) . " जी,\n\nतपाईंको टिप्पणी स्वीकृत भयो।\n\nलेख: " . $art['title'] . "\nहेर्नुस्: $art_url\n\n— {$site} टिम";
+                $hdrs   = "From: {$site} <" . setting('contact_email','') . ">\r\nContent-Type: text/plain; charset=UTF-8\r\n";
+                @mail($cmt['email'], "तपाईंको टिप्पणी स्वीकृत भयो — {$site}", $msg, $hdrs);
+            }
+        }
+        flash_set('success', 'टिप्पणी स्वीकृत गरियो।');
+    }
     if ($action === 'spam'    && $id)  { spam_comment($id);    flash_set('success', 'स्प्याम चिह्नित गरियो।'); }
     if ($action === 'delete'  && $id)  { delete_comment($id);  flash_set('success', 'टिप्पणी मेटाइयो।'); }
 
