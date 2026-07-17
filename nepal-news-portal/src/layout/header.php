@@ -95,6 +95,7 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
 <style>
   :root {
     --c-primary:    <?= h($_primary) ?>;
+    --c-secondary:  <?= h(secondary_color()) ?>;
     --c-nav-bg:     <?= h($_nav_color) ?>;
     --c-footer-bg:  <?= h($_nav_color) ?>;
     --c-primary-lt: <?= h(accent_color()) ?>;
@@ -255,7 +256,7 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
   </div>
 
   <!-- ── Main navigation ── -->
-  <nav class="main-nav" aria-label="Main navigation" style="background:linear-gradient(135deg, var(--c-nav-bg) 0%, var(--c-primary-dk, var(--c-nav-bg)) 100%)">
+  <nav class="main-nav" aria-label="Main navigation" style="background:linear-gradient(135deg, var(--c-primary) 0%, var(--c-secondary) 100%)">
     <div class="max-w-7xl mx-auto px-4">
       <ul class="nav-list" :class="mobileNav ? 'mobile-open' : ''" x-show="mobileNav || window.innerWidth >= 1024" x-cloak>
         <li>

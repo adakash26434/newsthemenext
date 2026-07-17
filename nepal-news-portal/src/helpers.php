@@ -183,9 +183,10 @@ function lang_label(string $np_text, string $en_text): string {
 }
 
 // ── Theme helpers ──────────────────────────────────────────
-function primary_color(): string  { return setting('primary_color', DEFAULT_COLOR_PRIMARY); }
-function nav_color(): string      { return setting('nav_color',     DEFAULT_COLOR_NAV); }
-function accent_color(): string   { return setting('accent_color',  DEFAULT_COLOR_ACCENT); }
+function primary_color(): string    { return setting('primary_color', DEFAULT_COLOR_PRIMARY); }
+function secondary_color(): string  { return setting('secondary_color', '#2563EB'); }
+function nav_color(): string        { return setting('nav_color',     DEFAULT_COLOR_NAV); }
+function accent_color(): string     { return setting('accent_color',  DEFAULT_COLOR_ACCENT); }
 function site_name(): string      { return current_lang()==='en' ? setting('site_name_en', DEFAULT_SITE_NAME_EN) : setting('site_name', DEFAULT_SITE_NAME); }
 function site_name_np(): string   { return setting('site_name',    DEFAULT_SITE_NAME); }
 function site_name_en(): string   { return setting('site_name_en', DEFAULT_SITE_NAME_EN); }

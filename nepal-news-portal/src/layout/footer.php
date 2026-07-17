@@ -77,7 +77,7 @@ $_cur_lang = current_lang();
 <?php endif; ?>
 
 <!-- Newsletter bar — Enhanced professional look -->
-<div class="newsletter-bar" style="background:linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dk, var(--c-primary)) 100%)">
+<div class="newsletter-bar" style="background:linear-gradient(135deg, var(--c-primary) 0%, var(--c-secondary) 100%)">
   <div class="max-w-7xl mx-auto px-4 text-center py-8">
     <h3 class="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-3">
       <?= icon('mail','w-6 h-6') ?> न्यूजलेटर सदस्यता लिनुस्
