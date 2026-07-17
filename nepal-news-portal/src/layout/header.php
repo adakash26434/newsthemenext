@@ -28,6 +28,14 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
         document.documentElement.setAttribute('data-theme', v?'dark':'light');
         localStorage.setItem('theme', v?'dark':'light');
       });
+      // Auto-detect system preference changes
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+          if (!localStorage.getItem('theme')) {
+            this.darkMode = e.matches;
+          }
+        });
+      }
       window.addEventListener('scroll', () => {
         this.scrolled = window.scrollY > 60;
         this.backTop  = window.scrollY > 400;
@@ -60,7 +68,11 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" onload="lucide.createIcons()"></script>
 <script>
-(function(){var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');})();
+(function(){
+  var t = localStorage.getItem('theme');
+  if (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) t = 'dark';
+  if (t === 'dark') document.documentElement.setAttribute('data-theme','dark');
+})();
 </script>
 <style>
   :root {

@@ -8,6 +8,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash_set('success', 'सदस्य मेटाइयो।');
         redirect('admin/subscribers');
     }
+    // ── Newsletter broadcast ───────────────────────────────
+    if (($_POST['action']??'') === 'broadcast') {
+        $subject = trim($_POST['subject'] ?? '');
+        $body    = trim($_POST['body']    ?? '');
+        if (!$subject || !$body) {
+            flash_set('error', 'विषय र सन्देश अनिवार्य छ।');
+            redirect('admin/subscribers');
+        }
+        $from_email = setting('contact_email', '');
+        if (!$from_email) {
+            flash_set('error', 'पहिले Settings → Contact Email सेट गर्नुस्।');
+            redirect('admin/subscribers');
+        }
+        $all_subs = db_fetchAll("SELECT email, name, token FROM newsletter_subscribers");
+        $sent = 0;
+        $site = site_name();
+        $base = rtrim(setting('site_url','https://localhost'),'/');
+        foreach ($all_subs as $sub) {
+            $unsub  = $base . '/newsletter/unsubscribe?token=' . urlencode($sub['token'] ?? '');
+            $msg    = ($sub['name'] ? $sub['name'] . " जी,\n\n" : '') . $body
+                    . "\n\n---\nसदस्यता रद्द गर्न: $unsub\n— {$site} टिम";
+            $hdrs   = "From: {$site} <{$from_email}>\r\nContent-Type: text/plain; charset=UTF-8\r\n";
+            if (@mail($sub['email'], $subject, $msg, $hdrs)) $sent++;
+        }
+        flash_set('success', np_number($sent) . ' सदस्यहरूलाई इमेल पठाइयो।');
+        redirect('admin/subscribers');
+    }
 }
 
 // CSV export
@@ -73,6 +100,33 @@ admin_sidebar('subscribers');
   </table>
 </div>
 <?php render_pagination($pag); ?>
+<?php endif; ?>
+
+<!-- Newsletter Broadcast Form -->
+<?php if (count_subscribers() > 0): ?>
+<div class="stat-card mt-6">
+  <h2 class="font-bold text-sm mb-4 flex items-center gap-2">
+    <?= icon('send','w-4 h-4') ?> सबै सदस्यलाई इमेल पठाउनुस् (Broadcast)
+  </h2>
+  <form method="POST" action="/admin/subscribers" onsubmit="return confirm('<?= np_number(count_subscribers()) ?> सदस्यलाई इमेल पठाउने?')">
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="broadcast">
+    <div class="space-y-3">
+      <div>
+        <label class="form-label">विषय (Subject) <span class="text-red-500">*</span></label>
+        <input type="text" name="subject" class="form-control" required placeholder="इमेलको विषय...">
+      </div>
+      <div>
+        <label class="form-label">सन्देश (Body) <span class="text-red-500">*</span></label>
+        <textarea name="body" class="form-control" rows="5" required placeholder="इमेलको मूल सन्देश..."></textarea>
+        <p class="form-help">Unsubscribe link स्वतः जोडिनेछ।</p>
+      </div>
+      <button type="submit" class="btn btn-primary gap-1">
+        <?= icon('send','w-3.5 h-3.5') ?> <?= np_number(count_subscribers()) ?> सदस्यलाई पठाउनुस्
+      </button>
+    </div>
+  </form>
+</div>
 <?php endif; ?>
 </div>
 </div>
