@@ -511,7 +511,7 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
 </div>
 
 <!-- Back to top -->
-<button class="back-to-top" :class="backTop ? '' : 'hidden'" @click="window.scrollTo({top:0,behavior:'smooth'})" title="माथि जानुस्" aria-label="Go to top">
+<button class="back-to-top" :class="backTop ? 'visible' : ''" @click="window.scrollTo({top:0,behavior:'smooth'})" title="माथि जानुस्" aria-label="Go to top">
   <?= icon('arrow-up','w-5 h-5') ?>
 </button>
 
