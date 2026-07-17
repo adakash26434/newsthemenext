@@ -32,6 +32,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         redirect('admin/articles');
     }
+    // ── Clone article ─────────────────────────────────────
+    if (($_POST['action']??'') === 'clone') {
+        $src = get_article_by_id((int)($_POST['id'] ?? 0));
+        if ($src) {
+            unset($src['id'], $src['created_at'], $src['updated_at'], $src['views']);
+            $src['title']  = '[Copy] ' . $src['title'];
+            $src['slug']   = $src['slug'] . '-copy-' . date('His');
+            $src['status'] = 'draft';
+            $src['published_at'] = date('Y-m-d H:i:s');
+            $new_id = save_article($src);
+            flash_set('success', 'लेख Clone गरियो। Draft मा सेभ भयो।');
+            redirect('admin/articles?action=edit&id=' . $new_id);
+        }
+        redirect('admin/articles');
+    }
     // ── Bulk actions ──────────────────────────────────────
     if (($_POST['action']??'') === 'bulk') {
         $bulk_op  = $_POST['bulk_op'] ?? '';
@@ -159,7 +174,13 @@ admin_sidebar('articles');
           <a href="/article/<?= h($a['slug']) ?>" target="_blank" class="btn btn-secondary btn-sm gap-1">
             <?= icon('eye','w-3 h-3') ?>
           </a>
-          <form method="POST" action="/admin/articles" onsubmit="return confirm('लेख मेटाउने?')">
+          <form method="POST" action="/admin/articles" style="display:inline">
+            <?= csrf_field() ?>
+            <input type="hidden" name="action" value="clone">
+            <input type="hidden" name="id" value="<?= $a['id'] ?>">
+            <button class="btn btn-secondary btn-sm" title="Clone"><?= icon('copy','w-3 h-3') ?></button>
+          </form>
+          <form method="POST" action="/admin/articles" onsubmit="return confirm('लेख मेटाउने?')" style="display:inline">
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="delete">
             <input type="hidden" name="id" value="<?= $a['id'] ?>">

@@ -80,6 +80,32 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
 </head>
 <body class="min-h-screen">
 
+<?php
+// ── Site-wide announcement banner ─────────────────────────
+$_ann_text = setting('announcement_text','');
+$_ann_url  = setting('announcement_url','');
+$_ann_type = setting('announcement_type','info');
+$_ann_colors = [
+  'info'    => ['background:#1e40af;color:#fff','background:rgba(30,64,175,.15);color:#1e40af;border-bottom:1px solid rgba(30,64,175,.2)'],
+  'warning' => ['background:#92400e;color:#fff','background:rgba(146,64,14,.1);color:#92400e;border-bottom:1px solid rgba(146,64,14,.2)'],
+  'success' => ['background:#14532d;color:#fff','background:rgba(20,83,45,.1);color:#14532d;border-bottom:1px solid rgba(20,83,45,.2)'],
+  'danger'  => ['background:#7F1D1D;color:#fff','background:rgba(127,29,29,.1);color:#7F1D1D;border-bottom:1px solid rgba(127,29,29,.2)'],
+];
+$_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
+?>
+<?php if ($_ann_text): ?>
+<div class="text-sm py-2 px-4 text-center" style="<?= $_ann_style ?>">
+  <span class="inline-flex items-center gap-2">
+    <?= icon('megaphone','w-3.5 h-3.5') ?>
+    <?php if ($_ann_url): ?>
+      <a href="<?= h($_ann_url) ?>" class="hover:underline font-medium"><?= h($_ann_text) ?></a>
+    <?php else: ?>
+      <span class="font-medium"><?= h($_ann_text) ?></span>
+    <?php endif; ?>
+  </span>
+</div>
+<?php endif; ?>
+
 <div id="read-prog" class="reading-progress"></div>
 
 <!-- ── Top utility bar ── -->

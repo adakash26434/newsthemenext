@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'footer_about','footer_about_en',
         'meta_keywords','google_analytics',
         'youtube_channel','youtube_embed',
+        'announcement_text','announcement_url','announcement_type',
     ];
     foreach ($keys as $k) {
         save_setting($k, trim($_POST[$k] ?? ''));
@@ -105,6 +106,29 @@ admin_sidebar('settings');
     <div class="md:col-span-2">
       <label class="form-label">Copyright Text</label>
       <input type="text" name="copyright_text" class="form-control" value="<?= h(setting('copyright_text')) ?>">
+    </div>
+  </div>
+</div>
+
+<!-- Announcement Banner -->
+<div class="stat-card mb-5">
+  <h2 class="font-bold text-sm mb-4 flex items-center gap-2"><i data-lucide="megaphone" class="w-4 h-4"></i> साइटव्यापी घोषणा ब्यानर</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="md:col-span-2">
+      <label class="form-label">घोषणा सन्देश <span class="text-xs" style="color:var(--c-muted)">(खाली राख्नुभयो भने ब्यानर देखिँदैन)</span></label>
+      <input type="text" name="announcement_text" class="form-control" value="<?= h(setting('announcement_text')) ?>" placeholder="महत्त्वपूर्ण सूचना वा घोषणा...">
+    </div>
+    <div>
+      <label class="form-label">Link URL (वैकल्पिक)</label>
+      <input type="url" name="announcement_url" class="form-control" value="<?= h(setting('announcement_url')) ?>" placeholder="https://...">
+    </div>
+    <div>
+      <label class="form-label">प्रकार</label>
+      <select name="announcement_type" class="form-control">
+        <?php foreach (['info'=>'Info (नीलो)','warning'=>'Warning (पहेँलो)','success'=>'Success (हरियो)','danger'=>'Danger (रातो)'] as $v=>$l): ?>
+        <option value="<?= $v ?>" <?= setting('announcement_type')===$v?'selected':'' ?>><?= h($l) ?></option>
+        <?php endforeach; ?>
+      </select>
     </div>
   </div>
 </div>
