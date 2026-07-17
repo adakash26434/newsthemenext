@@ -177,6 +177,14 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
         </li>
         <?php endforeach; ?>
 
+        <!-- Trending -->
+        <li>
+          <a href="/trending" class="<?= $_current_path==='/trending'?'active':'' ?>">
+            <?= icon('trending-up','w-3.5 h-3.5') ?>
+            <span><?= $_cur_lang==='en'?'Trending':'ट्रेन्डिङ' ?></span>
+          </a>
+        </li>
+
         <!-- Events dropdown -->
         <li x-data="{open:false}" class="has-dropdown">
           <a href="/events" class="<?= str_starts_with($_current_path,'/event')?'active':'' ?>"

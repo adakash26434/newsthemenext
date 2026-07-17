@@ -24,6 +24,8 @@ admin_sidebar('dashboard');
     ['कार्यक्रम',     $stats['events_total'], 'calendar-days','#059669'],
     ['Event दर्ता',   $stats['events_reg'],   'user-check',   '#7C3AED'],
     ['न्यूजलेटर',     $stats['subscribers'],  'mail',         '#D97706'],
+    ['टिप्पणी (पेन्डिङ)', $stats['comments_pending'] ?? 0, 'message-circle', '#EF4444'],
+    ['कुल टिप्पणी',   $stats['comments_total'] ?? 0,    'messages-square',  '#0891B2'],
   ];
   foreach ($cards as [$label,$val,$ic,$color]): ?>
   <div class="stat-card">

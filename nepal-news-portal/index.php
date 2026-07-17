@@ -499,6 +499,11 @@ if ($uri === '/admin/events/registrations/export') {
 }
 
 // Sitemap
+// favicon.ico → SVG redirect
+if ($uri === '/favicon.ico') {
+    header('Location: /assets/favicon.svg', true, 301); exit;
+}
+
 if ($uri === '/sitemap.xml') {
     require __DIR__ . '/sitemap.php'; exit;
 }
@@ -527,6 +532,9 @@ if ($m = route_match('/author/{slug}', $uri)) {
 if ($m = route_match('/tag/{slug}', $uri)) {
     $_slug = $m[0];
     require SRC_DIR . '/pages/tag.php'; exit;
+}
+if ($uri === '/trending') {
+    require SRC_DIR . '/pages/trending.php'; exit;
 }
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;

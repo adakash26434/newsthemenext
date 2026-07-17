@@ -744,9 +744,12 @@ function get_dashboard_stats(): array {
          LEFT JOIN articles a ON a.category_id = c.id AND a.status = 'published'
          GROUP BY c.id ORDER BY cnt DESC LIMIT 10"
     );
-    $recent = get_articles(['status'=>'published','limit'=>6]);
+    $recent           = get_articles(['status'=>'published','limit'=>6]);
+    $comments_pending = count_comments('pending');
+    $comments_total   = count_comments();
     return compact('total','published','draft','views','cats','auths','ads_total','ads_active',
-                   'subscribers','events_total','events_reg','bycat','recent');
+                   'subscribers','events_total','events_reg','bycat','recent',
+                   'comments_pending','comments_total');
 }
 
 // ── Comments ───────────────────────────────────────────────────────────────────

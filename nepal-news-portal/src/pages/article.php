@@ -157,8 +157,8 @@ require SRC_DIR . '/layout/header.php';
           <?= icon('hash','w-3.5 h-3.5') ?> ट्यागहरू:
         </span>
         <?php foreach ($article['tags'] as $tag): ?>
-          <a href="/search?q=<?= urlencode($tag['name']) ?>" class="tag-cloud-item">
-            <?= h($tag['name']) ?>
+          <a href="/tag/<?= h($tag['slug'] ?? slug_from_title($tag['name'])) ?>" class="tag-cloud-item">
+            #<?= h($tag['name']) ?>
           </a>
         <?php endforeach; ?>
       </div>
