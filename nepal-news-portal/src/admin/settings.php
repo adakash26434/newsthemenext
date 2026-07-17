@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $keys = [
         'site_name','site_name_en','site_tagline','site_logo_url','site_logo_text',
-        'primary_color','nav_color','accent_color',
+        'primary_color','secondary_color','nav_color','accent_color',
         'ticker_label','default_lang','registration_no','founded_year','copyright_text',
         'social_facebook','social_twitter','social_youtube','social_instagram','social_tiktok',
         'contact_email','contact_phone','contact_address',
@@ -145,16 +145,23 @@ admin_sidebar('settings');
       </div>
     </div>
     <div>
+      <label class="form-label">Secondary Color</label>
+      <div class="flex gap-2 items-center">
+        <input type="color" name="secondary_color" class="h-10 w-16 p-1 rounded border cursor-pointer" style="border-color:var(--c-border)" value="<?= h(setting('secondary_color','#2563EB')) ?>">
+        <input type="text" name="secondary_color" class="form-control flex-1" value="<?= h(setting('secondary_color','#2563EB')) ?>">
+      </div>
+    </div>
+    <div>
       <label class="form-label">Navigation Color</label>
       <div class="flex gap-2 items-center">
-        <input type="color" class="h-10 w-16 p-1 rounded border cursor-pointer" style="border-color:var(--c-border)" value="<?= h(setting('nav_color','#7F1D1D')) ?>">
+        <input type="color" name="nav_color" class="h-10 w-16 p-1 rounded border cursor-pointer" style="border-color:var(--c-border)" value="<?= h(setting('nav_color','#7F1D1D')) ?>">
         <input type="text" name="nav_color" class="form-control flex-1" value="<?= h(setting('nav_color','#7F1D1D')) ?>">
       </div>
     </div>
     <div>
       <label class="form-label">Accent Color</label>
       <div class="flex gap-2 items-center">
-        <input type="color" class="h-10 w-16 p-1 rounded border cursor-pointer" style="border-color:var(--c-border)" value="<?= h(setting('accent_color','#991B1B')) ?>">
+        <input type="color" name="accent_color" class="h-10 w-16 p-1 rounded border cursor-pointer" style="border-color:var(--c-border)" value="<?= h(setting('accent_color','#991B1B')) ?>">
         <input type="text" name="accent_color" class="form-control flex-1" value="<?= h(setting('accent_color','#991B1B')) ?>">
       </div>
     </div>
