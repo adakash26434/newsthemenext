@@ -365,6 +365,25 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
             <li><a href="/horoscope?tab=gudmilan"><?= $_cur_lang==='en'?'Gud Milan':'गुड मिलन' ?></a></li>
           </ul>
         </li>
+
+        <!-- Live Data dropdown -->
+        <li x-data="{open:false}" class="has-dropdown">
+          <a href="/live-data" class="<?= str_starts_with($_current_path,'/live-data')?'active':'' ?>"
+             @mouseenter="open=true" @mouseleave="open=false">
+            <?= icon('activity','w-4 h-4') ?>
+            <span><?= $_cur_lang==='en'?'Live Data':'लाइभ डेटा' ?></span>
+            <?= icon('chevron-down','w-3 h-3') ?>
+          </a>
+          <ul class="dropdown-menu" x-show="open" x-cloak
+              @mouseenter="open=true" @mouseleave="open=false">
+            <li><a href="/live-data?tab=earthquake"><?= $_cur_lang==='en'?'Earthquakes':'भूकम्प' ?></a></li>
+            <li><a href="/live-data?tab=weather"><?= $_cur_lang==='en'?'Weather':'मौसम' ?></a></li>
+            <li><a href="/live-data?tab=air"><?= $_cur_lang==='en'?'Air Quality':'वातावरण' ?></a></li>
+            <li class="dropdown-divider"></li>
+            <li><a href="/live-data?tab=alerts"><?= $_cur_lang==='en'?'Alerts':'चेतावनी' ?></a></li>
+            <li><a href="/live-data?tab=notices"><?= $_cur_lang==='en'?'Government Notices':'सरकारी सूचना' ?></a></li>
+          </ul>
+        </li>
       </ul>
     </div>
   </nav>
