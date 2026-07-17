@@ -902,3 +902,34 @@ function add_reaction(int $article_id, string $type): array {
     }
     return get_reaction_counts($article_id);
 }
+
+
+// ── Scheduled Publishing ────────────────────────────────────
+function get_scheduled_articles(int $limit = 20): array {
+    try {
+        $sql = "SELECT a.*, c.name as category_name, c.slug as category_slug 
+                FROM articles a 
+                LEFT JOIN categories c ON a.category_id = c.id 
+                WHERE a.status = 'scheduled' 
+                AND a.scheduled_at <= datetime('now') 
+                ORDER BY a.scheduled_at ASC 
+                LIMIT ?";
+        return db_fetchAll($sql, [$limit]);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+function publish_scheduled_articles(): int {
+    $scheduled = get_scheduled_articles(50);
+    $count = 0;
+    foreach ($scheduled as $article) {
+        db_query(
+            "UPDATE articles SET status = 'published', published_at = ? WHERE id = ?",
+            [date('Y-m-d H:i:s'), $article['id']]
+        );
+        $count++;
+    }
+    return $count;
+}
+

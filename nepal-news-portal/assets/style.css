@@ -852,3 +852,20 @@ i[data-lucide] { display: inline-flex; flex-shrink: 0; }
   color: var(--c-text);
 }
 [data-theme="dark"] .article-main-title { color: var(--c-text); }
+
+/* Reading Progress Bar */
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 9999;
+  background: var(--c-border);
+}
+.reading-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--c-primary), var(--c-primary-lt));
+  width: 0%;
+  transition: width 50ms linear;
+}
