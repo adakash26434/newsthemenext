@@ -542,6 +542,9 @@ if ($uri === '/breaking') {
 if ($uri === '/saved') {
     require SRC_DIR . '/pages/saved.php'; exit;
 }
+if ($uri === '/contact') {
+    require SRC_DIR . '/pages/contact.php'; exit;
+}
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }
