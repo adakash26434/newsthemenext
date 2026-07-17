@@ -176,6 +176,10 @@ function save_tag(array $data, ?int $id = null): int {
 function delete_tag(int $id): void {
     db_query("DELETE FROM tags WHERE id = ?", [$id]);
 }
+function get_all_tags(): array { return get_tags(); }
+function get_tag_by_slug(string $slug): ?array {
+    return db_fetch("SELECT * FROM tags WHERE slug = ?", [$slug]);
+}
 
 // ── Articles ───────────────────────────────────────────────
 function get_articles(array $opts = []): array {
@@ -194,6 +198,11 @@ function get_articles(array $opts = []): array {
         $s = '%' . $opts['search'] . '%';
         $params[] = $s; $params[] = $s; $params[] = $s; $params[] = $s;
     }
+    $tag_join = '';
+    if (!empty($opts['tag_slug'])) {
+        $tag_join = "JOIN article_tags _at ON _at.article_id = a.id JOIN tags _t ON _t.id = _at.tag_id AND _t.slug = ?";
+        array_unshift($params, $opts['tag_slug']);
+    }
     $limit  = (int)($opts['limit']  ?? ARTICLES_PER_PAGE);
     $offset = (int)($opts['offset'] ?? 0);
     $order  = preg_replace('/[^a-zA-Z0-9_.() ,]/', '', $opts['order'] ?? 'a.published_at DESC, a.created_at DESC');
@@ -206,6 +215,7 @@ function get_articles(array $opts = []): array {
          FROM articles a
          JOIN categories c  ON c.id = a.category_id
          JOIN authors    au ON au.id = a.author_id
+         $tag_join
          WHERE $ws ORDER BY $order LIMIT $limit OFFSET $offset",
         $params
     );
@@ -221,11 +231,17 @@ function count_articles(array $opts = []): int {
         $s = '%' . $opts['search'] . '%';
         $params[] = $s; $params[] = $s; $params[] = $s; $params[] = $s;
     }
+    $tag_join = '';
+    if (!empty($opts['tag_slug'])) {
+        $tag_join = "JOIN article_tags _at ON _at.article_id = a.id JOIN tags _t ON _t.id = _at.tag_id AND _t.slug = ?";
+        array_unshift($params, $opts['tag_slug']);
+    }
     $ws = implode(' AND ', $where);
     return db_count(
         "SELECT COUNT(*) FROM articles a
          JOIN categories c  ON c.id = a.category_id
          JOIN authors    au ON au.id = a.author_id
+         $tag_join
          WHERE $ws",
         $params
     );

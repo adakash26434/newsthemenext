@@ -1,0 +1,20 @@
+{
+  "name": "नेपाल न्यूज पोर्टल",
+  "short_name": "न्यूज पोर्टल",
+  "description": "नेपालको विश्वसनीय समाचार पोर्टल",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7F1D1D",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["news"],
+  "lang": "ne"
+}

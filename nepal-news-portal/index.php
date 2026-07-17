@@ -477,6 +477,8 @@ if ($uri === '/admin/subscribers')  { admin_check(); require SRC_DIR . '/admin/s
 if ($uri === '/admin/epaper')       { admin_check(); require SRC_DIR . '/admin/epaper.php'; exit; }
 if ($uri === '/admin/market')       { admin_check(); require SRC_DIR . '/admin/market_widgets.php'; exit; }
 if ($uri === '/admin/redirects')    { admin_check(); require SRC_DIR . '/admin/redirects.php'; exit; }
+if ($uri === '/admin/comments')    { require SRC_DIR . '/admin/comments.php'; exit; }
+if ($uri === '/admin/media')       { require SRC_DIR . '/admin/media.php'; exit; }
 
 // CSV export registrations
 if ($uri === '/admin/events/registrations/export') {
@@ -521,6 +523,10 @@ if ($m = route_match('/category/{slug}', $uri)) {
 if ($m = route_match('/author/{slug}', $uri)) {
     $_slug = $m[0];
     require SRC_DIR . '/pages/author.php'; exit;
+}
+if ($m = route_match('/tag/{slug}', $uri)) {
+    $_slug = $m[0];
+    require SRC_DIR . '/pages/tag.php'; exit;
 }
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
