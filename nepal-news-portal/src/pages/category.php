@@ -26,10 +26,13 @@ require SRC_DIR . '/layout/header.php';
     <?php endif; ?>
     <div>
       <h1 class="text-2xl font-extrabold text-white"><?= h($cat_name) ?></h1>
-      <p class="text-sm mt-1" style="color:rgba(255,255,255,.75)">
-        <?= np_number($total) ?> समाचार
+      <p class="text-sm mt-1 flex items-center gap-3" style="color:rgba(255,255,255,.75)">
+        <span><?= np_number($total) ?> समाचार</span>
       </p>
     </div>
+    <a href="/rss/<?= h($slug) ?>" target="_blank" rel="noopener noreferrer" class="ml-auto flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);text-decoration:none">
+      <?= icon('rss','w-3.5 h-3.5') ?> RSS
+    </a>
   </div>
 </div>
 

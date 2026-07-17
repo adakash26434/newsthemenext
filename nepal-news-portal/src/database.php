@@ -142,16 +142,19 @@ function get_author_by_slug(string $slug): ?array {
     return db_fetch("SELECT * FROM authors WHERE slug = ?", [$slug]);
 }
 function save_author(array $data, ?int $id = null): int {
+    $tw = $data['twitter_url']  ?? '';
+    $fb = $data['facebook_url'] ?? '';
+    $li = $data['linkedin_url'] ?? '';
     if ($id) {
         db_query(
-            "UPDATE authors SET name=?,name_np=?,slug=?,bio=?,avatar_url=? WHERE id=?",
-            [$data['name'],$data['name_np'],$data['slug'],$data['bio'],$data['avatar_url'],$id]
+            "UPDATE authors SET name=?,name_np=?,slug=?,bio=?,avatar_url=?,twitter_url=?,facebook_url=?,linkedin_url=? WHERE id=?",
+            [$data['name'],$data['name_np'],$data['slug'],$data['bio'],$data['avatar_url'],$tw,$fb,$li,$id]
         );
         return $id;
     }
     return db_insert(
-        "INSERT INTO authors (name,name_np,slug,bio,avatar_url) VALUES (?,?,?,?,?)",
-        [$data['name'],$data['name_np'],$data['slug'],$data['bio'],$data['avatar_url']]
+        "INSERT INTO authors (name,name_np,slug,bio,avatar_url,twitter_url,facebook_url,linkedin_url) VALUES (?,?,?,?,?,?,?,?)",
+        [$data['name'],$data['name_np'],$data['slug'],$data['bio'],$data['avatar_url'],$tw,$fb,$li]
     );
 }
 function delete_author(int $id): void {

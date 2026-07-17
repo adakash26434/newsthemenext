@@ -235,6 +235,21 @@ require SRC_DIR . '/layout/header.php';
           <?php if ($article['author_bio']): ?>
             <p class="text-xs mt-1" style="color:var(--c-text2)"><?= h($article['author_bio']) ?></p>
           <?php endif; ?>
+          <?php
+            $au_full = $article['author_slug'] ? get_author_by_slug($article['author_slug']) : null;
+            if ($au_full): ?>
+          <div class="flex items-center gap-2 mt-2">
+            <?php if ($au_full['twitter_url'] ?? ''): ?>
+            <a href="<?= h($au_full['twitter_url']) ?>" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 text-xs hover:underline" style="color:rgba(255,255,255,.7)"><?= icon('twitter','w-3 h-3') ?> Twitter</a>
+            <?php endif; ?>
+            <?php if ($au_full['facebook_url'] ?? ''): ?>
+            <a href="<?= h($au_full['facebook_url']) ?>" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 text-xs hover:underline" style="color:rgba(255,255,255,.7)"><?= icon('facebook','w-3 h-3') ?> Facebook</a>
+            <?php endif; ?>
+            <?php if ($au_full['linkedin_url'] ?? ''): ?>
+            <a href="<?= h($au_full['linkedin_url']) ?>" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1 text-xs hover:underline" style="color:rgba(255,255,255,.7)"><?= icon('linkedin','w-3 h-3') ?> LinkedIn</a>
+            <?php endif; ?>
+          </div>
+          <?php endif; ?>
         </div>
       </div>
       <?php endif; ?>

@@ -548,6 +548,12 @@ if ($uri === '/contact') {
 if ($uri === '/about') {
     require SRC_DIR . '/pages/about.php'; exit;
 }
+if ($uri === '/privacy') {
+    require SRC_DIR . '/pages/privacy.php'; exit;
+}
+if ($uri === '/terms') {
+    require SRC_DIR . '/pages/terms.php'; exit;
+}
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }

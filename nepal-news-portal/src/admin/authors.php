@@ -7,11 +7,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'save') {
         $id = !empty($_POST['id']) ? (int)$_POST['id'] : null;
         $data = [
-            'name'       => trim($_POST['name']    ?? ''),
-            'name_np'    => trim($_POST['name_np'] ?? ''),
-            'slug'       => trim($_POST['slug']    ?? '') ?: slugify(trim($_POST['name'] ?? '')),
-            'bio'        => trim($_POST['bio']     ?? ''),
-            'avatar_url' => trim($_POST['avatar_url'] ?? ''),
+            'name'         => trim($_POST['name']         ?? ''),
+            'name_np'      => trim($_POST['name_np']      ?? ''),
+            'slug'         => trim($_POST['slug']         ?? '') ?: slugify(trim($_POST['name'] ?? '')),
+            'bio'          => trim($_POST['bio']          ?? ''),
+            'avatar_url'   => trim($_POST['avatar_url']   ?? ''),
+            'twitter_url'  => trim($_POST['twitter_url']  ?? ''),
+            'facebook_url' => trim($_POST['facebook_url'] ?? ''),
+            'linkedin_url' => trim($_POST['linkedin_url'] ?? ''),
         ];
         $upload = handle_upload('avatar_file', 'authors');
         if ($upload) $data['avatar_url'] = $upload;
@@ -75,6 +78,18 @@ admin_sidebar('authors');
       <div>
         <label class="form-label">परिचय (Bio)</label>
         <textarea name="bio" class="form-control" rows="3"><?= h($edit['bio']??'') ?></textarea>
+      </div>
+      <div>
+        <label class="form-label">Twitter/X URL</label>
+        <input type="url" name="twitter_url" class="form-control" value="<?= h($edit['twitter_url']??'') ?>" placeholder="https://twitter.com/...">
+      </div>
+      <div>
+        <label class="form-label">Facebook URL</label>
+        <input type="url" name="facebook_url" class="form-control" value="<?= h($edit['facebook_url']??'') ?>" placeholder="https://facebook.com/...">
+      </div>
+      <div>
+        <label class="form-label">LinkedIn URL</label>
+        <input type="url" name="linkedin_url" class="form-control" value="<?= h($edit['linkedin_url']??'') ?>" placeholder="https://linkedin.com/in/...">
       </div>
       <div class="flex gap-2">
         <button type="submit" class="btn btn-primary gap-1"><?= icon('save','w-3.5 h-3.5') ?> सेभ</button>

@@ -169,6 +169,8 @@ $_cur_lang = current_lang();
           <li><a href="/search" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Search':'खोज गर्नुस्' ?></a></li>
           <li><a href="/about" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'About Us':'हाम्रोबारे' ?></a></li>
           <li><a href="/contact" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Contact Us':'सम्पर्क' ?></a></li>
+          <li><a href="/privacy" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Privacy Policy':'गोपनीयता नीति' ?></a></li>
+          <li><a href="/terms" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Terms':'सेवा शर्त' ?></a></li>
           <li><a href="/sitemap.xml" class="footer-link flex items-center gap-1" target="_blank"><?= icon('chevron-right','w-3 h-3') ?> Sitemap</a></li>
         </ul>
         <?php if (!empty($_f_events)): ?>
