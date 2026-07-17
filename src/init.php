@@ -286,6 +286,15 @@ if ($mysql) {
         "ALTER TABLE newsletter_subscribers ADD COLUMN IF NOT EXISTS token VARCHAR(64) DEFAULT ''",
         "ALTER TABLE categories ADD COLUMN IF NOT EXISTS description TEXT DEFAULT ''",
         "ALTER TABLE articles ADD COLUMN IF NOT EXISTS correction_note TEXT DEFAULT NULL",
+        // Create rate_limits table if not exists (for users who imported demo_data before this fix)
+        "CREATE TABLE IF NOT EXISTS rate_limits (
+            id         INT NOT NULL AUTO_INCREMENT,
+            action_key VARCHAR(200) NOT NULL,
+            attempts   INT DEFAULT 0,
+            expires_at DATETIME,
+            PRIMARY KEY (id),
+            UNIQUE KEY uq_rl_key (action_key)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
     ];
     foreach ($migrations as $m) {
         try { $db->exec($m); } catch (Exception $e) { /* column already exists */ }
@@ -509,6 +518,13 @@ if ($mysql) {
         "ALTER TABLE authors ADD COLUMN email TEXT DEFAULT ''",
         "ALTER TABLE authors ADD COLUMN role TEXT DEFAULT ''",
         "ALTER TABLE newsletter_subscribers ADD COLUMN token TEXT DEFAULT ''",
+        // Create rate_limits table if not exists
+        "CREATE TABLE IF NOT EXISTS rate_limits (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            action_key TEXT NOT NULL UNIQUE,
+            attempts   INTEGER DEFAULT 0,
+            expires_at TEXT
+        )",
     ];
     foreach ($migrations as $m) {
         try { $db->exec($m); } catch (Exception $e) { /* already exists */ }

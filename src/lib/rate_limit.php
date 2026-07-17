@@ -22,6 +22,15 @@ function rate_limit_check(string $action, int $max = 5, int $window = 300): bool
         $now = time();
         $key = $action . ':' . $ip;
 
+        // Check if rate_limits table exists first
+        if (db_driver() === 'mysql') {
+            $tables = db_fetchAll("SHOW TABLES LIKE 'rate_limits'");
+            if (empty($tables)) return true; // Table doesn't exist, skip rate limiting
+        } else {
+            $tables = db_fetchAll("SELECT name FROM sqlite_master WHERE type='table' AND name='rate_limits'");
+            if (empty($tables)) return true; // Table doesn't exist, skip rate limiting
+        }
+
         // Clean old entries (best-effort, not every request)
         if (rand(1, 20) === 1) {
             if (db_driver() === 'mysql') {
