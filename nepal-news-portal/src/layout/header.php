@@ -55,13 +55,31 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
 <title><?= h($page_title ?? $_site_name_np) ?></title>
 <meta name="description" content="<?= h($page_desc ?? $_site_tagline) ?>">
 <meta name="keywords" content="<?= h(setting('meta_keywords','नेपाल समाचार,nepal news')) ?>">
+<meta name="author" content="<?= h($article['author_name'] ?? '') ?>">
+<meta name="robots" content="index,follow, max-image-preview:large">
+<?php if (!empty($article['published_at'])): ?>
+<meta name="article:published_time" content="<?= date('c', strtotime($article['published_at'])) ?>">
+<?php endif; ?>
+<!-- Open Graph / Facebook -->
 <meta property="og:title"       content="<?= h($page_title ?? $_site_name_np) ?>">
 <meta property="og:description" content="<?= h($page_desc ?? $_site_tagline) ?>">
 <meta property="og:type"        content="<?= h($og_type ?? 'website') ?>">
+<meta property="og:site_name"  content="<?= h($_site_name_en) ?>">
+<meta property="og:locale"      content="<?= current_lang()==='en' ? 'en_US' : 'ne_NP' ?>">
 <?php if (!empty($og_image)): ?>
-<meta property="og:image" content="<?= h($og_image) ?>">
+<meta property="og:image"       content="<?= h($og_image) ?>">
+<meta property="og:image:width"  content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt"    content="<?= h($page_title ?? $_site_name_np) ?>">
 <?php endif; ?>
-<meta name="robots" content="index,follow">
+<!-- Twitter Card -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="<?= h($page_title ?? $_site_name_np) ?>">
+<meta name="twitter:description" content="<?= h($page_desc ?? $_site_tagline) ?>">
+<?php if (!empty($og_image)): ?>
+<meta name="twitter:image"       content="<?= h($og_image) ?>">
+<?php endif; ?>
+<meta name="twitter:site"        content="@<?= h(setting('social_twitter_handle','')) ?>">
 <link rel="icon" href="<?= h($_favicon) ?>" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/style.css">
 <script src="https://cdn.tailwindcss.com"></script>
@@ -91,6 +109,8 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
 <link rel="alternate" type="application/rss+xml" title="<?= h(site_name()) ?> RSS" href="/rss.xml">
 </head>
 <body class="min-h-screen">
+<!-- Skip to main content for accessibility -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
 
 <?php
 // ── Site-wide announcement banner ─────────────────────────
@@ -448,9 +468,9 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
 </div>
 
 <!-- Back to top -->
-<button class="back-to-top" :class="backTop ? '' : 'hidden'" @click="window.scrollTo({top:0,behavior:'smooth'})" title="माथि जानुस्">
+<button class="back-to-top" :class="backTop ? '' : 'hidden'" @click="window.scrollTo({top:0,behavior:'smooth'})" title="माथि जानुस्" aria-label="Go to top">
   <?= icon('arrow-up','w-5 h-5') ?>
 </button>
 
 <!-- Main content wrapper -->
-<main class="max-w-7xl mx-auto px-4 py-6">
+<main id="main-content" class="max-w-7xl mx-auto px-4 py-6" role="main" tabindex="-1">

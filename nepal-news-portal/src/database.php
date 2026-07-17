@@ -78,11 +78,19 @@ function db_insert_ignore(string $table, array $cols, array $vals): int {
 // ── Settings ───────────────────────────────────────────────
 function get_all_settings(): array {
     static $cache = null;
-    if ($cache !== null) return $cache;
+    static $cache_time = 0;
+    $now = time();
+    
+    // Cache settings for 60 seconds (auto-refreshes on next request after timeout)
+    if ($cache !== null && ($now - $cache_time) < 60) {
+        return $cache;
+    }
+    
     try {
         $rows  = db_fetchAll("SELECT `key`, value FROM settings");
         $cache = [];
         foreach ($rows as $r) $cache[$r['key']] = $r['value'];
+        $cache_time = $now;
     } catch (Exception $e) { $cache = []; }
     return $cache;
 }

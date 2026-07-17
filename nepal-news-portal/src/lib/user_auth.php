@@ -46,7 +46,7 @@ function user_register(string $email, string $password, string $name): array {
     init_users_table();
     
     // Check if email exists
-    $existing = db_fetchOne("SELECT id FROM users WHERE email = ?", [$email]);
+    $existing = db_fetch("SELECT id FROM users WHERE email = ?", [$email]);
     if ($existing) {
         return ['success' => false, 'error' => 'Email already registered'];
     }
@@ -55,7 +55,7 @@ function user_register(string $email, string $password, string $name): array {
     $hash = password_hash($password, PASSWORD_DEFAULT);
     
     // Insert user
-    $user_id = db_query(
+    $user_id = db_insert(
         "INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)",
         [$email, $hash, $name]
     );
@@ -66,7 +66,7 @@ function user_register(string $email, string $password, string $name): array {
 function user_login(string $email, string $password): array {
     init_users_table();
     
-    $user = db_fetchOne("SELECT * FROM users WHERE email = ?", [$email]);
+    $user = db_fetch("SELECT * FROM users WHERE email = ?", [$email]);
     if (!$user) {
         return ['success' => false, 'error' => 'Invalid email or password'];
     }
@@ -141,7 +141,7 @@ function user_unbookmark(int $article_id): bool {
 
 function user_has_bookmarked(int $article_id): bool {
     if (!is_logged_in()) return false;
-    $result = db_fetchOne(
+    $result = db_fetch(
         "SELECT id FROM bookmarks WHERE user_id = ? AND article_id = ?",
         [$_SESSION['user_id'], $article_id]
     );

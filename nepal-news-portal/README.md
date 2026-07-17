@@ -1,20 +1,25 @@
-# 🇳🇵 Nepal News Portal
+# Nepal News Portal
 
 A complete Nepali news portal built with **PHP + SQLite + Tailwind CSS + Alpine.js**.
 
 ## Features
 
-- 📰 Full news portal (articles, categories, authors, tags)
-- 🌙 Dark / Light mode toggle (persisted in localStorage)
-- 📢 Advertisement management (header, sidebar, in-article placements)
-- ⚙️ Site Settings (logo, name, colors, contact, social links)
-- 🇳🇵 Bilingual (Nepali + English content per article)
-- 🔐 Admin Panel with CSRF protection
-- 📱 Fully responsive (mobile-first)
-- 🏷️ Breaking news ticker
-- 🔍 Full-text search
+- Full news portal (articles, categories, authors, tags)
+- Dark / Light mode toggle (persisted in localStorage)
+- Advertisement management (header, sidebar, in-article placements)
+- Site Settings (logo, name, colors, contact, social links)
+- Bilingual (Nepali + English content per article)
+- Admin Panel with CSRF protection
+- Fully responsive (mobile-first)
+- Breaking news ticker
+- Full-text search
+- **Accessibility**: WCAG 2.1 AA compliant (skip links, focus-visible, reduced motion, ARIA labels)
+- **Performance**: Lazy loading images, optimized caching (60s TTL), skeleton loading states
+- **PWA**: Service worker, manifest, offline support
+- **SEO**: Open Graph, Twitter Cards, JSON-LD structured data, canonical URLs
+- **Design**: Karobar Daily-inspired professional newspaper quality
 
-## Stack
+## Tech Stack
 
 | Layer      | Technology                  |
 |------------|-----------------------------|
@@ -23,6 +28,14 @@ A complete Nepali news portal built with **PHP + SQLite + Tailwind CSS + Alpine.
 | CSS        | Tailwind CDN + custom CSS   |
 | JS         | Alpine.js v3 (CDN)          |
 | Fonts      | Google Fonts (Mukta + Noto) |
+
+## Version 2.1 Improvements
+
+- **Security**: Fixed undefined `db_fetchOne` function calls, enhanced rate limiting
+- **Accessibility**: Skip links, focus-visible states, reduced motion support, high contrast mode
+- **SEO**: Enhanced Open Graph, Twitter Cards, article meta tags, canonical URLs
+- **Performance**: Settings cache with 60s TTL, lazy image helpers, skeleton loading
+- **Design**: Enhanced card system, improved typography, better dark mode
 
 ## cPanel Deployment
 
@@ -72,8 +85,8 @@ public_html/          ← upload all this
 | `/admin/categories`          | Category management     |
 | `/admin/authors`             | Author management       |
 | `/admin/tags`                | Tag management          |
-| `/admin/advertisements`      | Ad management *(NEW)*   |
-| `/admin/settings`            | Site settings *(NEW)*   |
+| `/admin/advertisements`      | Ad management           |
+| `/admin/settings`            | Site settings           |
 
 ## Advertisement Positions
 
@@ -103,4 +116,5 @@ To change colors: Admin → Settings → Theme Colors → Save.
 - `.htaccess` blocks direct access to `data/` and `*.db` files
 - CSRF tokens on all forms
 - All output HTML-escaped via `h()` helper
-# newsthemenext
+- Rate limiting on login (5 attempts per 5 minutes)
+- bcrypt password hashing

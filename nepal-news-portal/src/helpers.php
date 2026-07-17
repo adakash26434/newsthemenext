@@ -309,3 +309,41 @@ function reading_time_label(string $content): string {
     $minutes = reading_time($content);
     return $minutes . ' ' . ($minutes == 1 ? 'min read' : 'mins read');
 }
+
+// ── Image Helpers ────────────────────────────────────────────
+function lazy_img(string $src, string $alt = '', string $class = '', string $style = ''): string {
+    $class_attr = $class ? ' class="' . h($class) . '"' : '';
+    $style_attr = $style ? ' style="' . h($style) . '"' : '';
+    $alt_attr = $alt ? ' alt="' . h($alt) . '"' : ' alt=""';
+    $loading_attr = ' loading="lazy"';
+    
+    if (empty($src)) {
+        return '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 9\'%3E%3C/svg%3E" class="img-loading"' . $class_attr . $alt_attr . '>';
+    }
+    
+    return '<img src="' . h($src) . '"' . $alt_attr . $class_attr . $style_attr . $loading_attr . '>';
+}
+
+function img_with_srcset(string $src, string $alt = '', array $sizes = [], string $class = ''): string {
+    if (empty($src)) {
+        return '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 16 9\'%3E%3C/svg%3E" class="img-loading"' . ($class ? ' class="' . h($class) . '"' : '') . ' alt="" loading="lazy">';
+    }
+    
+    $class_attr = $class ? ' class="' . h($class) . '"' : '';
+    $alt_attr = $alt ? ' alt="' . h($alt) . '"' : ' alt=""';
+    
+    // For now, just return a simple lazy-loaded image
+    // In production, you'd generate multiple image sizes and srcset
+    return '<img src="' . h($src) . '"' . $alt_attr . $class_attr . ' loading="lazy">';
+}
+
+function og_image(string $src = ''): string {
+    if (!empty($src)) return $src;
+    
+    $logo_url = site_logo_url();
+    if (!empty($logo_url)) {
+        return $logo_url;
+    }
+    
+    return setting('og_default_image', '');
+}
