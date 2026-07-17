@@ -403,5 +403,32 @@ window.initBookmark = function(articleId) {
 
 <!-- AI Chat Widget -->
 <?php require_once __DIR__ . '/../components/ai_chat_widget.php'; ?>
+
+<!-- Bottom Mobile Navigation (like karobardaily, setopati) -->
+<div class="bottom-mobile-nav">
+  <div class="bottom-nav-items">
+    <a href="/" class="bottom-nav-item <?= $_current_path === '/' ? 'active' : '' ?>">
+      <?= icon('home','w-5 h-5') ?>
+      <span>गृहपृष्ठ</span>
+    </a>
+    <a href="/category" class="bottom-nav-item">
+      <?= icon('grid-3x3','w-5 h-5') ?>
+      <span>श्रेणी</span>
+    </a>
+    <a href="/live-data" class="bottom-nav-item">
+      <?= icon('activity','w-5 h-5') ?>
+      <span>लाइभ</span>
+    </a>
+    <a href="/horoscope" class="bottom-nav-item">
+      <?= icon('sparkles','w-5 h-5') ?>
+      <span>ज्योतिष</span>
+    </a>
+    <a href="/bookmark" class="bottom-nav-item">
+      <?= icon('bookmark','w-5 h-5') ?>
+      <span>सुरक्षित</span>
+    </a>
+  </div>
+</div>
+
 </body>
 </html>
