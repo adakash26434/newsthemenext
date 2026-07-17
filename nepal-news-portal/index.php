@@ -545,6 +545,9 @@ if ($uri === '/saved') {
 if ($uri === '/contact') {
     require SRC_DIR . '/pages/contact.php'; exit;
 }
+if ($uri === '/about') {
+    require SRC_DIR . '/pages/about.php'; exit;
+}
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }
