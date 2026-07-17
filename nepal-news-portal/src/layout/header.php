@@ -342,6 +342,29 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
           </ul>
           <?php endif; ?>
         </li>
+
+        <!-- Horoscope dropdown -->
+        <li x-data="{open:false}" class="has-dropdown">
+          <a href="/horoscope" class="<?= str_starts_with($_current_path,'/horoscope')?'active':'' ?>"
+             @mouseenter="open=true" @mouseleave="open=false">
+            <?= icon('sparkles','w-4 h-4') ?>
+            <span><?= $_cur_lang==='en'?'Horoscope':'ज्योतिष' ?></span>
+            <?= icon('chevron-down','w-3 h-3') ?>
+          </a>
+          <ul class="dropdown-menu" x-show="open" x-cloak
+              @mouseenter="open=true" @mouseleave="open=false">
+            <li><a href="/horoscope?tab=daily"><?= $_cur_lang==='en'?'Daily Rashifal':'दैनिक राशिफल' ?></a></li>
+            <li><a href="/horoscope?tab=monthly"><?= $_cur_lang==='en'?'Monthly Rashifal':'मासिक राशिफल' ?></a></li>
+            <li><a href="/horoscope?tab=yearly"><?= $_cur_lang==='en'?'Yearly Rashifal':'वार्षिक राशिफल' ?></a></li>
+            <li class="dropdown-divider"></li>
+            <li><a href="/horoscope?tab=subhatime"><?= $_cur_lang==='en'?'Auspicious Time':'शुभ समय' ?></a></li>
+            <li><a href="/horoscope?tab=subhadin"><?= $_cur_lang==='en'?'Auspicious Days':'शुभ दिन' ?></a></li>
+            <li><a href="/horoscope?tab=lagna"><?= $_cur_lang==='en'?'Lagna':'लग्न' ?></a></li>
+            <li class="dropdown-divider"></li>
+            <li><a href="/horoscope?tab=bastu"><?= $_cur_lang==='en'?'Bastu':'बस्तु' ?></a></li>
+            <li><a href="/horoscope?tab=gudmilan"><?= $_cur_lang==='en'?'Gud Milan':'गुड मिलन' ?></a></li>
+          </ul>
+        </li>
       </ul>
     </div>
   </nav>

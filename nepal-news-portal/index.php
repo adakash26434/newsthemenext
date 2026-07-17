@@ -608,6 +608,7 @@ if ($uri === '/admin/pages')        { admin_check(); require SRC_DIR . '/admin/s
 if ($uri === '/admin/subscribers')  { admin_check(); require SRC_DIR . '/admin/subscribers.php'; exit; }
 if ($uri === '/admin/epaper')       { admin_check(); require SRC_DIR . '/admin/epaper.php'; exit; }
 if ($uri === '/admin/market')       { admin_check(); require SRC_DIR . '/admin/market_widgets.php'; exit; }
+if ($uri === '/admin/horoscope') { admin_check(); require SRC_DIR . '/admin/horoscope.php'; exit; }
 if ($uri === '/admin/redirects')    { admin_check(); require SRC_DIR . '/admin/redirects.php'; exit; }
 if ($uri === '/admin/comments')    { require SRC_DIR . '/admin/comments.php'; exit; }
 if ($uri === '/admin/media')       { require SRC_DIR . '/admin/media.php'; exit; }
@@ -708,6 +709,7 @@ if ($uri === '/newsletter/unsubscribe') {
 if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }
+if ($uri === '/horoscope') { require SRC_DIR . '/pages/horoscope.php'; exit; }
 if ($uri === '/epaper' || $uri === '/epaper/') {
     require SRC_DIR . '/pages/epaper.php'; exit;
 }
