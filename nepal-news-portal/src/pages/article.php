@@ -128,6 +128,8 @@ require SRC_DIR . '/layout/header.php';
                   title="सुरक्षित गर्नुस्"
                   onclick="toggleBookmark(<?= (int)$article['id'] ?>, <?= json_encode(h($title_main)) ?>, '<?= h($article['slug']) ?>')"
                   ><?= icon('bookmark','w-3 h-3') ?></button>
+          <button id="tts-btn" class="font-btn" title="पढेर सुनाउनुस्"
+                  onclick="ttsToggle()"><?= icon('volume-2','w-3 h-3') ?></button>
         </div>
       </div>
 
@@ -380,4 +382,24 @@ function changeFontSize(d) {
 </style>
 
 <?php require SRC_DIR . '/layout/footer.php'; ?>
-<script>initBookmark(<?= (int)$article['id'] ?>);</script>
+<script>
+initBookmark(<?= (int)$article['id'] ?>);
+// ── Text-to-Speech ───────────────────────────────────────
+(function(){
+  var synth  = window.speechSynthesis;
+  var utt    = null;
+  var btn    = document.getElementById('tts-btn');
+  if (!synth || !btn) return;
+  window.ttsToggle = function() {
+    if (synth.speaking) { synth.cancel(); btn.title='पढेर सुनाउनुस्'; btn.style.color=''; return; }
+    var text = (document.getElementById('article-body') || document.body).innerText.slice(0,3000);
+    utt = new SpeechSynthesisUtterance(text);
+    utt.lang = 'ne-NP';
+    utt.rate = 0.9;
+    utt.onend = function(){ btn.title='पढेर सुनाउनुस्'; btn.style.color=''; };
+    synth.speak(utt);
+    btn.title='रोक्नुस्';
+    btn.style.color = 'var(--c-primary)';
+  };
+})();
+</script>

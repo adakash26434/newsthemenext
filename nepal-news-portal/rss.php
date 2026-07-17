@@ -22,11 +22,14 @@ $base_url = rtrim($base_url, '/');
 
 // ── Determine feed type ───────────────────────────────────
 $category_slug = '';
+$tag_slug      = '';
 $is_gnews = ($uri === '/google-news-sitemap.xml');
 
 if (!$is_gnews) {
-    // /rss/{slug} or /rss.xml
-    if (preg_match('#^/rss/([^/]+)$#', $uri, $m)) {
+    // /rss/tag/{slug} or /rss/{category-slug} or /rss.xml
+    if (preg_match('#^/rss/tag/([^/]+)$#', $uri, $m)) {
+        $tag_slug = $m[1];
+    } elseif (preg_match('#^/rss/([^/]+)$#', $uri, $m)) {
         $category_slug = $m[1];
     }
 }
@@ -34,6 +37,12 @@ if (!$is_gnews) {
 // ── Fetch articles ────────────────────────────────────────
 $opts = ['status'=>'published','limit'=>30];
 $category = null;
+$tag_obj  = null;
+if ($tag_slug) {
+    $tag_obj = get_tag_by_slug($tag_slug);
+    if (!$tag_obj) { http_response_code(404); exit; }
+    $opts['tag_slug'] = $tag_slug;
+}
 if ($category_slug) {
     $category = get_category_by_slug($category_slug);
     if (!$category) { http_response_code(404); exit; }
@@ -94,7 +103,9 @@ if ($is_gnews) {
 }
 
 // ── RSS 2.0 ───────────────────────────────────────────────
-$feed_title  = $category ? h($category['name_np'] ?: $category['name']) . ' — ' . $site_name : $site_name;
+$feed_title  = $tag_obj
+    ? '#' . h($tag_obj['name']) . ' — ' . $site_name
+    : ($category ? h($category['name_np'] ?: $category['name']) . ' — ' . $site_name : $site_name);
 $feed_desc   = $category ? ($category['name_np'] ?: $category['name']) . ' विभागका समाचार' : $tagline;
 $feed_link   = $base_url . ($category ? '/category/' . $category['slug'] : '/');
 $last_build  = !empty($articles) ? date('r', strtotime($articles[0]['published_at'] ?? $articles[0]['created_at'])) : date('r');
