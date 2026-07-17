@@ -15,6 +15,13 @@ $page_title = h($author['name']) . ' — ' . site_name();
 require SRC_DIR . '/layout/header.php';
 ?>
 
+<!-- Breadcrumb -->
+<nav class="breadcrumb mb-4">
+  <a href="/"><?= icon('home','w-3 h-3') ?> <?= lang_label('गृहपृष्ठ','Home') ?></a>
+  <span>›</span>
+  <span class="current"><?= h($author['name']) ?></span>
+</nav>
+
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
   <div class="lg:col-span-2">
     <!-- Author profile -->
