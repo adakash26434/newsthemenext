@@ -280,7 +280,6 @@ window.loadMore = function(btn) {
       btn.textContent = '⚠ पुनः प्रयास गर्नुस्';
     });
 };
-};
 
 // ── Back to Top ──────────────────────────────────────────
 (function(){
