@@ -8,12 +8,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id   = !empty($_POST['id']) ? (int)$_POST['id'] : null;
         $slug = trim($_POST['slug'] ?? '') ?: slugify(trim($_POST['name'] ?? ''));
         $data = [
-            'name'       => trim($_POST['name']       ?? ''),
-            'name_np'    => trim($_POST['name_np']    ?? ''),
-            'slug'       => $slug,
-            'color'      => trim($_POST['color']      ?? '#7F1D1D'),
-            'icon'       => trim($_POST['icon']       ?? ''),
-            'sort_order' => (int)($_POST['sort_order'] ?? 0),
+            'name'        => trim($_POST['name']        ?? ''),
+            'name_np'     => trim($_POST['name_np']     ?? ''),
+            'slug'        => $slug,
+            'color'       => trim($_POST['color']       ?? '#7F1D1D'),
+            'icon'        => trim($_POST['icon']        ?? ''),
+            'sort_order'  => (int)($_POST['sort_order']  ?? 0),
+            'description' => trim($_POST['description']  ?? ''),
         ];
         if (!$data['name']) { flash_set('error','नाम आवश्यक छ।'); }
         else { save_category($data, $id); flash_set('success', $id ? 'श्रेणी अपडेट गरियो।' : 'श्रेणी थपियो।'); }
@@ -75,6 +76,10 @@ admin_sidebar('categories');
         <label class="form-label">Lucide Icon Name</label>
         <input type="text" name="icon" class="form-control" value="<?= h($edit['icon']??'') ?>" placeholder="e.g. trending-up, briefcase, users">
         <p class="form-help">lucide.dev बाट icon नाम खोज्नुस्</p>
+      </div>
+      <div>
+        <label class="form-label">विवरण (Description)</label>
+        <textarea name="description" class="form-control" rows="2" placeholder="यस श्रेणीबारे छोटो विवरण..."><?= h($edit['description']??'') ?></textarea>
       </div>
       <div class="flex gap-2">
         <button type="submit" class="btn btn-primary gap-1"><?= icon('save','w-3.5 h-3.5') ?> सेभ गर्नुस्</button>

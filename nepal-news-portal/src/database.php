@@ -118,16 +118,17 @@ function get_category_by_slug(string $slug): ?array {
     return db_fetch("SELECT * FROM categories WHERE slug = ?", [$slug]);
 }
 function save_category(array $data, ?int $id = null): int {
+    $desc = $data['description'] ?? '';
     if ($id) {
         db_query(
-            "UPDATE categories SET name=?,name_np=?,slug=?,color=?,icon=?,sort_order=? WHERE id=?",
-            [$data['name'],$data['name_np'],$data['slug'],$data['color'],$data['icon'],$data['sort_order'],$id]
+            "UPDATE categories SET name=?,name_np=?,slug=?,color=?,icon=?,sort_order=?,description=? WHERE id=?",
+            [$data['name'],$data['name_np'],$data['slug'],$data['color'],$data['icon'],$data['sort_order'],$desc,$id]
         );
         return $id;
     }
     return db_insert(
-        "INSERT INTO categories (name,name_np,slug,color,icon,sort_order) VALUES (?,?,?,?,?,?)",
-        [$data['name'],$data['name_np'],$data['slug'],$data['color'],$data['icon'],$data['sort_order']]
+        "INSERT INTO categories (name,name_np,slug,color,icon,sort_order,description) VALUES (?,?,?,?,?,?,?)",
+        [$data['name'],$data['name_np'],$data['slug'],$data['color'],$data['icon'],$data['sort_order'],$desc]
     );
 }
 function delete_category(int $id): void {

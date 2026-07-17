@@ -26,7 +26,10 @@ require SRC_DIR . '/layout/header.php';
     <?php endif; ?>
     <div>
       <h1 class="text-2xl font-extrabold text-white"><?= h($cat_name) ?></h1>
-      <p class="text-sm mt-1 flex items-center gap-3" style="color:rgba(255,255,255,.75)">
+      <?php if ($cat['description'] ?? ''): ?>
+      <p class="text-sm mt-0.5" style="color:rgba(255,255,255,.80)"><?= h($cat['description']) ?></p>
+      <?php endif; ?>
+      <p class="text-xs mt-1 flex items-center gap-3" style="color:rgba(255,255,255,.65)">
         <span><?= np_number($total) ?> समाचार</span>
       </p>
     </div>
