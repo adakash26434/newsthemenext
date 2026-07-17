@@ -1,5 +1,23 @@
 <?php
 $q        = trim($_GET['q'] ?? '');
+
+// ── AJAX autocomplete suggest ─────────────────────────────
+if (!empty($_GET['ajax']) && $_GET['ajax'] === 'suggest' && $q !== '') {
+    $sugg = get_articles(['status'=>'published','search'=>$q,'limit'=>6]);
+    $out  = [];
+    foreach ($sugg as $s) {
+        $out[] = [
+            'title'    => h($s['title']),
+            'slug'     => $s['slug'],
+            'image'    => $s['image_url'] ?? '',
+            'category' => $s['category_name_np'] ?: $s['category_name'],
+        ];
+    }
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($out);
+    exit;
+}
+
 $page     = max(1, (int)($_GET['page'] ?? 1));
 $per_page = ARTICLES_PER_PAGE;
 

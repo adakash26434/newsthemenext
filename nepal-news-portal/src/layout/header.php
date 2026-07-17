@@ -260,16 +260,45 @@ $_favicon      = setting('favicon_url', '/assets/favicon.svg');
         <?= icon('x','w-5 h-5') ?>
       </button>
     </div>
-    <form method="GET" action="/search">
-      <input type="search" name="q" class="search-overlay-input"
-             placeholder="<?= $_cur_lang==='en'?'Search in Nepali or English...':'नेपाली वा English मा खोज्नुस्...' ?>"
-             autofocus x-ref="searchInput"
-             x-effect="if(searchOpen) $nextTick(()=>$refs.searchInput.focus())">
+    <form method="GET" action="/search" autocomplete="off"
+          x-data="{suggestions:[], sq:'', loadSugg(){
+            if(this.sq.length < 2){this.suggestions=[];return;}
+            fetch('/search?q='+encodeURIComponent(this.sq)+'&ajax=suggest')
+              .then(r=>r.json()).then(d=>this.suggestions=d).catch(()=>{this.suggestions=[];});
+          }}">
+      <div class="relative">
+        <input type="search" name="q" class="search-overlay-input"
+               placeholder="<?= $_cur_lang==='en'?'Search in Nepali or English...':'नेपाली वा English मा खोज्नुस्...' ?>"
+               autofocus x-ref="searchInput"
+               x-model="sq"
+               @input.debounce.300ms="loadSugg()"
+               @keydown.escape.stop="suggestions=[]"
+               x-effect="if(searchOpen) $nextTick(()=>$refs.searchInput.focus())">
+        <!-- Suggestions dropdown -->
+        <div x-show="suggestions.length > 0" x-cloak
+             class="absolute left-0 right-0 mt-1 rounded-xl overflow-hidden z-50"
+             style="background:var(--c-surface);border:1px solid var(--c-border);box-shadow:0 8px 24px rgba(0,0,0,.15)">
+          <template x-for="s in suggestions" :key="s.slug">
+            <a :href="'/article/'+s.slug"
+               class="flex items-center gap-3 px-4 py-2.5 hover:opacity-80 transition-opacity border-b"
+               style="border-color:var(--c-border)"
+               @click="searchOpen=false;suggestions=[]">
+              <template x-if="s.image">
+                <img :src="s.image" class="w-10 h-8 rounded object-cover flex-shrink-0" alt="">
+              </template>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold truncate" x-text="s.title" style="color:var(--c-text)"></div>
+                <div class="text-xs" x-text="s.category" style="color:var(--c-muted)"></div>
+              </div>
+            </a>
+          </template>
+        </div>
+      </div>
       <div class="flex gap-2 mt-3">
         <button type="submit" class="btn btn-primary flex-1 justify-center gap-1">
           <?= icon('search','w-4 h-4') ?> <?= $_cur_lang==='en'?'Search':'खोज्नुस्' ?>
         </button>
-        <button type="button" @click="searchOpen=false" class="btn btn-secondary gap-1">
+        <button type="button" @click="searchOpen=false;suggestions=[]" class="btn btn-secondary gap-1">
           <?= icon('x','w-4 h-4') ?> <?= $_cur_lang==='en'?'Cancel':'रद्द' ?>
         </button>
       </div>

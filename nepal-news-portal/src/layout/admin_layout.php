@@ -46,6 +46,8 @@ $links = [
   ['advertisements', '/admin/advertisements','megaphone',        'विज्ञापन'],
   ['events',         '/admin/events',        'calendar-days',    'कार्यक्रम'],
   ['pages',          '/admin/pages',         'file-text',        'पृष्ठहरू'],
+  ['comments',       '/admin/comments',      'message-circle',   'टिप्पणीहरू'],
+  ['media',          '/admin/media',         'image',            'मिडिया'],
   ['subscribers',    '/admin/subscribers',   'mail',             'न्यूजलेटर'],
   ['epaper',         '/admin/epaper',        'newspaper',        'ई-पेपर'],
   ['market',         '/admin/market',        'bar-chart-2',      'बजार दर'],
@@ -58,10 +60,17 @@ $links = [
     <small>Admin Panel</small>
   </div>
   <nav class="admin-nav flex-1 py-2 overflow-y-auto">
+    <?php
+    $pending_comments = 0;
+    try { $pending_comments = count_comments('pending'); } catch(\Exception $e){}
+    ?>
     <?php foreach ($links as [$key, $href, $icon, $label]): ?>
-    <a href="<?= $href ?>" class="<?= $active === $key ? 'active' : '' ?>">
+    <a href="<?= $href ?>" class="<?= $active === $key ? 'active' : '' ?>" style="display:flex;align-items:center;gap:.625rem">
       <i data-lucide="<?= h($icon) ?>" class="w-4 h-4 flex-shrink-0"></i>
-      <?= h($label) ?>
+      <span style="flex:1"><?= h($label) ?></span>
+      <?php if ($key === 'comments' && $pending_comments > 0): ?>
+      <span class="sidebar-badge"><?= $pending_comments ?></span>
+      <?php endif; ?>
     </a>
     <?php endforeach; ?>
   </nav>
