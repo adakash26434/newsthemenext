@@ -564,6 +564,45 @@ if ($uri === '/api/ai/status' && $meth === 'GET') {
     exit;
 }
 
+// Live Data API endpoints
+if (str_starts_with($uri, '/api/live/')) {
+    header('Content-Type: application/json');
+    require_once __DIR__ . '/src/lib/live_data_service.php';
+    
+    $action = substr($uri, 9);
+    $live = live_data();
+    
+    switch ($action) {
+        case 'earthquakes':
+            echo json_encode(['success' => true, 'data' => $live->getEarthquakes()]);
+            break;
+        case 'weather':
+            echo json_encode(['success' => true, 'data' => $live->getWeather()]);
+            break;
+        case 'air-quality':
+            echo json_encode(['success' => true, 'data' => $live->getAirQuality()]);
+            break;
+        case 'alerts':
+            echo json_encode(['success' => true, 'data' => array_merge($live->getWeatherAlerts(), $live->getDisasterAlerts())]);
+            break;
+        case 'notices':
+            echo json_encode(['success' => true, 'data' => $live->getGovernmentNotices()]);
+            break;
+        case 'sun-times':
+            echo json_encode(['success' => true, 'data' => $live->getSunTimes()]);
+            break;
+        case 'commodities':
+            echo json_encode(['success' => true, 'data' => $live->getCommodityPrices()]);
+            break;
+        case 'dashboard':
+            echo json_encode(['success' => true, 'data' => $live->getDashboard()]);
+            break;
+        default:
+            echo json_encode(['success' => false, 'error' => 'Unknown endpoint']);
+    }
+    exit;
+}
+
 // ══════════════════════════════════════════════════════════
 //  GET routes
 // ══════════════════════════════════════════════════════════
@@ -609,6 +648,7 @@ if ($uri === '/admin/subscribers')  { admin_check(); require SRC_DIR . '/admin/s
 if ($uri === '/admin/epaper')       { admin_check(); require SRC_DIR . '/admin/epaper.php'; exit; }
 if ($uri === '/admin/market')       { admin_check(); require SRC_DIR . '/admin/market_widgets.php'; exit; }
 if ($uri === '/admin/horoscope') { admin_check(); require SRC_DIR . '/admin/horoscope.php'; exit; }
+if ($uri === '/admin/live_data') { admin_check(); require SRC_DIR . '/admin/live_data.php'; exit; }
 if ($uri === '/admin/redirects')    { admin_check(); require SRC_DIR . '/admin/redirects.php'; exit; }
 if ($uri === '/admin/comments')    { require SRC_DIR . '/admin/comments.php'; exit; }
 if ($uri === '/admin/media')       { require SRC_DIR . '/admin/media.php'; exit; }
@@ -710,6 +750,7 @@ if ($uri === '/search') {
     require SRC_DIR . '/pages/search.php'; exit;
 }
 if ($uri === '/horoscope') { require SRC_DIR . '/pages/horoscope.php'; exit; }
+if ($uri === '/live-data') { require SRC_DIR . '/pages/live_data.php'; exit; }
 if ($uri === '/epaper' || $uri === '/epaper/') {
     require SRC_DIR . '/pages/epaper.php'; exit;
 }
