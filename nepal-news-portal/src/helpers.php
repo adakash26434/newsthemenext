@@ -20,7 +20,7 @@ function csrf_check(): void {
 }
 
 // ── Lucide icon helper ─────────────────────────────────────
-// Usage: <?= icon('calendar') ?> or <?= icon('search', 'w-5 h-5') ?>
+// icon('name') or icon('name', 'css-classes')
 function icon(string $name, string $class = 'w-4 h-4 inline-block align-middle flex-shrink-0'): string {
     return '<i data-lucide="' . h($name) . '" class="' . h($class) . '"></i>';
 }
