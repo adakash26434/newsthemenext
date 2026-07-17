@@ -7,6 +7,7 @@ function h(mixed $v): string {
     return htmlspecialchars((string)($v ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 function csrf_token(): string {
+    configure_session();
     if (session_status() === PHP_SESSION_NONE) session_start();
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(24));
@@ -28,19 +29,50 @@ function icon(string $name, string $class = 'w-4 h-4 inline-block align-middle f
     return '<i data-lucide="' . h($name) . '" class="' . h($class) . '"></i>';
 }
 
+// ── Session helpers ───────────────────────────────────────
+function configure_session(): void {
+    static $configured = false;
+    if ($configured) return;
+    $configured = true;
+    if (session_status() === PHP_SESSION_NONE) {
+        ini_set('session.cookie_httponly', 1);
+        ini_set('session.use_strict_mode', 1);
+        ini_set('session.cookie_samesite', 'Strict');
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+            ini_set('session.cookie_secure', 1);
+        }
+        session_name('NPP_SESSID');
+    }
+}
+
 // ── Admin auth ─────────────────────────────────────────────
 function admin_login(string $user, string $pass): bool {
     $stored_user = setting('admin_username', DEFAULT_ADMIN_USERNAME);
     $stored_hash = setting('admin_password', '');
+    
+    // Rate limiting - prevent brute force
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    if (!check_rate_limit('admin_login', $ip, 5, 300)) {
+        flash_set('error', 'Too many login attempts. Please wait 5 minutes.');
+        return false;
+    }
+    
     if ($user !== $stored_user) return false;
+    
+    // Password hash comparison (secure)
     if ($stored_hash && str_starts_with($stored_hash, '$2y$')) {
         return password_verify($pass, $stored_hash);
     }
-    // Fallback plain-text
-    $plain = setting('admin_password_plain', DEFAULT_ADMIN_PASSWORD);
-    return $pass === $plain || $pass === $stored_hash;
+    
+    // Legacy plaintext check - ONLY for initial setup (when no hash exists)
+    if (empty($stored_hash)) {
+        return $pass === DEFAULT_ADMIN_PASSWORD;
+    }
+    
+    return false;
 }
 function is_admin(): bool {
+    configure_session();
     if (session_status() === PHP_SESSION_NONE) session_start();
     return !empty($_SESSION['admin_logged_in']);
 }
@@ -50,10 +82,12 @@ function admin_check(): void {
 
 // ── Flash messages ─────────────────────────────────────────
 function flash_set(string $key, string $msg): void {
+    configure_session();
     if (session_status() === PHP_SESSION_NONE) session_start();
     $_SESSION['flash'][$key] = $msg;
 }
 function flash_get(string $key): ?string {
+    configure_session();
     if (session_status() === PHP_SESSION_NONE) session_start();
     $msg = $_SESSION['flash'][$key] ?? null;
     unset($_SESSION['flash'][$key]);
@@ -135,10 +169,12 @@ function format_bs_date(string $adDate, bool $full = false): string {
 
 // ── Language helpers ───────────────────────────────────────
 function current_lang(): string {
+    configure_session();
     if (session_status() === PHP_SESSION_NONE) session_start();
     return $_SESSION['lang'] ?? setting('default_lang', 'np');
 }
 function set_lang(string $lang): void {
+    configure_session();
     if (session_status() === PHP_SESSION_NONE) session_start();
     $_SESSION['lang'] = in_array($lang, ['np','en']) ? $lang : 'np';
 }
