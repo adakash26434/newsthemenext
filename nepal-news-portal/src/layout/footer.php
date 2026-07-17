@@ -404,6 +404,46 @@ window.initBookmark = function(articleId) {
 <!-- AI Chat Widget -->
 <?php require_once __DIR__ . '/../components/ai_chat_widget.php'; ?>
 
+<!-- Newsletter Popup Modal -->
+<div x-data="{ nlShow: false, nlDismissed: localStorage.getItem('nlDismissed') === '1' }"
+     x-init="setTimeout(() => { if (!nlDismissed) nlShow = true; }, 3000)"
+     x-show="nlShow" x-cloak
+     class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+     style="background:rgba(0,0,0,0.6);backdrop-filter:blur(4px)"
+     @keydown.escape.window="nlShow=false;localStorage.setItem('nlDismissed','1')">
+  <div class="newsletter-modal w-full max-w-md rounded-2xl overflow-hidden"
+       @click.stop
+       style="background:var(--c-surface);box-shadow:var(--shadow-xl)">
+    <div class="relative p-6 text-center" style="background:linear-gradient(135deg, var(--c-primary) 0%, var(--c-secondary) 100%)">
+      <button @click="nlShow=false;localStorage.setItem('nlDismissed','1')"
+              class="absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-white/20 flex items-center justify-center">
+        <?= icon('mail','w-8 h-8 text-white') ?>
+      </div>
+      <h3 class="text-xl font-bold text-white mb-2">न्यूजलेटर सदस्यता</h3>
+      <p class="text-sm text-white/85">ताजा समाचार सिधै तपाईंको इमेलमा पाउनुस्</p>
+    </div>
+    <div class="p-6">
+      <form method="POST" action="/newsletter/subscribe" class="space-y-3">
+        <?= csrf_field() ?>
+        <input type="text" name="name" placeholder="तपाईंको नाम" required
+               class="w-full px-4 py-3 rounded-lg border" style="border-color:var(--c-border);background:var(--c-surface2);color:var(--c-text)">
+        <input type="email" name="email" placeholder="इमेल ठेगाना *" required
+               class="w-full px-4 py-3 rounded-lg border" style="border-color:var(--c-border);background:var(--c-surface2);color:var(--c-text)">
+        <button type="submit" class="w-full py-3 rounded-lg font-bold text-white transition-all hover:opacity-90"
+                style="background:linear-gradient(135deg, var(--c-primary), var(--c-secondary))">
+          सदस्य बन्नुस् <?= icon('arrow-right','w-4 h-4 inline') ?>
+        </button>
+      </form>
+      <p class="text-xs text-center mt-3" style="color:var(--c-muted)">
+        <button @click="nlShow=false;localStorage.setItem('nlDismissed','1')" class="underline hover:no-underline">अर्को पटक</button> · <a href="/newsletter/unsubscribe" class="underline hover:no-underline">सदस्यता रद्द</a>
+      </p>
+    </div>
+  </div>
+</div>
+
 <!-- Bottom Mobile Navigation (like karobardaily, setopati) -->
 <div class="bottom-mobile-nav">
   <div class="bottom-nav-items">
