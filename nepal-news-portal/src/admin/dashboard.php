@@ -106,6 +106,29 @@ admin_sidebar('dashboard');
   </div>
 </div>
 
+<!-- View chart (last 7 days) -->
+<?php if (!empty($stats['view_chart'])): ?>
+<div class="mt-6 rounded-lg p-5" style="border:1px solid var(--c-admin-border);background:var(--c-admin-surface)">
+  <h2 class="font-bold text-sm mb-4 flex items-center gap-2">
+    <i data-lucide="trending-up" class="w-4 h-4"></i> पछिल्लो ७ दिन — दैनिक दृश्य
+  </h2>
+  <?php
+    $max_v = max(array_column($stats['view_chart'], 'views') ?: [1]);
+    $max_v = max($max_v, 1);
+  ?>
+  <div class="flex items-end gap-2" style="height:80px">
+    <?php foreach ($stats['view_chart'] as $vc): ?>
+    <?php $pct = round(($vc['views'] / $max_v) * 100); $pct = max($pct, 2); ?>
+    <div class="flex-1 flex flex-col items-center gap-1" title="<?= $vc['date'] ?>: <?= $vc['views'] ?> दृश्य">
+      <div class="text-center text-xs" style="color:var(--c-muted);font-size:9px"><?= np_number((int)$vc['views']) ?></div>
+      <div class="w-full rounded-t-sm" style="height:<?= $pct ?>%;background:var(--c-primary);opacity:0.8;min-height:3px;transition:opacity .15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.8"></div>
+      <div class="text-center" style="font-size:9px;color:var(--c-muted)"><?= date('D', strtotime($vc['date'])) ?></div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+</div>
+<?php endif; ?>
+
 <!-- Quick actions -->
 <div class="mt-6">
   <h2 class="font-bold text-sm mb-3 flex items-center gap-2">

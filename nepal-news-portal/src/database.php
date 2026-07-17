@@ -788,9 +788,18 @@ function get_dashboard_stats(): array {
     $recent           = get_articles(['status'=>'published','limit'=>6]);
     $comments_pending = count_comments('pending');
     $comments_total   = count_comments();
+    // Last 7 days view chart
+    $view_chart = [];
+    try {
+        for ($i = 6; $i >= 0; $i--) {
+            $d = date('Y-m-d', strtotime("-{$i} days"));
+            $cnt = db_count("SELECT COALESCE(SUM(view_count),0) FROM article_views_log WHERE viewed_date=?", [$d]);
+            $view_chart[] = ['date' => $d, 'views' => $cnt];
+        }
+    } catch (\Exception $e) { $view_chart = []; }
     return compact('total','published','draft','views','cats','auths','ads_total','ads_active',
                    'subscribers','events_total','events_reg','bycat','recent',
-                   'comments_pending','comments_total');
+                   'comments_pending','comments_total','view_chart');
 }
 
 // ── Comments ───────────────────────────────────────────────────────────────────

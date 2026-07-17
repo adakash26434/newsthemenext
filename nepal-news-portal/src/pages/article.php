@@ -462,10 +462,13 @@ require SRC_DIR . '/layout/header.php';
 </div>
 
 <script>
-var _fontSize = 16;
+var _fontSize = parseInt(localStorage.getItem('nnp_fontsize') || '16', 10);
+(function(){ var b = document.getElementById('article-body'); if(b) b.style.fontSize = _fontSize + 'px'; })();
 function changeFontSize(d) {
   _fontSize = Math.min(22, Math.max(13, _fontSize + d));
-  document.getElementById('article-body').style.fontSize = _fontSize + 'px';
+  var b = document.getElementById('article-body');
+  if(b) b.style.fontSize = _fontSize + 'px';
+  localStorage.setItem('nnp_fontsize', _fontSize);
 }
 </script>
 <style>
