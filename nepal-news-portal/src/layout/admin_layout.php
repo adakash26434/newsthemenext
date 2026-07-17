@@ -191,6 +191,7 @@ $links = [
   ['market',         '/admin/market',        'bar-chart-2',      'बजार दर'],
   ['redirects',      '/admin/redirects',     'corner-right-down','रिडाइरेक्ट'],
   ['settings',       '/admin/settings',      'settings',         'सेटिङ्स'],
+  ['ai_settings',    '/admin/ai_settings',   'bot',              'AI Chat'],
 ]; ?>
 <aside class="admin-sidebar" :class="sidebarOpen ? '' : '-translate-x-full'">
   <div class="brand">
