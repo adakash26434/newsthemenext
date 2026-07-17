@@ -2,7 +2,7 @@
 -- Run this SQL to populate the database with sample news articles
 
 -- Categories
-INSERT OR IGNORE INTO categories (name, slug, name_np, color, icon, description) VALUES
+INSERT IGNORE INTO categories (name, slug, name_np, color, icon, description) VALUES
 ('Economy', 'arthatantra', 'अर्थतन्त्र', '#059669', 'trending-up', 'Economic news and analysis'),
 ('Banking', 'banking', 'बैंकिङ', '#2563EB', 'landmark', 'Banking and finance sector news'),
 ('Share Market', 'share-bazar', 'शेयर बजार', '#7C3AED', 'line-chart', 'Stock market and investment news'),
@@ -17,7 +17,7 @@ INSERT OR IGNORE INTO categories (name, slug, name_np, color, icon, description)
 ('Corporate', 'corporate', 'कर्पोरेट', '#F59E0B', 'briefcase', 'Corporate and business news');
 
 -- Authors
-INSERT OR IGNORE INTO authors (name, slug, email, bio, role, avatar_url) VALUES
+INSERT IGNORE INTO authors (name, slug, email, bio, role, avatar_url) VALUES
 ('रमेश शर्मा', 'ramesh-sharma', 'ramesh@newsportal.com', 'नेपाली राष्ट्र बैंकका पूर्व अर्थविज्ञानी', 'Senior Economic Reporter', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80'),
 ('सीता अधिकारी', 'sita-adhikari', 'sita@newsportal.com', 'अनुभवी पत्रकार', 'Business Correspondent', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'),
 ('विकास थापा', 'bikash-thapa', 'bikash@newsportal.com', 'शेयर बजार विश्लेषक', 'Financial Analyst', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80'),
@@ -25,7 +25,7 @@ INSERT OR IGNORE INTO authors (name, slug, email, bio, role, avatar_url) VALUES
 ('Editorial Team', 'team', 'editorial@newsportal.com', 'Editorial Team', 'Editor', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80');
 
 -- Articles (Sample - add more as needed)
-INSERT OR IGNORE INTO articles (title, slug, summary, content, image_url, category_id, author_id, featured, is_breaking, status, views, published_at) VALUES
+INSERT IGNORE INTO articles (title, slug, summary, content, image_url, category_id, author_id, featured, is_breaking, status, views, published_at) VALUES
 
 -- Featured Articles
 ('नेपालको आर्थिक वृद्धिदर यो वर्ष ५.५ प्रतिशत हुने IMF को प्रक्षेपण', 'nepal-economic-growth-imf',
@@ -119,7 +119,7 @@ INSERT OR IGNORE INTO articles (title, slug, summary, content, image_url, catego
 'https://images.unsplash.com/photo-1562679299-6f0d8b7a73c7?w=800&q=80', 9, 5, 0, 0, 'published', 3300, datetime('now', '-22 hours'));
 
 -- Tags
-INSERT OR IGNORE INTO tags (name, slug, usage_count) VALUES
+INSERT IGNORE INTO tags (name, slug, usage_count) VALUES
 ('अर्थतन्त्र', 'arthatantra', 5),
 ('बजेट', 'budget', 3),
 ('शेयर बजार', 'share-bazar', 4),
