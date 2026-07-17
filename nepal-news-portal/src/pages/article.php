@@ -467,7 +467,22 @@ function changeFontSize(d) {
 </style>
 
 <?php require SRC_DIR . '/layout/footer.php'; ?>
+<div class="reading-progress" id="reading-progress"></div>
 <script>
+// ── Reading progress bar ─────────────────────────────────
+(function(){
+  var bar  = document.getElementById('reading-progress');
+  var body = document.getElementById('article-body');
+  if (!bar || !body) return;
+  function update() {
+    var top  = body.getBoundingClientRect().top + window.scrollY;
+    var end  = top + body.offsetHeight;
+    var pct  = Math.max(0, Math.min(100, (window.scrollY - top) / (end - top - window.innerHeight + 100) * 100));
+    bar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', update, {passive:true});
+  update();
+})();
 initBookmark(<?= (int)$article['id'] ?>);
 // ── Text-to-Speech ───────────────────────────────────────
 (function(){
