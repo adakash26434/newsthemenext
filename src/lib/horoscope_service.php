@@ -45,15 +45,17 @@ class HoroscopeService {
      * Get today's rashifal for a sign
      */
     public function getDailyRashifal(string $sign): ?array {
-        $stmt = $this->db->prepare("
-            SELECT * FROM horoscope_daily 
-            WHERE sign = ? AND date = CURDATE() 
-            LIMIT 1
-        ");
-        $stmt->bind_param('s', $sign);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $today = date('Y-m-d');
+        $stmt = $this->db->prepare("SELECT * FROM horoscope_daily WHERE sign = ? AND date = ? LIMIT 1");
+        $stmt->execute([$sign, $today]);
+        $result = $stmt->fetch();
+        if (!$result) {
+            // Try to get the most recent one if today's is not available
+            $stmt = $this->db->prepare("SELECT * FROM horoscope_daily WHERE sign = ? ORDER BY date DESC LIMIT 1");
+            $stmt->execute([$sign]);
+            $result = $stmt->fetch();
+        }
+        return $result ?: null;
     }
     
     /**
@@ -63,15 +65,9 @@ class HoroscopeService {
         if ($month == 0) $month = (int)date('n');
         $year = (int)date('Y');
         
-        $stmt = $this->db->prepare("
-            SELECT * FROM horoscope_monthly 
-            WHERE sign = ? AND month = ? AND year = ? 
-            LIMIT 1
-        ");
-        $stmt->bind_param('sii', $sign, $month, $year);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $stmt = $this->db->prepare("SELECT * FROM horoscope_monthly WHERE sign = ? AND month = ? AND year = ? LIMIT 1");
+        $stmt->execute([$sign, $month, $year]);
+        return $stmt->fetch() ?: null;
     }
     
     /**
@@ -80,15 +76,9 @@ class HoroscopeService {
     public function getYearlyRashifal(string $sign, int $year = 0): ?array {
         if ($year == 0) $year = (int)date('Y');
         
-        $stmt = $this->db->prepare("
-            SELECT * FROM horoscope_yearly 
-            WHERE sign = ? AND year = ? 
-            LIMIT 1
-        ");
-        $stmt->bind_param('si', $sign, $year);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $stmt = $this->db->prepare("SELECT * FROM horoscope_yearly WHERE sign = ? AND year = ? LIMIT 1");
+        $stmt->execute([$sign, $year]);
+        return $stmt->fetch() ?: null;
     }
     
     /**
@@ -96,15 +86,9 @@ class HoroscopeService {
      */
     public function getTodayAuspiciousTimes(): ?array {
         $nepali_date = $this->getCurrentNepaliDate();
-        $stmt = $this->db->prepare("
-            SELECT * FROM auspicious_times 
-            WHERE nepali_date = ? 
-            LIMIT 1
-        ");
-        $stmt->bind_param('s', $nepali_date);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $stmt = $this->db->prepare("SELECT * FROM auspicious_times WHERE nepali_date = ? LIMIT 1");
+        $stmt->execute([$nepali_date]);
+        return $stmt->fetch() ?: null;
     }
     
     /**
@@ -114,15 +98,9 @@ class HoroscopeService {
         if ($month == 0) $month = (int)date('n');
         if ($year == 0) $year = (int)date('Y');
         
-        $stmt = $this->db->prepare("
-            SELECT * FROM auspicious_days 
-            WHERE month = ? AND year = ? 
-            ORDER BY day ASC
-        ");
-        $stmt->bind_param('ii', $month, $year);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $this->db->prepare("SELECT * FROM auspicious_days WHERE month = ? AND year = ? ORDER BY day ASC");
+        $stmt->execute([$month, $year]);
+        return $stmt->fetchAll();
     }
     
     /**
@@ -130,54 +108,34 @@ class HoroscopeService {
      */
     public function getTodayLagna(): ?array {
         $nepali_date = $this->getCurrentNepaliDate();
-        $stmt = $this->db->prepare("
-            SELECT * FROM lagna_info 
-            WHERE nepali_date = ? 
-            LIMIT 1
-        ");
-        $stmt->bind_param('s', $nepali_date);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $stmt = $this->db->prepare("SELECT * FROM lagna_info WHERE nepali_date = ? LIMIT 1");
+        $stmt->execute([$nepali_date]);
+        return $stmt->fetch() ?: null;
     }
     
     /**
      * Get Gud Milan (Compatibility) for two signs
      */
     public function getGudMilan(string $boy_sign, string $girl_sign): ?array {
-        $stmt = $this->db->prepare("
-            SELECT * FROM gud_milan 
-            WHERE boy_sign = ? AND girl_sign = ? 
-            LIMIT 1
-        ");
-        $stmt->bind_param('ss', $boy_sign, $girl_sign);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $stmt = $this->db->prepare("SELECT * FROM gud_milan WHERE boy_sign = ? AND girl_sign = ? LIMIT 1");
+        $stmt->execute([$boy_sign, $girl_sign]);
+        return $stmt->fetch() ?: null;
     }
     
     /**
      * Get Bastu recommendations
      */
     public function getBastuRecommendations(string $sign): ?array {
-        $stmt = $this->db->prepare("
-            SELECT * FROM bastu_recommendations 
-            WHERE sign = ? 
-            LIMIT 1
-        ");
-        $stmt->bind_param('s', $sign);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_assoc();
+        $stmt = $this->db->prepare("SELECT * FROM bastu_recommendations WHERE sign = ? LIMIT 1");
+        $stmt->execute([$sign]);
+        return $stmt->fetch() ?: null;
     }
     
     /**
      * Get current Nepali date
      */
     public function getCurrentNepaliDate(): string {
-        // Simple conversion - in production use proper Nepali calendar API
         $english_date = date('Y-m-d');
-        // This would call a Nepali calendar API
         return $this->convertToNepaliDate($english_date);
     }
     
@@ -185,15 +143,11 @@ class HoroscopeService {
      * Convert English date to Nepali (approximate)
      */
     private function convertToNepaliDate(string $eng_date): string {
-        // Using approximation based on Nepali calendar
-        // In production, use official API
         $nepali_months = ['बैशाख', 'जेठ', 'असार', 'श्रावण', 'भदौ', 'असोज', 'कार्तिक', 'मंसिर', 'पौष', 'माघ', 'फाल्गुन', 'चैत्र'];
         $month = (int)date('n', strtotime($eng_date)) - 1;
         if ($month < 0) $month = 11;
         $day = (int)date('j', strtotime($eng_date));
         $year = (int)date('Y', strtotime($eng_date));
-        
-        // Adjust year for BS (approximately)
         $bs_year = $year + 56;
         
         return $nepali_months[$month] . ' ' . $day . ', ' . $bs_year;
@@ -204,13 +158,9 @@ class HoroscopeService {
      */
     public function getAllDailyRashifal(): array {
         $today = date('Y-m-d');
-        $stmt = $this->db->prepare("
-            SELECT * FROM horoscope_daily 
-            WHERE date = CURDATE()
-        ");
-        $stmt->execute();
-        $result = $stmt->get_result();
-        return $result->fetch_all(MYSQLI_ASSOC);
+        $stmt = $this->db->prepare("SELECT * FROM horoscope_daily WHERE date = ?");
+        $stmt->execute([$today]);
+        return $stmt->fetchAll();
     }
     
     /**
