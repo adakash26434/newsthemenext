@@ -85,6 +85,28 @@ require SRC_DIR . '/layout/header.php';
   <!-- Sidebar -->
   <aside class="space-y-5">
     <?php render_ads('sidebar-top'); ?>
+    
+    <!-- Trending Widget -->
+    <?php $trending = get_articles(['status'=>'published','limit'=>5,'order_by'=>'views']); ?>
+    <?php if (!empty($trending)): ?>
+    <div class="trending-widget">
+      <div class="widget-header">
+        <?= icon('trending-up','w-4 h-4') ?> ट्रेन्डिङ
+      </div>
+      <?php foreach ($trending as $i => $t): ?>
+      <div class="trending-item">
+        <div class="trending-rank"><?= $i + 1 ?></div>
+        <div class="trending-content">
+          <a href="/article/<?= h($t['slug']) ?>"><?= h(current_lang()==='en' ? ($t['title_np']?:$t['title']) : $t['title']) ?></a>
+          <div class="trending-meta">
+            <span><?= icon('eye','w-3 h-3 inline') ?> <?= np_number((int)$t['views']) ?></span>
+          </div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+    
     <div class="sidebar-card">
       <div class="section-heading mb-3">
         <span class="flex items-center gap-2"><?= icon('grid','w-4 h-4') ?> सबै श्रेणीहरू</span>
