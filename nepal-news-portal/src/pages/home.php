@@ -403,7 +403,9 @@ require SRC_DIR . '/layout/header.php';
       </div>
       <div class="tag-cloud">
         <?php foreach ($all_tags as $tag): ?>
-          <a href="/search?q=<?= urlencode($tag['name']) ?>"><?= h($tag['name']) ?></a>
+          <a href="/tag/<?= h($tag['slug']) ?>">#<?= h($tag['name']) ?>
+            <?php if (($tag['usage_count']??0) > 1): ?><sup style="font-size:9px;opacity:.6"><?= np_number((int)$tag['usage_count']) ?></sup><?php endif; ?>
+          </a>
         <?php endforeach; ?>
       </div>
     </div>

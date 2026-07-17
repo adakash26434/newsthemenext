@@ -150,7 +150,7 @@ require SRC_DIR . '/layout/header.php';
       <?php endif; ?>
 
       <!-- Article body -->
-      <div class="article-content" id="article-body">
+      <div class="article-content" id="article-body" x-data>
         <?= $content_main ?>
       </div>
 
@@ -464,9 +464,27 @@ function changeFontSize(d) {
   transition:background .15s,color .15s;
 }
 .tag-cloud-item:hover{background:var(--c-primary);color:#fff;}
+/* Lightbox */
+#nnp-lightbox {
+  display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);
+  align-items:center;justify-content:center;cursor:zoom-out;
+}
+#nnp-lightbox.open { display:flex; }
+#nnp-lightbox img  { max-width:94vw;max-height:92vh;object-fit:contain;border-radius:4px;box-shadow:0 8px 40px rgba(0,0,0,.7); }
+#nnp-lightbox-cap  { position:absolute;bottom:12px;left:0;right:0;text-align:center;color:rgba(255,255,255,.7);font-size:13px;padding:0 20px; }
+#nnp-lightbox-close { position:absolute;top:14px;right:18px;color:#fff;font-size:28px;cursor:pointer;opacity:.8;line-height:1; }
+.article-content img { cursor:zoom-in;transition:opacity .15s; }
+.article-content img:hover { opacity:.9; }
 </style>
 
 <?php require SRC_DIR . '/layout/footer.php'; ?>
+
+<!-- Image Lightbox -->
+<div id="nnp-lightbox" onclick="this.classList.remove('open')">
+  <span id="nnp-lightbox-close" onclick="document.getElementById('nnp-lightbox').classList.remove('open')">&times;</span>
+  <img id="nnp-lightbox-img" src="" alt="">
+  <div id="nnp-lightbox-cap"></div>
+</div>
 <div class="reading-progress" id="reading-progress"></div>
 <script>
 // ── Reading progress bar ─────────────────────────────────
@@ -484,6 +502,22 @@ function changeFontSize(d) {
   update();
 })();
 initBookmark(<?= (int)$article['id'] ?>);
+// ── Image lightbox ───────────────────────────────────────
+(function(){
+  var lb  = document.getElementById('nnp-lightbox');
+  var img = document.getElementById('nnp-lightbox-img');
+  var cap = document.getElementById('nnp-lightbox-cap');
+  if (!lb) return;
+  document.getElementById('article-body').querySelectorAll('img').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.stopPropagation();
+      img.src = el.src;
+      cap.textContent = el.alt || '';
+      lb.classList.add('open');
+    });
+  });
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') lb.classList.remove('open'); });
+})();
 // ── Text-to-Speech ───────────────────────────────────────
 (function(){
   var synth  = window.speechSynthesis;

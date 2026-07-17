@@ -35,6 +35,9 @@ require SRC_DIR . '/layout/header.php';
           <span class="text-xs flex items-center gap-1" style="color:var(--c-muted)">
             <?= icon('newspaper','w-3.5 h-3.5') ?> <?= np_number($total) ?> समाचार
           </span>
+          <a href="/rss/author/<?= h($author['slug']) ?>" target="_blank" class="text-xs flex items-center gap-1 px-2 py-0.5 rounded" style="background:rgba(249,115,22,.15);color:#f97316;border:1px solid rgba(249,115,22,.3)">
+            <?= icon('rss','w-3 h-3') ?> RSS
+          </a>
           <?php if ($author['twitter_url'] ?? ''): ?>
           <a href="<?= h($author['twitter_url']) ?>" target="_blank" rel="noopener noreferrer" class="text-xs flex items-center gap-1 hover:underline" style="color:var(--c-primary)">
             <?= icon('twitter','w-3.5 h-3.5') ?> Twitter
