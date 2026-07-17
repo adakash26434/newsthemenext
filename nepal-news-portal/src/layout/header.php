@@ -120,37 +120,79 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
 
 <div id="read-prog" class="reading-progress"></div>
 
-<!-- ── Top utility bar ── -->
-<div class="top-utility-bar">
-  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between flex-wrap gap-1">
-    <span class="bs-date flex items-center gap-1.5">
-      <?= icon('calendar','w-3 h-3') ?> <?= bs_date_today() ?>
-    </span>
-    <div class="flex items-center gap-1 flex-wrap">
-      <?php if (setting('social_youtube','')): ?>
-      <a href="<?= h(setting('social_youtube')) ?>" target="_blank" rel="noopener" class="utility-link flex items-center gap-1">
-        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.4a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon fill="var(--c-nav-bg,#7F1D1D)" points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
-        TV
+<!-- ── Top utility bar — Enhanced ── -->
+<div class="top-utility-bar" style="background:var(--c-surface2);border-bottom:1px solid var(--c-border)">
+  <div class="max-w-7xl mx-auto px-4 flex items-center justify-between flex-wrap gap-2">
+    <!-- Date + Social -->
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="bs-date flex items-center gap-1.5 font-medium" style="color:var(--c-text2)">
+        <?= icon('calendar','w-3.5 h-3.5') ?> <?= bs_date_today() ?>
+      </span>
+      <?php if (setting('social_facebook','')): ?>
+      <a href="<?= h(setting('social_facebook')) ?>" target="_blank" rel="noopener" class="utility-link flex items-center gap-1" title="Facebook">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
       </a>
       <?php endif; ?>
-      <a href="/epaper" class="utility-link flex items-center gap-1">
-        <?= icon('newspaper','w-3 h-3') ?> ई-पेपर
+      <?php if (setting('social_twitter','')): ?>
+      <a href="<?= h(setting('social_twitter')) ?>" target="_blank" rel="noopener" class="utility-link flex items-center gap-1" title="Twitter/X">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
       </a>
-      <a href="/admin" class="utility-link flex items-center gap-1">
-        <?= icon('lock','w-3 h-3') ?> Admin
+      <?php endif; ?>
+      <?php if (setting('social_youtube','')): ?>
+      <a href="<?= h(setting('social_youtube')) ?>" target="_blank" rel="noopener" class="utility-link flex items-center gap-1" title="YouTube">
+        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 00-1.95 1.96A29 29 0 001 12a29 29 0 00.46 5.58A2.78 2.78 0 003.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.4a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon fill="var(--c-nav-bg,#7F1D1D)" points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+        <span class="hidden md:inline">YouTube</span>
       </a>
-      <!-- Language toggle -->
-      <span class="lang-toggle-wrap">
-        <a href="?lang=np" class="<?= $_cur_lang==='np'?'active':'' ?>">NP</a>
-        <a href="?lang=en" class="<?= $_cur_lang==='en'?'active':'' ?>">EN</a>
-      </span>
-      <!-- Dark/Light toggle -->
-      <button class="dark-toggle" @click="darkMode=!darkMode" title="Dark/Light Mode">
-        <span x-show="!darkMode" class="flex items-center gap-1">
-          <?= icon('moon','w-3 h-3') ?> <span class="hidden sm:inline">Dark</span>
+      <?php endif; ?>
+    </div>
+    
+    <!-- Right side controls -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <!-- e-Paper -->
+      <a href="/epaper" class="utility-link flex items-center gap-1" title="ई-पेपर">
+        <?= icon('newspaper','w-3.5 h-3.5') ?>
+        <span class="hidden sm:inline">ई-पेपर</span>
+      </a>
+      
+      <!-- Search button -->
+      <button @click="searchOpen=true" class="utility-link flex items-center gap-1" title="खोज्नुस्">
+        <?= icon('search','w-3.5 h-3.5') ?>
+        <span class="hidden md:inline"><?= $_cur_lang==='en'?'Search':'खोज' ?></span>
+      </button>
+      
+      <!-- Language toggle — Enhanced pill style -->
+      <div class="flex items-center rounded-full overflow-hidden border" style="border-color:var(--c-border)">
+        <a href="?lang=np" 
+           class="px-2.5 py-1 text-xs font-bold rounded-full transition-all duration-150
+                  <?= $_cur_lang==='np' ? 'text-white' : 'text-muted hover:text-primary' ?>"
+           style="<?= $_cur_lang==='np' ? 'background:var(--c-primary)' : '' ?>">
+          नेपाली
+        </a>
+        <a href="?lang=en" 
+           class="px-2.5 py-1 text-xs font-bold rounded-full transition-all duration-150
+                  <?= $_cur_lang==='en' ? 'text-white' : 'text-muted hover:text-primary' ?>"
+           style="<?= $_cur_lang==='en' ? 'background:var(--c-primary)' : '' ?>">
+          English
+        </a>
+      </div>
+      
+      <!-- Dark/Light toggle — Enhanced icon button -->
+      <button 
+        class="btn-icon !w-8 !h-8 !rounded-full !border"
+        @click="darkMode=!darkMode" 
+        :title="darkMode ? 'Light Mode' : 'Dark Mode'"
+        style="background:var(--c-surface);border-color:var(--c-border)">
+        <!-- Sun icon (shown in dark mode to switch to light) -->
+        <span x-show="darkMode" x-cloak class="flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
         </span>
-        <span x-show="darkMode" x-cloak class="flex items-center gap-1">
-          <?= icon('sun','w-3 h-3') ?> <span class="hidden sm:inline">Light</span>
+        <!-- Moon icon (shown in light mode to switch to dark) -->
+        <span x-show="!darkMode" class="flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
         </span>
       </button>
     </div>
@@ -193,12 +235,12 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
   </div>
 
   <!-- ── Main navigation ── -->
-  <nav class="main-nav" aria-label="Main navigation">
+  <nav class="main-nav" aria-label="Main navigation" style="background:linear-gradient(135deg, var(--c-nav-bg) 0%, var(--c-primary-dk, var(--c-nav-bg)) 100%)">
     <div class="max-w-7xl mx-auto px-4">
       <ul class="nav-list" :class="mobileNav ? 'mobile-open' : ''" x-show="mobileNav || window.innerWidth >= 1024" x-cloak>
         <li>
           <a href="/" class="<?= $_current_path==='/'?'active':'' ?>">
-            <?= icon('home','w-3.5 h-3.5') ?>
+            <?= icon('home','w-4 h-4') ?>
             <span><?= $_cur_lang==='en'?'Home':'गृहपृष्ठ' ?></span>
           </a>
         </li>
@@ -206,26 +248,53 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
         <?php foreach (array_slice($_categories, 0, 10) as $_cs): ?>
         <li>
           <a href="/category/<?= h($_cs['slug']) ?>"
-             class="<?= str_contains($_current_path, '/category/'.$_cs['slug'])?'active':'' ?>">
+             class="<?= str_contains($_current_path, '/category/'.$_cs['slug'])?'active':'' ?>"
+             style="<?= !empty($_cs['color']) ? '--cat-color:' . h($_cs['color']) : '' ?>">
             <?php if ($_cs['icon']): ?>
-              <i data-lucide="<?= h($_cs['icon']) ?>" class="w-3.5 h-3.5 inline-block align-middle flex-shrink-0"></i>
+              <i data-lucide="<?= h($_cs['icon']) ?>" class="w-4 h-4 inline-block align-middle flex-shrink-0"></i>
+            <?php else: ?>
+              <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:var(--cat-color, var(--c-primary-lt))"></span>
             <?php endif; ?>
             <span><?= h($_cur_lang==='en' ? ($_cs['name_np']?:$_cs['name']) : ($_cs['name']?:$_cs['name_np'])) ?></span>
           </a>
         </li>
         <?php endforeach; ?>
 
+        <!-- More dropdown for extra categories -->
+        <?php if (count($_categories) > 10): ?>
+        <li x-data="{open:false}" class="has-dropdown">
+          <a href="#" @mouseenter="open=true" @mouseleave="open=false" class="flex items-center gap-1">
+            <?= icon('more-horizontal','w-4 h-4') ?>
+            <span><?= $_cur_lang==='en'?'More':'थप' ?></span>
+            <?= icon('chevron-down','w-3 h-3') ?>
+          </a>
+          <ul class="dropdown-menu" x-show="open" x-cloak
+              @mouseenter="open=true" @mouseleave="open=false">
+            <?php foreach (array_slice($_categories, 10) as $_cs): ?>
+            <li>
+              <a href="/category/<?= h($_cs['slug']) ?>">
+                <?php if ($_cs['icon']): ?>
+                  <i data-lucide="<?= h($_cs['icon']) ?>" class="w-3.5 h-3.5 inline-block align-middle mr-1"></i>
+                <?php endif; ?>
+                <?= h($_cur_lang==='en' ? ($_cs['name_np']?:$_cs['name']) : ($_cs['name']?:$_cs['name_np'])) ?>
+              </a>
+            </li>
+            <?php endforeach; ?>
+          </ul>
+        </li>
+        <?php endif; ?>
+
         <!-- Trending -->
         <li>
           <a href="/trending" class="<?= $_current_path==='/trending'?'active':'' ?>">
-            <?= icon('trending-up','w-3.5 h-3.5') ?>
+            <?= icon('trending-up','w-4 h-4') ?>
             <span><?= $_cur_lang==='en'?'Trending':'ट्रेन्डिङ' ?></span>
           </a>
         </li>
         <!-- Breaking -->
         <li>
           <a href="/breaking" class="<?= $_current_path==='/breaking'?'active':'' ?>">
-            <?= icon('zap','w-3.5 h-3.5') ?>
+            <?= icon('zap','w-4 h-4') ?>
             <span><?= $_cur_lang==='en'?'Breaking':'ब्रेकिङ' ?></span>
           </a>
         </li>
@@ -234,7 +303,7 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
         <li x-data="{open:false}" class="has-dropdown">
           <a href="/events" class="<?= str_starts_with($_current_path,'/event')?'active':'' ?>"
              @mouseenter="open=true" @mouseleave="open=false">
-            <?= icon('calendar','w-3.5 h-3.5') ?>
+            <?= icon('calendar','w-4 h-4') ?>
             <span><?= $_cur_lang==='en'?'Events':'कार्यक्रम' ?></span>
             <?= icon('chevron-down','w-3 h-3') ?>
           </a>
@@ -258,20 +327,22 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
 
   <!-- ── Breaking news ticker ── -->
   <?php if (!empty($_breaking)): ?>
-  <div class="breaking-ticker" role="marquee" aria-label="Breaking news">
+  <div class="breaking-ticker" role="marquee" aria-label="Breaking news" style="background:linear-gradient(90deg, var(--c-surface2) 0%, var(--c-bg) 50%, var(--c-surface2) 100%);border-top:1px solid var(--c-border);border-bottom:1px solid var(--c-border)">
     <div class="max-w-7xl mx-auto px-4 flex items-center gap-3">
-      <span class="ticker-label flex items-center gap-1">
-        <?= icon('zap','w-3.5 h-3.5') ?> <?= h($_ticker_label) ?>
+      <span class="ticker-label flex items-center gap-1.5" style="animation:pulse-glow 2s ease-in-out infinite">
+        <?= icon('zap','w-4 h-4') ?> <?= h($_ticker_label) ?>
       </span>
       <div class="ticker-track-wrap">
         <div class="ticker-track">
           <?php foreach ($_breaking as $_bn): ?>
             <a href="/article/<?= h($_bn['slug']) ?>" class="ticker-item">
+              <span class="inline-block w-1.5 h-1.5 rounded-full mr-2" style="background:var(--c-primary)"></span>
               <?= h($_cur_lang==='en'?($_bn['title_np']?:$_bn['title']):$_bn['title']) ?>
             </a>
           <?php endforeach; ?>
           <?php foreach ($_breaking as $_bn): // duplicate for seamless loop ?>
             <a href="/article/<?= h($_bn['slug']) ?>" class="ticker-item">
+              <span class="inline-block w-1.5 h-1.5 rounded-full mr-2" style="background:var(--c-primary)"></span>
               <?= h($_cur_lang==='en'?($_bn['title_np']?:$_bn['title']):$_bn['title']) ?>
             </a>
           <?php endforeach; ?>
@@ -279,6 +350,12 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
       </div>
     </div>
   </div>
+  <style>
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+  </style>
   <?php endif; ?>
 
 </div><!-- /sticky wrap -->
@@ -286,15 +363,16 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
 <!-- ── Search overlay ── -->
 <div x-show="searchOpen" x-cloak class="search-overlay"
      @keydown.escape.window="searchOpen=false" @click.self="searchOpen=false"
-     x-transition:enter="transition ease-out duration-150"
-     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-  <div class="search-overlay-box" @click.stop>
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+     style="background:rgba(0,0,0,.6);backdrop-filter:blur(8px)">
+  <div class="search-overlay-box" @click.stop style="background:var(--c-surface);border-radius:var(--r-xl);padding:24px;max-width:580px;width:100%;box-shadow:var(--shadow-xl)">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-base font-bold flex items-center gap-2">
-        <?= icon('search','w-4 h-4') ?>
+      <h2 class="text-lg font-bold flex items-center gap-2" style="color:var(--c-text)">
+        <?= icon('search','w-5 h-5') ?>
         <?= $_cur_lang==='en'?'Search News':'समाचार खोज्नुस्' ?>
       </h2>
-      <button @click="searchOpen=false" class="p-1 rounded" style="background:none;border:none;cursor:pointer;color:var(--c-muted)">
+      <button @click="searchOpen=false" class="btn-icon" style="width:32px;height:32px">
         <?= icon('x','w-5 h-5') ?>
       </button>
     </div>
@@ -311,35 +389,60 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
                x-model="sq"
                @input.debounce.300ms="loadSugg()"
                @keydown.escape.stop="suggestions=[]"
-               x-effect="if(searchOpen) $nextTick(()=>$refs.searchInput.focus())">
+               x-effect="if(searchOpen) $nextTick(()=>$refs.searchInput.focus())"
+               style="width:100%;padding:14px 16px;border-radius:var(--r-lg);border:2px solid var(--c-border);background:var(--c-bg);font-size:15px;outline:none;transition:border-color .2s"
+               @focus="this.style.borderColor='var(--c-primary)'"
+               @blur="this.style.borderColor='var(--c-border)'">
+        <!-- Search icon inside input -->
+        <span class="absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--c-muted)">
+          <?= icon('search','w-5 h-5') ?>
+        </span>
+        <input type="search" x-model="sq" @input.debounce.300ms="loadSugg()" @keydown.escape.stop="suggestions=[]"
+               x-effect="if(searchOpen) $nextTick(()=>$refs.searchInput.focus())" class="absolute left-0 top-0 w-full h-full opacity-0" style="pointer-events:none" autofocus>
         <!-- Suggestions dropdown -->
         <div x-show="suggestions.length > 0" x-cloak
-             class="absolute left-0 right-0 mt-1 rounded-xl overflow-hidden z-50"
-             style="background:var(--c-surface);border:1px solid var(--c-border);box-shadow:0 8px 24px rgba(0,0,0,.15)">
+             class="absolute left-0 right-0 mt-2 rounded-xl overflow-hidden z-50"
+             style="background:var(--c-surface);border:1px solid var(--c-border);box-shadow:var(--shadow-lg);max-height:400px;overflow-y:auto">
           <template x-for="s in suggestions" :key="s.slug">
             <a :href="'/article/'+s.slug"
-               class="flex items-center gap-3 px-4 py-2.5 hover:opacity-80 transition-opacity border-b"
+               class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors border-b last:border-b-0"
                style="border-color:var(--c-border)"
                @click="searchOpen=false;suggestions=[]">
               <template x-if="s.image">
-                <img :src="s.image" class="w-10 h-8 rounded object-cover flex-shrink-0" alt="">
+                <img :src="s.image" class="w-12 h-10 rounded-lg object-cover flex-shrink-0" alt="">
+              </template>
+              <template x-if="!s.image">
+                <div class="w-12 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:var(--c-surface2)">
+                  <?= icon('file-text','w-5 h-5') ?>
+                </div>
               </template>
               <div class="flex-1 min-w-0">
                 <div class="text-sm font-semibold truncate" x-text="s.title" style="color:var(--c-text)"></div>
-                <div class="text-xs" x-text="s.category" style="color:var(--c-muted)"></div>
+                <div class="text-xs flex items-center gap-1 mt-0.5" style="color:var(--c-muted)">
+                  <template x-if="s.category">
+                    <span x-text="s.category"></span>
+                  </template>
+                </div>
               </div>
+              <span class="flex-shrink-0" style="color:var(--c-muted)">
+                <?= icon('arrow-right','w-4 h-4') ?>
+              </span>
             </a>
           </template>
         </div>
       </div>
-      <div class="flex gap-2 mt-3">
-        <button type="submit" class="btn btn-primary flex-1 justify-center gap-1">
+      <div class="flex gap-3 mt-4">
+        <button type="submit" class="btn btn-primary flex-1 justify-center gap-2" style="padding:12px">
           <?= icon('search','w-4 h-4') ?> <?= $_cur_lang==='en'?'Search':'खोज्नुस्' ?>
         </button>
         <button type="button" @click="searchOpen=false;suggestions=[]" class="btn btn-secondary gap-1">
           <?= icon('x','w-4 h-4') ?> <?= $_cur_lang==='en'?'Cancel':'रद्द' ?>
         </button>
       </div>
+      <!-- Search tips -->
+      <p class="text-xs mt-3 text-center" style="color:var(--c-muted)">
+        <?= $_cur_lang==='en' ? 'Press ESC to close' : 'ESC दबाउनुस् बन्द गर्न' ?>
+      </p>
     </form>
   </div>
 </div>

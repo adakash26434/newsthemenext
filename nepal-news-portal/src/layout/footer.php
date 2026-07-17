@@ -76,45 +76,101 @@ $_cur_lang = current_lang();
 </section>
 <?php endif; ?>
 
-<!-- Newsletter bar -->
-<div class="newsletter-bar">
-  <div class="max-w-7xl mx-auto px-4 text-center">
-    <h3 class="text-xl font-bold text-white mb-1 flex items-center justify-center gap-2">
-      <?= icon('mail','w-5 h-5') ?> न्यूजलेटर सदस्यता लिनुस्
+<!-- Newsletter bar — Enhanced professional look -->
+<div class="newsletter-bar" style="background:linear-gradient(135deg, var(--c-primary) 0%, var(--c-primary-dk, var(--c-primary)) 100%)">
+  <div class="max-w-7xl mx-auto px-4 text-center py-8">
+    <h3 class="text-2xl font-bold text-white mb-2 flex items-center justify-center gap-3">
+      <?= icon('mail','w-6 h-6') ?> न्यूजलेटर सदस्यता लिनुस्
     </h3>
-    <p class="text-sm mb-4" style="color:rgba(255,255,255,0.75)">ताजा समाचार सिधै तपाईंको इमेलमा पाउनुस्</p>
+    <p class="text-sm mb-5" style="color:rgba(255,255,255,0.85)">ताजा समाचार सिधै तपाईंको इमेलमा पाउनुस् — निःशुल्क सदस्यता</p>
     <?php $flash_nl_s = flash_get('nl_success'); $flash_nl_e = flash_get('nl_error'); ?>
     <?php if ($flash_nl_s): ?><div class="mb-3 text-sm font-semibold" style="color:#86EFAC"><?= h($flash_nl_s) ?></div><?php endif; ?>
     <?php if ($flash_nl_e): ?><div class="mb-3 text-sm font-semibold" style="color:#FCA5A5"><?= h($flash_nl_e) ?></div><?php endif; ?>
-    <form method="POST" action="/newsletter/subscribe" class="flex flex-col sm:flex-row gap-2 justify-center max-w-md mx-auto">
+    <form method="POST" action="/newsletter/subscribe" class="flex flex-col sm:flex-row gap-3 justify-center max-w-lg mx-auto">
       <?= csrf_field() ?>
-      <input type="text"  name="name"  placeholder="तपाईंको नाम"    class="newsletter-input" style="flex:0 0 auto">
-      <input type="email" name="email" placeholder="इमेल ठेगाना *"  class="newsletter-input flex-1" required>
-      <button type="submit" class="newsletter-btn">सदस्य बन्नुस् →</button>
+      <input type="text"  name="name"  placeholder="तपाईंको नाम" class="newsletter-input" style="flex:0 0 auto;max-width:200px">
+      <input type="email" name="email" placeholder="इमेल ठेगाना *" class="newsletter-input flex-1" required>
+      <button type="submit" class="newsletter-btn" style="background:#fff;color:var(--c-primary);font-weight:700;padding:10px 24px">
+        सदस्य बन्नुस् <?= icon('arrow-right','w-4 h-4 inline') ?>
+      </button>
     </form>
   </div>
 </div>
 
-<!-- ── Footer ── -->
-<footer class="site-footer">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-8">
-
-      <!-- Brand + social -->
-      <div>
-        <?php if (site_logo_url()): ?>
-          <img src="<?= h(site_logo_url()) ?>" alt="<?= h(site_name_np()) ?>" class="h-10 mb-3" style="filter:brightness(0) invert(1)">
-        <?php else: ?>
-          <div class="text-xl font-extrabold text-white mb-1"><?= h(site_logo_text()) ?></div>
-        <?php endif; ?>
-        <p class="text-sm leading-relaxed mb-4" style="color:rgba(255,255,255,0.65)"><?= h($_f_about) ?></p>
-        <?php if ($_f_addr || $_f_phone || $_f_email): ?>
-        <div class="space-y-1.5 text-xs mb-4" style="color:rgba(255,255,255,0.6)">
-          <?php if ($_f_addr):  ?><p class="flex items-center gap-1.5"><?= icon('map-pin','w-3 h-3 flex-shrink-0') ?> <?= h($_f_addr) ?></p><?php endif; ?>
-          <?php if ($_f_phone): ?><p class="flex items-center gap-1.5"><?= icon('phone','w-3 h-3 flex-shrink-0') ?> <a href="tel:<?= h($_f_phone) ?>" class="hover:text-white transition-colors"><?= h($_f_phone) ?></a></p><?php endif; ?>
-          <?php if ($_f_email): ?><p class="flex items-center gap-1.5"><?= icon('mail','w-3 h-3 flex-shrink-0') ?> <a href="mailto:<?= h($_f_email) ?>" class="hover:text-white transition-colors"><?= h($_f_email) ?></a></p><?php endif; ?>
+<!-- ── Footer — Professional Karobar Style ── -->
+<footer class="site-footer" style="background:var(--c-footer-bg, var(--c-nav-bg))">
+  
+  <!-- Footer Logo Section with Company Info -->
+  <div style="background:rgba(0,0,0,0.15);border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- Logo and Name -->
+        <div class="flex items-center gap-4">
+          <?php if (site_logo_url()): ?>
+            <img src="<?= h(site_logo_url()) ?>" alt="<?= h(site_name_np()) ?>" class="h-12" style="filter:brightness(0) invert(1)">
+          <?php else: ?>
+            <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background:rgba(255,255,255,0.15)">
+              <span class="text-2xl font-extrabold text-white"><?= mb_substr(site_logo_text(), 0, 1) ?></span>
+            </div>
+          <?php endif; ?>
+          <div>
+            <div class="text-xl font-extrabold text-white"><?= h(site_name_np()) ?></div>
+            <div class="text-xs" style="color:rgba(255,255,255,0.5)"><?= h(site_tagline()) ?></div>
+          </div>
         </div>
-        <?php endif; ?>
+        
+        <!-- Registration Info -->
+        <div class="flex flex-wrap items-center gap-4 text-xs" style="color:rgba(255,255,255,0.6)">
+          <?php if ($_reg_no): ?>
+          <div class="flex items-center gap-1.5">
+            <?= icon('stamp','w-4 h-4') ?>
+            <span>सूचना विभाग दर्ता नं.: <?= h($_reg_no) ?></span>
+          </div>
+          <?php endif; ?>
+          <?php if ($_founded): ?>
+          <div class="flex items-center gap-1.5">
+            <?= icon('calendar','w-4 h-4') ?>
+            <span>स्थापना: <?= h($_founded) ?></span>
+          </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Main Footer Content -->
+  <div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+      <!-- About + Contact -->
+      <div>
+        <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2 pb-2" style="border-bottom:2px solid rgba(255,255,255,0.2)">
+          <?= icon('building-2','w-4 h-4') ?> <?= $_cur_lang==='en'?'About Us':'हाम्रोबारे' ?>
+        </h4>
+        <p class="text-sm leading-relaxed mb-4" style="color:rgba(255,255,255,0.65)"><?= h($_f_about ?: excerpt(site_tagline(), 20)) ?></p>
+        
+        <!-- Contact Info -->
+        <div class="space-y-2 text-xs mb-4" style="color:rgba(255,255,255,0.55)">
+          <?php if ($_f_addr): ?>
+          <div class="flex items-start gap-2">
+            <?= icon('map-pin','w-3.5 h-3.5 mt-0.5 flex-shrink-0') ?>
+            <span><?= h($_f_addr) ?></span>
+          </div>
+          <?php endif; ?>
+          <?php if ($_f_phone): ?>
+          <div class="flex items-center gap-2">
+            <?= icon('phone','w-3.5 h-3.5 flex-shrink-0') ?>
+            <a href="tel:<?= h($_f_phone) ?>" class="hover:text-white transition-colors"><?= h($_f_phone) ?></a>
+          </div>
+          <?php endif; ?>
+          <?php if ($_f_email): ?>
+          <div class="flex items-center gap-2">
+            <?= icon('mail','w-3.5 h-3.5 flex-shrink-0') ?>
+            <a href="mailto:<?= h($_f_email) ?>" class="hover:text-white transition-colors"><?= h($_f_email) ?></a>
+          </div>
+          <?php endif; ?>
+        </div>
+        
         <!-- Social links -->
         <div class="flex gap-2 flex-wrap">
           <?php if ($_f_fb): ?>
@@ -134,7 +190,7 @@ $_cur_lang = current_lang();
           <?php endif; ?>
           <?php if ($_f_ig): ?>
           <a href="<?= h($_f_ig) ?>" class="social-link" target="_blank" rel="noopener" title="Instagram">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path fill="rgba(127,29,29,0.8)" d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><circle cx="17.5" cy="6.5" r="1.5" fill="rgba(127,29,29,0.8)"/></svg>
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path fill="rgba(255,255,255,0.8)" d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><circle cx="17.5" cy="6.5" r="1.5" fill="rgba(255,255,255,0.8)"/></svg>
           </a>
           <?php endif; ?>
           <?php if ($_f_tk): ?>
@@ -147,15 +203,17 @@ $_cur_lang = current_lang();
 
       <!-- Categories -->
       <div>
-        <h4 class="footer-heading flex items-center gap-2"><?= icon('grid','w-3.5 h-3.5') ?> श्रेणीहरू</h4>
-        <ul class="space-y-1.5">
+        <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2 pb-2" style="border-bottom:2px solid rgba(255,255,255,0.2)">
+          <?= icon('grid','w-4 h-4') ?> <?= $_cur_lang==='en'?'Categories':'श्रेणीहरू' ?>
+        </h4>
+        <ul class="space-y-2">
           <?php foreach (array_slice($_f_cats, 0, 8) as $_fc): ?>
           <li>
-            <a href="/category/<?= h($_fc['slug']) ?>" class="footer-link flex items-center gap-1.5">
-              <?php if ($_fc['icon']): ?><i data-lucide="<?= h($_fc['icon']) ?>" class="w-3 h-3 flex-shrink-0"></i><?php else: ?><span class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:<?= h($_fc['color']?:accent_color()) ?>"></span><?php endif; ?>
-              <?= h($_fc['name']) ?>
+            <a href="/category/<?= h($_fc['slug']) ?>" class="footer-link flex items-center gap-2 text-sm">
+              <?php if ($_fc['icon']): ?><i data-lucide="<?= h($_fc['icon']) ?>" class="w-3.5 h-3.5 flex-shrink-0"></i><?php else: ?><span class="w-2 h-2 rounded-full flex-shrink-0" style="background:<?= h($_fc['color']?:accent_color()) ?>"></span><?php endif; ?>
+              <span class="flex-1"><?= h($_cur_lang==='en'?($_fc['name_np']?:$_fc['name']):($_fc['name']?:$_fc['name_np'])) ?></span>
               <?php if ((int)($_fc['article_count']??0)>0): ?>
-                <span class="ml-auto text-xs opacity-50"><?= np_number((int)$_fc['article_count']) ?></span>
+                <span class="text-xs px-1.5 py-0.5 rounded" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)"><?= np_number((int)$_fc['article_count']) ?></span>
               <?php endif; ?>
             </a>
           </li>
@@ -163,76 +221,63 @@ $_cur_lang = current_lang();
         </ul>
       </div>
 
-      <!-- Recent news -->
+      <!-- Recent News -->
       <div>
-        <h4 class="footer-heading flex items-center gap-2"><?= icon('newspaper','w-3.5 h-3.5') ?> ताजा समाचार</h4>
+        <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2 pb-2" style="border-bottom:2px solid rgba(255,255,255,0.2)">
+          <?= icon('newspaper','w-4 h-4') ?> <?= $_cur_lang==='en'?'Latest News':'ताजा समाचार' ?>
+        </h4>
         <div class="space-y-3">
           <?php foreach ($_f_recent as $_fr): ?>
-          <div>
-            <a href="/article/<?= h($_fr['slug']) ?>" class="footer-link text-sm font-medium leading-snug block hover:underline">
-              <?= h(excerpt($_fr['title'], 8)) ?>
-            </a>
-            <span class="text-xs flex items-center gap-1 mt-0.5" style="color:rgba(255,255,255,0.35)">
+          <a href="/article/<?= h($_fr['slug']) ?>" class="footer-link text-sm font-medium leading-snug block group">
+            <span class="flex items-start gap-2">
+              <span class="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0" style="background:var(--c-primary-lt)"></span>
+              <span class="flex-1 group-hover:text-white transition-colors"><?= h(excerpt($_fr['title'], 8)) ?></span>
+            </span>
+            <span class="text-xs flex items-center gap-1 mt-0.5 ml-3.5" style="color:rgba(255,255,255,0.35)">
               <?= icon('clock','w-2.5 h-2.5') ?> <?= time_ago($_fr['published_at']??$_fr['created_at']) ?>
             </span>
-          </div>
+          </a>
           <?php endforeach; ?>
         </div>
       </div>
 
-      <!-- Quick links + Events -->
+      <!-- Quick Links -->
       <div>
-        <h4 class="footer-heading flex items-center gap-2"><?= icon('link','w-3.5 h-3.5') ?> उपयोगी लिंकहरू</h4>
-        <ul class="space-y-1.5 mb-4">
+        <h4 class="text-sm font-bold text-white mb-4 flex items-center gap-2 pb-2" style="border-bottom:2px solid rgba(255,255,255,0.2)">
+          <?= icon('link','w-4 h-4') ?> <?= $_cur_lang==='en'?'Quick Links':'छिटो लिंकहरू' ?>
+        </h4>
+        <ul class="space-y-2">
           <?php foreach ($_f_pages as $_fp): ?>
           <li>
-            <a href="/page/<?= h($_fp['slug']) ?>" class="footer-link flex items-center gap-1">
+            <a href="/page/<?= h($_fp['slug']) ?>" class="footer-link flex items-center gap-2 text-sm">
               <?= icon('chevron-right','w-3 h-3') ?>
               <?= h($_cur_lang==='en'?($_fp['title_en']?:$_fp['title']):$_fp['title']) ?>
             </a>
           </li>
           <?php endforeach; ?>
-          <li><a href="/trending" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Trending':'ट्रेन्डिङ' ?></a></li>
-          <li><a href="/saved" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Saved Articles':'सुरक्षित समाचार' ?></a></li>
-          <li><a href="/events" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Events':'कार्यक्रम' ?></a></li>
-          <li><a href="/search" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Search':'खोज गर्नुस्' ?></a></li>
-          <li><a href="/about" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'About Us':'हाम्रोबारे' ?></a></li>
-          <li><a href="/contact" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Contact Us':'सम्पर्क' ?></a></li>
-          <li><a href="/privacy" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Privacy Policy':'गोपनीयता नीति' ?></a></li>
-          <li><a href="/terms" class="footer-link flex items-center gap-1"><?= icon('chevron-right','w-3 h-3') ?> <?= $_cur_lang==='en'?'Terms':'सेवा शर्त' ?></a></li>
-          <li><a href="/sitemap.xml" class="footer-link flex items-center gap-1" target="_blank"><?= icon('chevron-right','w-3 h-3') ?> Sitemap</a></li>
+          <li><a href="/trending" class="footer-link flex items-center gap-2 text-sm"><?= icon('trending-up','w-3 h-3') ?> <?= $_cur_lang==='en'?'Trending':'ट्रेन्डिङ' ?></a></li>
+          <li><a href="/breaking" class="footer-link flex items-center gap-2 text-sm"><?= icon('zap','w-3 h-3') ?> <?= $_cur_lang==='en'?'Breaking News':'ब्रेकिङ न्यूज' ?></a></li>
+          <li><a href="/events" class="footer-link flex items-center gap-2 text-sm"><?= icon('calendar','w-3 h-3') ?> <?= $_cur_lang==='en'?'Events':'कार्यक्रम' ?></a></li>
+          <li><a href="/epaper" class="footer-link flex items-center gap-2 text-sm"><?= icon('newspaper','w-3 h-3') ?> <?= $_cur_lang==='en'?'e-Paper':'ई-पेपर' ?></a></li>
+          <li><a href="/contact" class="footer-link flex items-center gap-2 text-sm"><?= icon('phone','w-3 h-3') ?> <?= $_cur_lang==='en'?'Contact':'सम्पर्क' ?></a></li>
+          <li><a href="/sitemap.xml" class="footer-link flex items-center gap-2 text-sm" target="_blank"><?= icon('map','w-3 h-3') ?> Sitemap</a></li>
         </ul>
-        <?php if (!empty($_f_events)): ?>
-        <h4 class="footer-heading flex items-center gap-2 mt-4"><?= icon('calendar','w-3.5 h-3.5') ?> आगामी कार्यक्रम</h4>
-        <ul class="space-y-1.5">
-          <?php foreach ($_f_events as $_fe): ?>
-          <li>
-            <a href="/event/<?= h($_fe['slug']) ?>" class="footer-link text-xs flex items-center gap-1">
-              <?= icon('chevron-right','w-3 h-3 flex-shrink-0') ?>
-              <?= h(excerpt($_fe['title'], 6)) ?>
-            </a>
-          </li>
-          <?php endforeach; ?>
-        </ul>
-        <?php endif; ?>
       </div>
     </div>
+  </div>
 
-    <!-- Footer bottom -->
-    <div class="footer-bottom">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-2 text-xs" style="color:rgba(255,255,255,0.4)">
-        <div>
-          &copy; <?= date('Y') ?> <?= h(site_name_np()) ?>.
-          <?= h($_copy) ?>
-          <?php if ($_reg_no):   ?> | दर्ता नं: <?= h($_reg_no) ?><?php endif; ?>
-          <?php if ($_founded):  ?> | स्थापना: <?= h($_founded) ?><?php endif; ?>
+  <!-- Footer Bottom — Copyright -->
+  <div style="background:rgba(0,0,0,0.2);border-top:1px solid rgba(255,255,255,0.08)">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-3 text-xs" style="color:rgba(255,255,255,0.4)">
+        <div class="flex flex-wrap items-center gap-2 text-center md:text-left">
+          <span>&copy; <?= date('Y') ?> <?= h(site_name_np()) ?>. <?= h($_copy) ?: 'सर्वाधिकार सुरक्षित' ?></span>
         </div>
-        <div class="flex items-center gap-4">
-          <?php foreach ($_f_pages as $_fbp): ?>
-          <a href="/page/<?= h($_fbp['slug']) ?>" class="hover:text-white transition-colors">
-            <?= h($_cur_lang==='en'?($_fbp['title_en']?:$_fbp['title']):$_fbp['title']) ?>
-          </a>
-          <?php endforeach; ?>
+        <div class="flex items-center gap-4 flex-wrap justify-center">
+          <a href="/privacy" class="hover:text-white transition-colors"><?= $_cur_lang==='en'?'Privacy Policy':'गोपनीयता नीति' ?></a>
+          <a href="/terms" class="hover:text-white transition-colors"><?= $_cur_lang==='en'?'Terms of Service':'सेवा शर्त' ?></a>
+          <a href="/about" class="hover:text-white transition-colors"><?= $_cur_lang==='en'?'About':'हाम्रोबारे' ?></a>
+          <a href="/contact" class="hover:text-white transition-colors"><?= $_cur_lang==='en'?'Contact':'सम्पर्क' ?></a>
         </div>
       </div>
     </div>
