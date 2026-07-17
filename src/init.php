@@ -428,6 +428,61 @@ if ($mysql) {
         updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         UNIQUE KEY unique_sign (sign)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS api_cache (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        cache_key       VARCHAR(100) NOT NULL,
+        data            LONGTEXT,
+        fetched_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at      TIMESTAMP NOT NULL,
+        UNIQUE KEY unique_key (cache_key),
+        INDEX idx_expires (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS weather_alerts (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        alert_type      VARCHAR(50) NOT NULL,
+        severity        VARCHAR(20) DEFAULT 'moderate',
+        title           VARCHAR(255),
+        description     TEXT,
+        source          VARCHAR(100),
+        start_time      DATETIME,
+        end_time        DATETIME,
+        is_active       TINYINT(1) DEFAULT 1,
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_active (is_active)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS earthquake_records (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        external_id     VARCHAR(50) UNIQUE,
+        magnitude       DECIMAL(4,2),
+        place           VARCHAR(255),
+        latitude        DECIMAL(10,6),
+        longitude       DECIMAL(10,6),
+        depth           DECIMAL(8,2),
+        event_time      DATETIME,
+        tsunami         TINYINT(1) DEFAULT 0,
+        source          VARCHAR(50) DEFAULT 'USGS',
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_magnitude (magnitude),
+        INDEX idx_time (event_time)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS government_notices (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        title           VARCHAR(255) NOT NULL,
+        description     TEXT,
+        notice_type     VARCHAR(50),
+        source          VARCHAR(100),
+        notice_date     DATE,
+        expiry_date     DATE,
+        url             VARCHAR(500),
+        is_featured     TINYINT(1) DEFAULT 0,
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_date (notice_date),
+        INDEX idx_featured (is_featured)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ");
 
     // Migrations for existing MySQL installs
@@ -799,6 +854,54 @@ if ($mysql) {
         bad_feng_shui      TEXT,
         created_at          TEXT DEFAULT (CURRENT_TIMESTAMP),
         updated_at          TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS api_cache (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        cache_key       TEXT NOT NULL UNIQUE,
+        data            TEXT,
+        fetched_at      TEXT DEFAULT (CURRENT_TIMESTAMP),
+        expires_at      TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS weather_alerts (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        alert_type      TEXT NOT NULL,
+        severity        TEXT DEFAULT 'moderate',
+        title           TEXT,
+        description     TEXT,
+        source          TEXT,
+        start_time      TEXT,
+        end_time        TEXT,
+        is_active       INTEGER DEFAULT 1,
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS earthquake_records (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        external_id     TEXT UNIQUE,
+        magnitude       REAL,
+        place           TEXT,
+        latitude        REAL,
+        longitude       REAL,
+        depth           REAL,
+        event_time      TEXT,
+        tsunami         INTEGER DEFAULT 0,
+        source          TEXT DEFAULT 'USGS',
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS government_notices (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        title           TEXT NOT NULL,
+        description     TEXT,
+        notice_type     TEXT,
+        source          TEXT,
+        notice_date     TEXT,
+        expiry_date     TEXT,
+        url             TEXT,
+        is_featured     INTEGER DEFAULT 0,
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
     );
 
     CREATE INDEX IF NOT EXISTS idx_art_status   ON articles(status);
