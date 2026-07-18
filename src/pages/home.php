@@ -107,11 +107,37 @@ require SRC_DIR . '/layout/header.php';
 <?php render_ads('header-banner-inline', false); ?>
 
 <!-- ══════════════════════════════════════════════════════
+     BULLETIN TICKER — Full-width scrolling news bar
+     ══════════════════════════════════════════════════════ -->
+<?php
+$bulletin_items = get_articles(['status'=>'published','limit'=>12,'order'=>'a.published_at DESC']);
+if (!empty($bulletin_items)):
+?>
+<div class="bulletin-ticker-wrap mb-5 home-fullbleed">
+  <div class="bulletin-label">
+    <?= icon('radio','w-3 h-3') ?> बुलेटिन
+  </div>
+  <div class="bulletin-scroll">
+    <div class="bulletin-scroll-inner">
+      <?php for ($bi=0; $bi<2; $bi++): ?>
+      <?php foreach ($bulletin_items as $bi_art): ?>
+      <a href="/article/<?= h($bi_art['slug']) ?>" class="bulletin-item">
+        <?= h(mb_substr($bi_art['title'], 0, 70)) ?><?= mb_strlen($bi_art['title'])>70?'…':'' ?>
+      </a>
+      <span class="bulletin-sep">◆</span>
+      <?php endforeach; ?>
+      <?php endfor; ?>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+
+<!-- ══════════════════════════════════════════════════════
      ZONE 1: HERO — Full-width main news banner
      Layout: 1 big card left + 4 secondary cards right
      ══════════════════════════════════════════════════════ -->
 <?php if (!empty($featured)): $hero = $featured[0]; ?>
-<div class="hero-section mb-6">
+<div class="hero-section mb-6 home-fullbleed">
   <div class="hero-main-card">
     <?php if ($hero['image_url']): ?>
     <div class="hero-main-img">

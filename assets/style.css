@@ -3474,3 +3474,32 @@ img.lazy.loaded {
   transition: color var(--t-base);
 }
 .footer-link:hover { color: #fff; }
+
+/* ── Home full-bleed: ticker + hero break out of px-4 container ── */
+.home-fullbleed {
+  width: calc(100% + 2rem); /* cancel the px-4 (1rem each side) */
+  margin-left: -1rem;
+  margin-right: -1rem;
+}
+.home-fullbleed .bulletin-ticker-wrap,
+.home-fullbleed.bulletin-ticker-wrap {
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+}
+.home-fullbleed .hero-main-card,
+.home-fullbleed.hero-section .hero-main-card {
+  border-radius: 0;
+}
+@media (min-width: 1280px) {
+  /* on very wide screens keep within max-w-7xl — reset bleed */
+  .home-fullbleed {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .home-fullbleed .hero-main-card,
+  .home-fullbleed.hero-section .hero-main-card {
+    border-radius: var(--r-xl);
+  }
+}
