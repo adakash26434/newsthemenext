@@ -1,49 +1,38 @@
-# See https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# PHP News Portal - Git Ignore
 
-# compiled output
-dist
-tmp
-out-tsc
-*.tsbuildinfo
-.expo
-.expo-shared
+# Database files
+data/*.db
+data/*.sqlite
+data/*.sqlite3
 
-# dependencies
-node_modules
+# Uploaded files (if not committed)
+assets/uploads/*
+!assets/uploads/.gitkeep
 
 # IDEs and editors
-/.idea
-.project
-.classpath
-.c9/
-*.launch
-.settings/
+.idea/
+.vscode/
 *.sublime-workspace
+*.sublime-project
+.settings/
 
-# IDE - VSCode
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-
-# misc
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
-
-# System Files
+# OS files
 .DS_Store
 Thumbs.db
+desktop.ini
 
-.cursor/rules/nx-rules.mdc
-.github/instructions/nx.instructions.md
+# Logs
+*.log
+logs/
 
-# Replit
-.cache/
-.local/
+# Backup files
+*.bak
+*.backup
+*.zip
+*~
+
+# Composer
+/vendor/
+
+# Local configuration overrides (keep db.config.example if exists)
+/db.config.local.php

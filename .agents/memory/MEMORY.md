@@ -1,3 +1,5 @@
 - [Nepal News Portal stack](nepal-news-stack.md) — PHP 8.2 + SQLite/MySQL + Tailwind CDN + Alpine.js + Lucide CDN; NO npm/build step; cPanel zip-deployable.
 - [Header architecture](nepal-news-header.md) — 3-zone layout (top-bar → logo-area → sticky nav+ticker); back-to-top and Lucide createIcons both owned by header.php only.
 - [Helper functions added](nepal-news-helpers.md) — bs_date_np(), lighten_color(), darken_color() added to src/helpers.php in v2.3.
+- [Nepal News Portal URL decode fix](nepal-url-decode.md) — Nepali slug routes need rawurldecode; article JSON-LD must be output in page body (not header.php).
+- [Nepal News Portal DB migrations](nepal-db-migrations.md) — New columns on existing DB: run ALTER TABLE manually via PHP CLI; init.php only runs on fresh DB.

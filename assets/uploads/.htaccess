@@ -1,0 +1,6 @@
+# Allow image serving but block PHP execution
+Options -Indexes
+AddType text/plain .php .php3 .php4 .php5 .phtml .phps
+<FilesMatch "\.ph(p[0-9]?|tml|ps)$">
+  Deny from all
+</FilesMatch>

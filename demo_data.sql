@@ -1,0 +1,143 @@
+-- Demo Data for Nepali News Portal
+-- Run this SQL to populate the database with sample news articles
+
+-- Categories
+-- NOTE: slugs here are intentionally kept IDENTICAL to the canonical list
+-- auto-seeded by src/init.php (INSERT IGNORE only dedupes on exact slug
+-- match). Previously this file used different slugs for the same topics
+-- (prabidhi/khel-kurod/"par tourism"/sansar/opinions vs init.php's
+-- technology/sports/paryatan/world/bichar), which created duplicate
+-- category rows — including a broken slug with a literal space
+-- ("par tourism") — the moment both were run against the same database.
+-- If you already imported the old version of this file, run
+-- fix_duplicate_categories.php once to merge the duplicates it created.
+INSERT IGNORE INTO categories (name, slug, name_np, color, icon, description) VALUES
+('Economy', 'arthatantra', 'अर्थतन्त्र', '#059669', 'trending-up', 'Economic news and analysis'),
+('Banking', 'banking', 'बैंकिङ', '#2563EB', 'landmark', 'Banking and finance sector news'),
+('Share Market', 'share-bazar', 'शेयर बजार', '#7C3AED', 'line-chart', 'Stock market and investment news'),
+('Politics', 'rajniti', 'राजनीति', '#DC2626', 'flag', 'Political news and updates'),
+('Technology', 'technology', 'प्रविधि', '#0891B2', 'cpu', 'Technology and innovation news'),
+('Sports', 'sports', 'खेलकुद', '#EA580C', 'trophy', 'Sports news and updates'),
+('Society', 'samaj', 'समाज', '#4F46E5', 'users', 'Social and community news'),
+('Tourism', 'paryatan', 'पर्यटन', '#0D9488', 'map', 'Tourism and travel news'),
+('World', 'world', 'विश्व', '#6366F1', 'globe', 'International news'),
+('Opinion', 'bichar', 'विचार', '#8B5CF6', 'message-square', 'Opinion and editorial pieces'),
+('Insurance', 'bima', 'बिमा', '#10B981', 'shield', 'Insurance sector news'),
+('Corporate', 'corporate', 'कर्पोरेट', '#F59E0B', 'briefcase', 'Corporate and business news');
+
+-- Authors
+INSERT IGNORE INTO authors (name, slug, email, bio, role, avatar_url) VALUES
+('रमेश शर्मा', 'ramesh-sharma', 'ramesh@newsportal.com', 'नेपाली राष्ट्र बैंकका पूर्व अर्थविज्ञानी', 'Senior Economic Reporter', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&q=80'),
+('सीता अधिकारी', 'sita-adhikari', 'sita@newsportal.com', 'अनुभवी पत्रकार', 'Business Correspondent', 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&q=80'),
+('विकास थापा', 'bikash-thapa', 'bikash@newsportal.com', 'शेयर बजार विश्लेषक', 'Financial Analyst', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&q=80'),
+('अनिता कार्माचार्य', 'anita-karmacharya', 'anita@newsportal.com', 'प्रविधि विशेषज्ञ', 'Technology Editor', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80'),
+('Editorial Team', 'team', 'editorial@newsportal.com', 'Editorial Team', 'Editor', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&q=80');
+
+-- Articles (Sample - add more as needed)
+INSERT IGNORE INTO articles (title, slug, summary, content, image_url, category_id, author_id, featured, is_breaking, status, views, published_at) VALUES
+
+-- Featured Articles
+('नेपालको आर्थिक वृद्धिदर यो वर्ष ५.५ प्रतिशत हुने IMF को प्रक्षेपण', 'nepal-economic-growth-imf',
+'अन्तर्राष्ट्रिय मुद्रा कोष (IMF) ले नेपालको चालु आर्थिक वर्षमा आर्थिक वृद्धिदर ५.५ प्रतिशत पुग्ने प्रक्षेपण गरेको छ।',
+'<p>काठमाडौं — अन्तर्राष्ट्रिय मुद्रा कोष (IMF) ले नेपालको चालु आर्थिक वर्ष २०८१/८२ मा आर्थिक वृद्धिदर ५.५ प्रतिशत पुग्ने प्रक्षेपण गरेको छ।</p><p>IMF ले प्रकाशित गरेको विश्व आर्थिक परिदृश्य प्रतिवेदनमा नेपालको अर्थतन्त्रबारे उल्लेख गर्दै विप्रेषण आय र पर्यटन क्षेत्रको पुनरुत्थानले यो लक्ष्य हासिल हुने विश्वास गरिएको छ।</p>',
+'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80', 1, 1, 1, 1, 'published', 12500, datetime('now', '-2 hours')),
+
+('संसद्मा बजेट अधिवेशन सुरु, आर्थिक विधेयकमा तीव्र बहस', 'parliament-budget-session',
+'संघीय संसद्को बजेट अधिवेशन सुरु भएको छ। आर्थिक विधेयकमा सत्तापक्ष र प्रतिपक्षबीच तीव्र बहस भइरहेको छ।',
+'<p>काठमाडौं — संघीय संसद् प्रतिनिधिसभाको बजेट अधिवेशन सोमबार सुरु भएको छ। आर्थिक वर्ष २०८२/८३ का लागि ल्याइएको रु. १७ खर्ब ४० अर्बको बजेट विधेयकमा सत्तापक्ष र प्रतिपक्षबीच तीव्र बहस भइरहेको छ।</p>',
+'https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=800&q=80', 4, 3, 1, 1, 'published', 8750, datetime('now', '-3 hours')),
+
+-- Economy Articles
+('विद्युत् आयोजनामा ३२ अर्ब विदेशी लगानी स्वीकृत, ऊर्जा क्षेत्रमा नयाँ सम्भावना', 'electricity-project-foreign-investment',
+'सरकारले पछिल्लो महिनामा जलविद्युत् आयोजनाहरूमा ३२ अर्ब रुपैयाँ बराबरको विदेशी प्रत्यक्ष लगानी स्वीकृत गरेको छ।',
+'<p>काठमाडौं — लगानी बोर्ड नेपालले पछिल्लो एक महिनाको अवधिमा जलविद्युत् क्षेत्रमा ३२ अर्ब रुपैयाँ बराबरको विदेशी प्रत्यक्ष लगानी स्वीकृत गरेको छ।</p><p>बोर्डका कार्यकारी निर्देशकका अनुसार यसमध्ये भारत, चीन र युरोपेली कम्पनीहरूको लगानी छ।</p>',
+'https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=800&q=80', 1, 1, 0, 0, 'published', 5600, datetime('now', '-5 hours')),
+
+('कृषि उत्पादन बढाउन सरकारले ५ अर्बको अनुदान कार्यक्रम ल्याउँदै', 'agriculture-subsidy-program',
+'खाद्य सुरक्षा सुदृढ गर्न कृषि मन्त्रालयले आगामी वर्षदेखि ५ अर्ब रुपैयाँको अनुदान कार्यक्रम लागू गर्ने भएको छ।',
+'<p>काठमाडौं — कृषि मन्त्रालयले आगामी आर्थिक वर्षदेखि ५ अर्ब रुपैयाँको किसान अनुदान कार्यक्रम लागू गर्ने घोषणा गरेको छ।</p><p>कार्यक्रम अन्तर्गत धान, मकै, गहुँ, र तरकारी खेती गर्ने किसानहरूलाई प्रति बिघा ५ हजार रुपैयाँसम्म अनुदान दिइने छ।</p>',
+'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80', 1, 2, 0, 0, 'published', 3200, datetime('now', '-8 hours')),
+
+-- Banking Articles
+('नेपाल राष्ट्र बैंकले नीति ब्याजदर ५.५ प्रतिशतमा यथावत राख्यो', 'nrb-monetary-policy-rate',
+'नेपाल राष्ट्र बैंकको मौद्रिक नीति समीक्षा बैठकले नीति ब्याजदर ५.५ प्रतिशतमा यथावत राख्ने निर्णय गरेको छ।',
+'<p>काठमाडौं — नेपाल राष्ट्र बैंकको मौद्रिक नीति समीक्षा बैठकले नीति ब्याजदर ५.५ प्रतिशतमा यथावत राख्ने निर्णय गरेको छ।</p><p>राष्ट्र बैंकका गभर्नर महाप्रसाद अधिकारीले बुधबार पत्रकार सम्मेलनमा बोल्दै मुद्रास्फीति नियन्त्रणमा आउँदै गरेको तर अझै लक्ष्यभन्दा माथि रहेको बताए।</p>',
+'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?w=800&q=80', 2, 1, 1, 0, 'published', 7800, datetime('now', '-4 hours')),
+
+('नबिल बैंकले ८ करोड शेयर आईपीओ निष्कासन गर्ने तयारी गर्दै', 'nabil-bank-ipo',
+'नबिल बैंक लिमिटेडले सर्वसाधारणलाई लक्षित गरी ८ करोड कित्ता शेयर आईपीओ मार्फत निष्कासन गर्ने घोषणा गरेको छ।',
+'<p>काठमाडौं — नबिल बैंक लिमिटेडको सञ्चालक समितिले ८ करोड कित्ता शेयर आईपीओ मार्फत सर्वसाधारणलाई बिक्री गर्ने निर्णय गरेको छ।</p><p>बैंकका प्रमुख कार्यकारी अधिकृत (CEO) ले बिहीबार काठमाडौंमा आयोजित पत्रकार सम्मेलनमा जानकारी दिँदै भने, "यो आईपीओले हाम्रो चुक्ता पूँजी बढाउनेछ।"</p>',
+'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&q=80', 2, 4, 0, 0, 'published', 4500, datetime('now', '-6 hours')),
+
+-- Share Market Articles
+('नेप्से सूचकांक ५ वर्षको उच्च विन्दुमा, एकै दिन ४२ अंकले उछाल', 'nepse-index-high',
+'नेपाल धितोपत्र विनिमय बजार (नेप्से) मा बुधबार ४२.३५ अंकले वृद्धि भई सूचकांक २३५६.१४ पुगेको छ।',
+'<p>काठमाडौं — नेपाल धितोपत्र विनिमय बजारको सूचकांक बुधबार ४२.३५ अंक (१.८३ प्रतिशत) ले वृद्धि भई २३५६.१४ विन्दुमा बन्द भएको छ।</p><p>दिनभरको कारोबारमा ५ अर्ब ७ करोड रुपैयाँ बराबरको शेयर किनबेच भयो।</p>',
+'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80', 3, 3, 1, 0, 'published', 9200, datetime('now', '-1 hour')),
+
+('SEBON ले म्युचुअल फन्ड नियमावली संशोधन गर्दै, लगानीकर्तालाई फाइदा', 'sebon-mutual-fund-rules',
+'धितोपत्र बोर्डले म्युचुअल फन्डमा लगानी गर्न सजिलो बनाउने गरी नियमावली संशोधन गर्ने तयारी गरेको छ।',
+'<p>काठमाडौं — धितोपत्र बोर्ड नेपाल (SEBON) ले म्युचुअल फन्ड नियमावली, २०६७ संशोधन गरी लगानीकर्ताका लागि थप सहज वातावरण बनाउने तयारी गरेको छ।</p><p>संशोधित नियमावलीमा न्यूनतम लगानी रकम घटाउने, अनलाइन लगानी सुविधा दिने व्यवस्था गरिने बताइएको छ।</p>',
+'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800&q=80', 3, 3, 0, 0, 'published', 3100, datetime('now', '-7 hours')),
+
+-- Politics Articles
+('स्थानीय निर्वाचन प्रमुख दलहरू एकमत, मिति तय गर्न बैठक बस्दै', 'local-election-date',
+'आगामी स्थानीय तह निर्वाचनको मिति तय गर्न प्रमुख राजनीतिक दलहरूबीच छलफल हुँदैछ।',
+'<p>काठमाडौं — स्थानीय तह निर्वाचन आगामी वैशाख महिनामा गर्ने विषयमा प्रमुख राजनीतिक दलहरू एकमत भएका छन्।</p><p>निर्वाचन आयोगका अनुसार आगामी सोमबार दलहरूसँग बैठक गरी अन्तिम मिति तय गरिनेछ।</p>',
+'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80', 4, 3, 0, 0, 'published', 6800, datetime('now', '-9 hours')),
+
+-- Technology Articles
+('नेपाल टेलिकमले ५जी सेवा विस्तारको योजना सार्वजनिक गर्यो', 'ncell-5g-expansion',
+'नेपाल टेलिकमले आगामी दुई वर्षमा देशका प्रमुख शहरहरूमा ५जी इन्टरनेट सेवा विस्तार गर्ने योजना सार्वजनिक गरेको छ।',
+'<p>काठमाडौं — नेपाल टेलिकमले आगामी दुई वर्षमा काठमाडौं, पोखरा, भरतपुर र विराटनगरमा ५जी मोबाइल इन्टरनेट सेवा विस्तार गर्ने योजना सार्वजनिक गरेको छ।</p><p>टेलिकमका प्रवक्ताका अनुसार पहिलो चरणमा काठमाडौं उपत्यकाका ३०० टावरमा ५जी उपकरण जडान गरिनेछ।</p>',
+'https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80', 5, 4, 0, 0, 'published', 5400, datetime('now', '-10 hours')),
+
+('स्मार्ट सिटी परियोजना: काठमाडौंमा डिजिटल इन्फ्रास्ट्रक्चर', 'smart-city-kathmandu',
+'काठमाडौंमा स्मार्ट सिटी परियोजना अन्तर्गत डिजिटल इन्फ्रास्ट्रक्चर विकासको काम तीव्र गतिमा छ।',
+'<p>काठमाडौं — स्मार्ट सिटी परियोजना अन्तर्गत काठमाडौंमा डिजिटल इन्फ्रास्ट्रक्चर विकासको काम तीव्र गतिमा छ।</p><p>यस परियोजनाले शहरी यातायात व्यवस्थापन, सार्वजनिक सुरक्षा, र डिजिटल सेवा प्रवाहमा क्रान्तिकारी परिवर्तन ल्याउने अपेक्षा गरिएको छ।</p>',
+'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80', 5, 4, 0, 0, 'published', 2800, datetime('now', '-12 hours')),
+
+-- Sports Articles
+('नेपाली क्रिकेट टोलीले ACC प्री-मियर कप जित्यो', 'nepal-cricket-acc-premier-cup',
+'नेपाली क्रिकेट टोलीले एसियन क्रिकेट परिषद् (ACC) प्री-मियर कप फाइनलमा UAE लाई हराउँदै जित हासिल गरेको छ।',
+'<p>काठमाडौं — नेपाली क्रिकेट टोलीले एसियन क्रिकेट परिषद् (ACC) प्री-मियर कपको फाइनलमा UAE लाई ७ विकेटले हराउँदै उपाधि जितेको छ।</p><p>अलराउण्डर सोमपाल कामीको उत्कृष्ट ब्याटिङ र बलिङले नेपाललाई जित दिलायो।</p>',
+'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&q=80', 6, 2, 0, 1, 'published', 15000, datetime('now', '-30 minutes')),
+
+-- Society Articles
+('काठमाडौंमा वायु प्रदूषण: विद्यालय बन्द गर्ने निर्णय सरकारको', 'kathmandu-air-pollution-school-closure',
+'काठमाडौं उपत्यकामा वायु प्रदूषणको सूचकांक "खतरनाक" स्तरमा पुगेपछि सरकारले प्राथमिक विद्यालयहरू बन्द गर्ने निर्णय गरेको छ।',
+'<p>काठमाडौं — काठमाडौं उपत्यकामा वायु प्रदूषणको सूचकांक (AQI) ३०० नाघेपछि सरकारले प्राथमिक विद्यालयहरू तीन दिन बन्द गर्ने निर्णय गरेको छ।</p><p>विश्व स्वास्थ्य संगठनका मापदण्ड अनुसार AQI २०० भन्दा माथि भएमा बाहिरी गतिविधिमा कटौती गर्नु पर्छ।</p>',
+'https://images.unsplash.com/photo-1569514616028-91a4a7d5b9e9?w=800&q=80', 7, 2, 0, 0, 'published', 11000, datetime('now', '-4 hours')),
+
+-- Corporate Articles
+('सिमेन्ट उद्योगमा ठूलो लगानी: नयाँ प्लान्टले १२ सय रोजगारी दिने', 'cement-industry-investment',
+'एक निजी कम्पनीले मकवानपुरमा वार्षिक ५ लाख टन क्षमताको सिमेन्ट उद्योग स्थापना गर्ने घोषणा गरेको छ।',
+'<p>हेटौंडा — एक निजी सिमेन्ट कम्पनीले मकवानपुर जिल्लामा वार्षिक ५ लाख टन क्षमताको नयाँ सिमेन्ट उत्पादन प्लान्ट स्थापना गर्ने घोषणा गरेको छ।</p><p>कम्पनीका सञ्चालकका अनुसार यस परियोजनामा ३ अर्ब रुपैयाँ लगानी हुनेछ र १२ सय जनालाई प्रत्यक्ष रोजगारी दिइनेछ।</p>',
+'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80', 12, 2, 0, 0, 'published', 2200, datetime('now', '-15 hours')),
+
+-- Tourism Articles
+('नेपाल भ्रमन会展 Year 2025: पर्यटक संख्या रेकर्ड तोड्ने अपेक्षा', 'nepal-tourism-year-2025',
+'नेपालले भ्रमन 会展को लागि २० लाख पर्यटक भित्र्याउने लक्ष्य राखेको छ।',
+'<p>काठमाडौं — नेपालले आगामी वर्ष भ्रमन会展 अन्तर्गत २० लाख पर्यटक भित्र्याउने लक्ष्य राखेको छ।</p><p>पर्यटन बोर्डका अनुसार हवाई यातायात क्षमता विस्तार र नयाँ पर्यटन गन्तव्यहरू विकास गर्दा यो लक्ष्य हासिल हुन सक्नेछ।</p>',
+'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80', 8, 1, 0, 0, 'published', 4100, datetime('now', '-20 hours')),
+
+-- World News
+('भारत-चीन सीमा विवाद: नयाँ सम्झौता', 'india-china-border-agreement',
+'भारत र चीनबीच पूर्वी लद्दाख क्षेत्रमा सैनिक पुनर्गठन सम्झौता भएको छ।',
+'<p>नयाँ दिल्ली — भारत र चीनबीच पूर्वी लद्दाख क्षेत्रमा सैनिक पुनर्गठन सम्झौता भएको छ। यो सम्झौताले दुई देशबीचको तनाव कम गर्न मद्दत पुर्‍याउने अपेक्षा गरिएको छ।</p>',
+'https://images.unsplash.com/photo-1562679299-6f0d8b7a73c7?w=800&q=80', 9, 5, 0, 0, 'published', 3300, datetime('now', '-22 hours'));
+
+-- Tags
+INSERT IGNORE INTO tags (name, slug, usage_count) VALUES
+('अर्थतन्त्र', 'arthatantra', 5),
+('बजेट', 'budget', 3),
+('शेयर बजार', 'share-bazar', 4),
+('नेप्से', 'nepse', 3),
+('बैंक', 'bank', 3),
+('विदेशी लगानी', 'foreign-investment', 2),
+('मौद्रिक नीति', 'monetary-policy', 2),
+('५जी', '5g', 2),
+('क्रिकेट', 'cricket', 2),
+('पर्यटन', 'tourism', 2),
+('जलविद्युत्', 'hydropower', 2),
+('कृषि', 'agriculture', 1);
