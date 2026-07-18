@@ -134,16 +134,18 @@ $meta_title = 'Live Data | ' . site_name();
         .notice-desc { font-size: 14px; color: var(--c-text2); }
         .notice-meta { font-size: 12px; color: var(--c-muted); margin-top: 4px; }
         
-        /* Air Quality styles */
+        /* Air Quality styles (colour-cleanup: was a loud green gradient card
+           regardless of actual AQI level; now a neutral card, with the AQI
+           number itself colour-coded by severity via inline style in the page) */
         .aqi-display {
             display: flex; align-items: center; gap: 24px; padding: 24px;
-            background: linear-gradient(135deg, #10B981, #059669);
-            border-radius: 16px; color: #fff; margin-bottom: 20px;
+            background: var(--c-surface2); border: 1px solid var(--c-border);
+            border-radius: 16px; color: var(--c-text); margin-bottom: 20px;
         }
         .aqi-value { font-size: 5rem; font-weight: 800; line-height: 1; }
         .aqi-info { flex: 1; }
         .aqi-status { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
-        .aqi-desc { font-size: 1rem; opacity: 0.9; }
+        .aqi-desc { font-size: 1rem; color: var(--c-text2); }
         .pollutants-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
         .pollutant-item {
             background: var(--c-surface2); border-radius: 12px; padding: 16px; text-align: center;
@@ -162,19 +164,20 @@ $meta_title = 'Live Data | ' . site_name();
         .commodity-name { font-size: 14px; color: var(--c-muted); margin-bottom: 4px; }
         .commodity-price { font-size: 1.3rem; font-weight: 800; }
         .commodity-change { font-size: 12px; padding: 2px 8px; border-radius: 10px; display: inline-block; margin-top: 4px; }
-        .commodity-change.up { background: #DCFCE7; color: #16A34A; }
-        .commodity-change.down { background: #FEE2E2; color: #DC2626; }
-        .commodity-change.stable { background: #F1F5F9; color: #64748B; }
+        .commodity-change.up { background: color-mix(in srgb, var(--c-success) 15%, transparent); color: var(--c-success); }
+        .commodity-change.down { background: color-mix(in srgb, var(--c-error) 15%, transparent); color: var(--c-error); }
+        .commodity-change.stable { background: var(--c-surface2); color: var(--c-muted); }
         
-        /* Sun times */
+        /* Sun times (colour-cleanup: was an orange gradient card; now neutral,
+           sun icon already carries the "warmth" visually without a loud background) */
         .sun-times {
             display: flex; gap: 24px; justify-content: center; padding: 24px;
-            background: linear-gradient(135deg, #FBBF24, #F59E0B);
-            border-radius: 16px; color: #fff;
+            background: var(--c-surface2); border: 1px solid var(--c-border);
+            border-radius: 16px; color: var(--c-text);
         }
         .sun-time-item { text-align: center; }
         .sun-time-icon { font-size: 3rem; margin-bottom: 8px; }
-        .sun-time-label { font-size: 14px; opacity: 0.9; margin-bottom: 4px; }
+        .sun-time-label { font-size: 14px; color: var(--c-text2); margin-bottom: 4px; }
         .sun-time-value { font-size: 2rem; font-weight: 800; }
         
         /* Grid layouts */
@@ -299,9 +302,12 @@ $meta_title = 'Live Data | ' . site_name();
                         </div>
                         <a href="?tab=air" class="text-sm text-blue-600 hover:underline">View All →</a>
                     </div>
-                    <?php if (!empty($dashboard['air_quality'])): ?>
-                    <div class="aqi-display" style="background: linear-gradient(135deg, <?= $dashboard['air_quality']['aqi'] <= 50 ? '#10B981, #059669' : ($dashboard['air_quality']['aqi'] <= 100 ? '#FBBF24, #F59E0B' : '#EF4444, #DC2626') ?>);">
-                        <div class="aqi-value"><?= $dashboard['air_quality']['aqi'] ?></div>
+                    <?php if (!empty($dashboard['air_quality'])):
+                        $_aqi = $dashboard['air_quality']['aqi'];
+                        $_aqi_color = $_aqi <= 50 ? 'var(--c-success)' : ($_aqi <= 100 ? 'var(--c-warning)' : 'var(--c-error)');
+                    ?>
+                    <div class="aqi-display">
+                        <div class="aqi-value" style="color:<?= $_aqi_color ?>"><?= $_aqi ?></div>
                         <div class="aqi-info">
                             <div class="aqi-status"><?= $dashboard['air_quality']['status_np'] ?></div>
                             <div class="aqi-desc">AQI - US Standard</div>
@@ -520,8 +526,9 @@ $meta_title = 'Live Data | ' . site_name();
                     <span class="text-sm text-gray-500">Updated: <?= $dashboard['air_quality']['updated_at'] ?></span>
                 </div>
                 
+                <?php $_aqi2 = $dashboard['air_quality']['aqi']; $_aqi2_color = $_aqi2 <= 50 ? 'var(--c-success)' : ($_aqi2 <= 100 ? 'var(--c-warning)' : 'var(--c-error)'); ?>
                 <div class="aqi-display">
-                    <div class="aqi-value"><?= $dashboard['air_quality']['aqi'] ?></div>
+                    <div class="aqi-value" style="color:<?= $_aqi2_color ?>"><?= $_aqi2 ?></div>
                     <div class="aqi-info">
                         <div class="aqi-status"><?= $dashboard['air_quality']['status_np'] ?></div>
                         <div class="aqi-desc"><?= $dashboard['air_quality']['status'] ?></div>

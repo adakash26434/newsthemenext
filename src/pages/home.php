@@ -150,12 +150,16 @@ require SRC_DIR . '/layout/header.php';
         <?php endif; ?>
         
         <!-- NEPSE Widget -->
-        <?php if (!empty($nepse_widgets[0])): ?>
+        <?php if (!empty($nepse_widgets[0])):
+            $nepse_up = ($nepse_widgets[0]['change_pct'] ?? 0) >= 0;
+        ?>
         <a href="/live-data?tab=notices" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg">
             <span class="text-2xl">📈</span>
             <div>
-                <div class="font-bold text-lg">नेप्से</div>
-                <div class="text-xs" style="color:var(--c-text3)">शेयर बजार</div>
+                <div class="font-bold text-lg"><?= h($nepse_widgets[0]['value'] ?? '') ?></div>
+                <div class="text-xs" style="color:<?= $nepse_up ? 'var(--c-success)' : 'var(--c-error)' ?>">
+                    <?= $nepse_up ? '▲' : '▼' ?> <?= number_format(abs((float)($nepse_widgets[0]['change_pct'] ?? 0)), 2) ?>% नेप्से
+                </div>
             </div>
         </a>
         <?php endif; ?>
