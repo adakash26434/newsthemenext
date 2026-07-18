@@ -32,14 +32,13 @@ args = "artifacts/mockup-sandbox: Component Preview Server"
 name = "Nepal News Portal"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace/nepal-news && php -S 0.0.0.0:${PORT:-3000} router.php"
-waitForPort = 3000
-
 [workflows.workflow.metadata]
 agentBlurb = "नेपाली न्यूज पोर्टल — PHP 8.2 + SQLite"
 outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && php -S 0.0.0.0:${PORT:-3000} router.php"
 
 [agent]
 stack = "PNPM_WORKSPACE"

@@ -106,223 +106,117 @@ require SRC_DIR . '/layout/header.php';
 <!-- Inline header ad -->
 <?php render_ads('header-banner-inline', false); ?>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-  <!-- ════ Main column ════ -->
-  <div class="lg:col-span-2">
-
-    <!-- ── Bulletin ticker (2nd headline strip) ── -->
-    <?php
-    $bulletin_items = get_articles(['status'=>'published','is_breaking'=>false,'limit'=>10,'order'=>'a.published_at DESC']);
-    if (!empty($bulletin_items)):
-    ?>
-    <div class="bulletin-ticker-wrap mb-5">
-      <div class="bulletin-label">
-        <?= icon('radio','w-3 h-3') ?> बुलेटिन
-      </div>
-      <div class="bulletin-scroll">
-        <div class="bulletin-scroll-inner">
-          <?php for ($bi=0; $bi<2; $bi++): // duplicate for seamless loop ?>
-          <?php foreach ($bulletin_items as $bi_art): ?>
-          <a href="/article/<?= h($bi_art['slug']) ?>" class="bulletin-item">
-            <?= h(mb_substr($bi_art['title'], 0, 60)) ?><?= mb_strlen($bi_art['title'])>60?'…':'' ?>
-          </a>
-          <span class="bulletin-sep">◆</span>
-          <?php endforeach; ?>
-          <?php endfor; ?>
-        </div>
-      </div>
+<!-- ══════════════════════════════════════════════════════
+     ZONE 1: HERO — Full-width main news banner
+     Layout: 1 big card left + 4 secondary cards right
+     ══════════════════════════════════════════════════════ -->
+<?php if (!empty($featured)): $hero = $featured[0]; ?>
+<div class="hero-section mb-6">
+  <div class="hero-main-card">
+    <?php if ($hero['image_url']): ?>
+    <div class="hero-main-img">
+      <img src="<?= h($hero['image_url']) ?>" alt="<?= h($hero['title']) ?>" loading="eager">
     </div>
     <?php endif; ?>
-
-    <!-- Top Stories horizontal scroll -->
-    <?php if (!empty($top_stories)): ?>
-    <div class="mb-6">
-      <div class="section-heading">
-        <span class="flex items-center gap-2">
-          <?= icon('zap','w-4 h-4') ?> ताजा समाचार
+    <div class="hero-main-overlay">
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="hero-main-badge" style="background:<?= h(category_color($hero['category_color'])) ?>">
+          <?php if ($hero['is_breaking']): ?>
+          <?= icon('zap','w-3 h-3') ?> ब्रेकिङ
+          <?php else: ?>
+          <?= h($hero['category_name_np']?:$hero['category_name']) ?>
+          <?php endif; ?>
         </span>
       </div>
-      <div class="top-stories-scroll">
-        <?php foreach ($top_stories as $ts): ?>
-        <a href="/article/<?= h($ts['slug']) ?>" class="top-story-card group block">
-          <div class="img">
-            <?php if ($ts['image_url']): ?>
-              <img src="<?= h($ts['image_url']) ?>" alt="" loading="lazy">
-            <?php else: ?>
-              <div class="img-placeholder"></div>
-            <?php endif; ?>
-          </div>
-          <div class="body">
-            <span class="cat-badge mb-1 inline-block" style="background:<?= h(category_color($ts['category_color'])) ?>">
-              <?= h($ts['category_name_np']?:$ts['category_name']) ?>
-            </span>
-            <div class="title group-hover:underline"><?= h($ts['title']) ?></div>
-            <div class="text-xs mt-1 flex items-center gap-1" style="color:var(--c-muted)">
-              <?= icon('clock','w-2.5 h-2.5') ?> <?= time_ago($ts['published_at']??$ts['created_at']) ?>
-            </div>
-          </div>
-        </a>
-        <?php endforeach; ?>
+      <h2 class="hero-main-title">
+        <a href="/article/<?= h($hero['slug']) ?>"><?= h($hero['title']) ?></a>
+      </h2>
+      <p class="hero-main-summary"><?= h(excerpt($hero['summary']??'',30)) ?></p>
+      <div class="flex items-center gap-4 mt-3 text-sm" style="color:rgba(255,255,255,0.75)">
+        <span class="flex items-center gap-1"><?= icon('user','w-4 h-4') ?> <?= h($hero['author_name']) ?></span>
+        <span class="flex items-center gap-1"><?= icon('clock','w-4 h-4') ?> <?= time_ago($hero['published_at']??$hero['created_at']) ?></span>
+        <span class="flex items-center gap-1"><?= icon('eye','w-4 h-4') ?> <?= np_number((int)$hero['views']) ?></span>
       </div>
     </div>
-    <?php endif; ?>
+  </div>
 
-    <!-- Hero featured block - Enhanced karobardaily style -->
-    <?php if (!empty($featured)): $hero = $featured[0]; ?>
-    <div class="hero-section mb-6">
-      <div class="hero-main-card">
-        <?php if ($hero['image_url']): ?>
-        <div class="hero-main-img">
-          <img src="<?= h($hero['image_url']) ?>" alt="<?= h($hero['title']) ?>" loading="eager">
-        </div>
+  <?php if (count($featured) > 1): ?>
+  <div class="hero-secondary-grid">
+    <?php foreach (array_slice($featured,1,4) as $fa): ?>
+    <a href="/article/<?= h($fa['slug']) ?>" class="hero-secondary-card">
+      <div class="img">
+        <?php if ($fa['image_url']): ?>
+          <img src="<?= h($fa['image_url']) ?>" alt="" loading="lazy">
         <?php endif; ?>
-        <div class="hero-main-overlay">
-          <div class="flex items-center gap-2 mb-3 flex-wrap">
-            <span class="hero-main-badge" style="background:<?= h(category_color($hero['category_color'])) ?>">
-              <?php if ($hero['is_breaking']): ?>
-              <?= icon('zap','w-3 h-3') ?> ब्रेकिङ
-              <?php else: ?>
-              <?= h($hero['category_name_np']?:$hero['category_name']) ?>
-              <?php endif; ?>
-            </span>
-          </div>
-          <h2 class="hero-main-title">
-            <a href="/article/<?= h($hero['slug']) ?>"><?= h($hero['title']) ?></a>
-          </h2>
-          <p class="hero-main-summary"><?= h(excerpt($hero['summary']??'',30)) ?></p>
-          <div class="flex items-center gap-4 mt-3 text-sm" style="color:rgba(255,255,255,0.75)">
-            <span class="flex items-center gap-1">
-              <?= icon('user','w-4 h-4') ?> <?= h($hero['author_name']) ?>
-            </span>
-            <span class="flex items-center gap-1">
-              <?= icon('clock','w-4 h-4') ?> <?= time_ago($hero['published_at']??$hero['created_at']) ?>
-            </span>
-            <span class="flex items-center gap-1">
-              <?= icon('eye','w-4 h-4') ?> <?= np_number((int)$hero['views']) ?>
-            </span>
-          </div>
+      </div>
+      <div class="body">
+        <span class="cat-badge mb-1 inline-block" style="background:<?= h(category_color($fa['category_color'])) ?>">
+          <?= h($fa['category_name_np']?:$fa['category_name']) ?>
+        </span>
+        <h3 class="title"><?= h($fa['title']) ?></h3>
+        <div class="flex items-center gap-2 mt-2 text-xs" style="color:var(--c-muted)">
+          <?= icon('clock','w-3 h-3') ?> <?= time_ago($fa['published_at']??$fa['created_at']) ?>
         </div>
       </div>
-
-      <!-- Secondary featured cards -->
-      <?php if (count($featured) > 1): ?>
-      <div class="hero-secondary-grid">
-        <?php foreach (array_slice($featured,1,4) as $fa): ?>
-        <a href="/article/<?= h($fa['slug']) ?>" class="hero-secondary-card">
-          <div class="img">
-            <?php if ($fa['image_url']): ?>
-              <img src="<?= h($fa['image_url']) ?>" alt="" loading="lazy">
-            <?php endif; ?>
-          </div>
-          <div class="body">
-            <span class="cat-badge mb-1 inline-block" style="background:<?= h(category_color($fa['category_color'])) ?>">
-              <?= h($fa['category_name_np']?:$fa['category_name']) ?>
-            </span>
-            <h3 class="title"><?= h($fa['title']) ?></h3>
-            <div class="flex items-center gap-2 mt-2 text-xs" style="color:var(--c-muted)">
-              <?= icon('clock','w-3 h-3') ?> <?= time_ago($fa['published_at']??$fa['created_at']) ?>
-            </div>
-          </div>
-        </a>
-        <?php endforeach; ?>
-      </div>
-      <?php endif; ?>
-    </div>
-    <?php endif; ?>
-
-    <!-- Article middle ad -->
-    <?php render_ads('article-middle'); ?>
-
-    <!-- Category sections - Enhanced news-card style -->
-    <?php
-    $cat_count = 0;
-    foreach ($cat_articles as $slug => $block):
-        $cat    = $block['cat'];
-        $arts   = $block['articles'];
-        $lead   = $arts[0];
-        $rest   = array_slice($arts, 1, 4);
-        $cat_count++;
-    ?>
-    <div class="mb-8">
-      <!-- Section Header with category color -->
-      <div class="flex items-center justify-between mb-4 pb-2" style="border-bottom: 2px solid <?= h($cat['color']?:accent_color()) ?>">
-        <h2 class="flex items-center gap-2 text-lg font-bold" style="color:<?= h($cat['color']?:accent_color()) ?>">
-          <?php if ($cat['icon']): ?><i data-lucide="<?= h($cat['icon']) ?>" class="w-5 h-5"></i><?php endif; ?>
-          <?= h(cat_name($cat, $_cur_lang ?? current_lang())) ?>
-        </h2>
-        <a href="/category/<?= h($cat['slug']) ?>" class="flex items-center gap-1 text-sm font-semibold hover:underline" style="color:<?= h($cat['color']?:accent_color()) ?>">
-          थप हेर्नुस् <?= icon('arrow-right','w-4 h-4') ?>
-        </a>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Lead article - Large card -->
-        <?php if ($lead): ?>
-        <a href="/article/<?= h($lead['slug']) ?>" class="news-card block lg:col-span-2">
-          <div class="news-card-img">
-            <?php if ($lead['image_url']): ?>
-              <img src="<?= h($lead['image_url']) ?>" alt="" loading="lazy">
-            <?php endif; ?>
-            <div class="news-card-img-overlay"></div>
-            <span class="cat-badge absolute top-3 left-3" style="background:<?= h($cat['color']?:accent_color()) ?>">
-              <?= h(cat_name($cat, $_cur_lang ?? current_lang())) ?>
-            </span>
-          </div>
-          <div class="news-card-body">
-            <h3 class="news-card-title"><?= h($lead['title']) ?></h3>
-            <div class="news-card-meta">
-              <span class="flex items-center gap-1"><?= icon('user','w-3 h-3') ?> <?= h($lead['author_name']) ?></span>
-              <span class="flex items-center gap-1"><?= icon('clock','w-3 h-3') ?> <?= time_ago($lead['published_at']??$lead['created_at']) ?></span>
-              <span class="flex items-center gap-1"><?= icon('eye','w-3 h-3') ?> <?= np_number((int)$lead['views']) ?></span>
-            </div>
-          </div>
-        </a>
-        <?php endif; ?>
-        
-        <!-- Rest as compact list -->
-        <?php foreach ($rest as $ra): ?>
-        <a href="/article/<?= h($ra['slug']) ?>" class="article-card-compact">
-          <div class="img-wrap">
-            <?php if ($ra['image_url']): ?>
-              <img src="<?= h($ra['image_url']) ?>" alt="" loading="lazy">
-            <?php endif; ?>
-          </div>
-          <div class="p-3">
-            <h3 class="title text-sm"><?= h($ra['title']) ?></h3>
-            <p class="meta mt-1 flex items-center gap-1">
-              <?= icon('clock','w-2.5 h-2.5') ?> <?= time_ago($ra['published_at']??$ra['created_at']) ?>
-            </p>
-          </div>
-        </a>
-        <?php endforeach; ?>
-      </div>
-    </div>
-
-    <!-- In-feed ad after every 3rd category -->
-    <?php if ($cat_count % 3 === 0) render_ads('in-feed'); ?>
+    </a>
     <?php endforeach; ?>
+  </div>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
 
-  </div><!-- /main -->
+<!-- ══════════════════════════════════════════════════════
+     ZONE 2: ताजा समाचार (left) + विदेशी मुद्रा दर (right)
+     ══════════════════════════════════════════════════════ -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
 
-  <!-- ════ Sidebar ════ -->
+  <!-- Left: Latest news list -->
+  <div class="lg:col-span-2">
+    <div class="section-heading mb-4">
+      <span class="flex items-center gap-2"><?= icon('newspaper','w-4 h-4') ?> ताजा समाचार</span>
+    </div>
+    <?php
+    $latest12 = get_articles(['status'=>'published','limit'=>12]);
+    foreach ($latest12 as $la):
+    ?>
+    <div class="sidebar-article mb-3">
+      <a href="/article/<?= h($la['slug']) ?>" class="thumb flex-shrink-0" style="width:96px;height:68px;overflow:hidden;border-radius:6px;display:block">
+        <?php if ($la['image_url']): ?>
+          <img src="<?= h($la['image_url']) ?>" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+        <?php else: ?>
+          <div style="width:100%;height:100%;background:var(--c-bg3)"></div>
+        <?php endif; ?>
+      </a>
+      <div class="info flex-1 min-w-0">
+        <a href="/article/<?= h($la['slug']) ?>" class="title block hover:underline font-semibold" style="font-size:0.97rem;line-height:1.4;color:var(--c-text1)"><?= h($la['title']) ?></a>
+        <div class="meta flex items-center gap-2 mt-1 flex-wrap">
+          <span class="inline-block px-1.5 rounded" style="background:<?= h(category_color($la['category_color'])) ?>;color:#fff;font-size:0.6rem;font-weight:700">
+            <?= h($la['category_name_np']?:$la['category_name']) ?>
+          </span>
+          <span class="flex items-center gap-1 text-xs" style="color:var(--c-muted)">
+            <?= icon('clock','w-2.5 h-2.5') ?> <?= time_ago($la['published_at']??$la['created_at']) ?>
+          </span>
+        </div>
+      </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+
+  <!-- Right: Market widgets (Forex / Gold / NEPSE) -->
   <aside class="lg:col-span-1">
-
-    <!-- Sidebar top ad -->
     <?php render_ads('sidebar-top'); ?>
 
-    <!-- Market widgets (Forex / Gold / NEPSE) -->
     <?php if (!empty($forex_widgets) || !empty($gold_widgets) || !empty($nepse_widgets)): ?>
     <div class="market-widget-card mb-5">
       <?php
-      // Helper: render one market section
+      if (!function_exists('_mw_section')) {
       function _mw_section(array $rows, string $icon_name, string $label): void {
           if (empty($rows)) return;
           echo '<div class="market-widget-header">' . icon($icon_name,'w-3 h-3') . ' ' . h($label) . '</div>';
           foreach ($rows as $mw) {
               $chg = $mw['change_pct'] !== null ? (float)$mw['change_pct'] : null;
               $cls = $chg === null ? '' : ($chg > 0 ? 'up' : ($chg < 0 ? 'down' : 'flat'));
-              $val = h($mw['value']); // value already has रू prefix from live fetch
+              $val = h($mw['value']);
               echo '<div class="market-row">';
               echo '<span class="market-label">' . h($mw['label']) . '</span>';
               echo '<div class="flex items-center gap-2">';
@@ -333,16 +227,11 @@ require SRC_DIR . '/layout/header.php';
               echo '</div></div>';
           }
       }
+      }
       ?>
-      <?php if (!empty($forex_widgets)): ?>
-      <?php _mw_section($forex_widgets, 'globe', 'विदेशी मुद्रा दर'); ?>
-      <?php endif; ?>
-      <?php if (!empty($gold_widgets)): ?>
-      <?php _mw_section($gold_widgets, 'gem', 'सुन / चाँदी'); ?>
-      <?php endif; ?>
-      <?php if (!empty($nepse_widgets)): ?>
-      <?php _mw_section($nepse_widgets, 'trending-up', 'नेप्से'); ?>
-      <?php endif; ?>
+      <?php if (!empty($forex_widgets)): _mw_section($forex_widgets, 'globe', 'विदेशी मुद्रा दर'); endif; ?>
+      <?php if (!empty($gold_widgets)):  _mw_section($gold_widgets,  'gem',   'सुन / चाँदी');     endif; ?>
+      <?php if (!empty($nepse_widgets)): _mw_section($nepse_widgets, 'trending-up', 'नेप्से');    endif; ?>
       <?php
       $mf_last = setting('market_last_fetch','');
       $mf_ago  = $mf_last ? time_ago_np($mf_last) : '';
@@ -379,6 +268,96 @@ require SRC_DIR . '/layout/header.php';
     </div>
     <?php endif; ?>
 
+    <!-- Tag cloud -->
+    <?php if (!empty($all_tags)): ?>
+    <div class="sidebar-card mb-5">
+      <div class="section-heading mb-3">
+        <span class="flex items-center gap-2"><?= icon('hash','w-4 h-4') ?> ट्यागहरू</span>
+      </div>
+      <div class="tag-cloud">
+        <?php foreach ($all_tags as $tag): ?>
+          <a href="/tag/<?= h($tag['slug']) ?>">#<?= h($tag['name']) ?>
+            <?php if (($tag['usage_count']??0) > 1): ?><sup style="font-size:9px;opacity:.6"><?= np_number((int)$tag['usage_count']) ?></sup><?php endif; ?>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+    <?php endif; ?>
+  </aside>
+
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ZONE 3: Category sections + full sidebar
+     ══════════════════════════════════════════════════════ -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <div class="lg:col-span-2">
+    <?php render_ads('article-middle'); ?>
+
+    <?php
+    $cat_count = 0;
+    foreach ($cat_articles as $slug => $block):
+        $cat    = $block['cat'];
+        $arts   = $block['articles'];
+        $lead   = $arts[0];
+        $rest   = array_slice($arts, 1, 4);
+        $cat_count++;
+    ?>
+    <div class="mb-8">
+      <div class="flex items-center justify-between mb-4 pb-2" style="border-bottom: 2px solid <?= h($cat['color']?:accent_color()) ?>">
+        <h2 class="flex items-center gap-2 text-lg font-bold" style="color:<?= h($cat['color']?:accent_color()) ?>">
+          <?php if ($cat['icon']): ?><i data-lucide="<?= h($cat['icon']) ?>" class="w-5 h-5"></i><?php endif; ?>
+          <?= h(cat_name($cat, $_cur_lang ?? current_lang())) ?>
+        </h2>
+        <a href="/category/<?= h($cat['slug']) ?>" class="flex items-center gap-1 text-sm font-semibold hover:underline" style="color:<?= h($cat['color']?:accent_color()) ?>">
+          थप हेर्नुस् <?= icon('arrow-right','w-4 h-4') ?>
+        </a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <?php if ($lead): ?>
+        <a href="/article/<?= h($lead['slug']) ?>" class="news-card block lg:col-span-2">
+          <div class="news-card-img">
+            <?php if ($lead['image_url']): ?>
+              <img src="<?= h($lead['image_url']) ?>" alt="" loading="lazy">
+            <?php endif; ?>
+            <div class="news-card-img-overlay"></div>
+            <span class="cat-badge absolute top-3 left-3" style="background:<?= h($cat['color']?:accent_color()) ?>">
+              <?= h(cat_name($cat, $_cur_lang ?? current_lang())) ?>
+            </span>
+          </div>
+          <div class="news-card-body">
+            <h3 class="news-card-title"><?= h($lead['title']) ?></h3>
+            <div class="news-card-meta">
+              <span class="flex items-center gap-1"><?= icon('user','w-3 h-3') ?> <?= h($lead['author_name']) ?></span>
+              <span class="flex items-center gap-1"><?= icon('clock','w-3 h-3') ?> <?= time_ago($lead['published_at']??$lead['created_at']) ?></span>
+              <span class="flex items-center gap-1"><?= icon('eye','w-3 h-3') ?> <?= np_number((int)$lead['views']) ?></span>
+            </div>
+          </div>
+        </a>
+        <?php endif; ?>
+        <?php foreach ($rest as $ra): ?>
+        <a href="/article/<?= h($ra['slug']) ?>" class="article-card-compact">
+          <div class="img-wrap">
+            <?php if ($ra['image_url']): ?><img src="<?= h($ra['image_url']) ?>" alt="" loading="lazy"><?php endif; ?>
+          </div>
+          <div class="p-3">
+            <h3 class="title text-sm"><?= h($ra['title']) ?></h3>
+            <p class="meta mt-1 flex items-center gap-1">
+              <?= icon('clock','w-2.5 h-2.5') ?> <?= time_ago($ra['published_at']??$ra['created_at']) ?>
+            </p>
+          </div>
+        </a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+    <?php if ($cat_count % 3 === 0) render_ads('in-feed'); ?>
+    <?php endforeach; ?>
+  </div>
+
+  <!-- Zone 3 sidebar -->
+  <aside class="lg:col-span-1">
+
     <!-- Most popular -->
     <?php if (!empty($popular)): ?>
     <div class="sidebar-card mb-5">
@@ -389,9 +368,7 @@ require SRC_DIR . '/layout/header.php';
       <div class="popular-item">
         <span class="popular-num"><?= $i+1 ?></span>
         <div>
-          <a href="/article/<?= h($pop['slug']) ?>" class="ptitle block hover:underline">
-            <?= h($pop['title']) ?>
-          </a>
+          <a href="/article/<?= h($pop['slug']) ?>" class="ptitle block hover:underline"><?= h($pop['title']) ?></a>
           <div class="pmeta flex items-center gap-1 flex-wrap">
             <span class="inline-block px-1.5 py-0 rounded" style="background:<?= h(category_color($pop['category_color'])) ?>;color:#fff;font-size:0.6rem;font-weight:700">
               <?= h($pop['category_name_np']?:$pop['category_name']) ?>
@@ -426,32 +403,6 @@ require SRC_DIR . '/layout/header.php';
     </div>
     <?php endif; ?>
 
-    <!-- Latest news -->
-    <div class="sidebar-card mb-5">
-      <div class="section-heading mb-3">
-        <span class="flex items-center gap-2"><?= icon('newspaper','w-4 h-4') ?> ताजा समाचार</span>
-      </div>
-      <?php foreach ($latest as $la): ?>
-      <div class="sidebar-article">
-        <a href="/article/<?= h($la['slug']) ?>" class="thumb flex-shrink-0">
-          <?php if ($la['image_url']): ?><img src="<?= h($la['image_url']) ?>" alt="" loading="lazy"><?php endif; ?>
-        </a>
-        <div class="info flex-1 min-w-0">
-          <a href="/article/<?= h($la['slug']) ?>" class="title block hover:underline"><?= h($la['title']) ?></a>
-          <div class="meta flex items-center gap-1 flex-wrap">
-            <span class="inline-block px-1.5 rounded" style="background:<?= h(category_color($la['category_color'])) ?>;color:#fff;font-size:0.6rem;font-weight:700">
-              <?= h($la['category_name_np']?:$la['category_name']) ?>
-            </span>
-            <?= icon('clock','w-2.5 h-2.5') ?> <?= time_ago($la['published_at']??$la['created_at']) ?>
-          </div>
-        </div>
-      </div>
-      <?php endforeach; ?>
-    </div>
-
-    <!-- Sidebar bottom ad -->
-    <?php render_ads('sidebar-bottom'); ?>
-
     <!-- Newsletter widget -->
     <div class="newsletter-widget mb-5">
       <h3 class="flex items-center gap-2"><?= icon('mail','w-4 h-4') ?> न्यूजलेटर</h3>
@@ -462,22 +413,6 @@ require SRC_DIR . '/layout/header.php';
         <button type="submit" class="newsletter-btn">सदस्य बन्नुस् →</button>
       </form>
     </div>
-
-    <!-- Tag cloud -->
-    <?php if (!empty($all_tags)): ?>
-    <div class="sidebar-card mb-5">
-      <div class="section-heading mb-3">
-        <span class="flex items-center gap-2"><?= icon('hash','w-4 h-4') ?> ट्यागहरू</span>
-      </div>
-      <div class="tag-cloud">
-        <?php foreach ($all_tags as $tag): ?>
-          <a href="/tag/<?= h($tag['slug']) ?>">#<?= h($tag['name']) ?>
-            <?php if (($tag['usage_count']??0) > 1): ?><sup style="font-size:9px;opacity:.6"><?= np_number((int)$tag['usage_count']) ?></sup><?php endif; ?>
-          </a>
-        <?php endforeach; ?>
-      </div>
-    </div>
-    <?php endif; ?>
 
     <!-- Upcoming events widget -->
     <?php if (!empty($upcoming_evts)): ?>
@@ -510,7 +445,7 @@ require SRC_DIR . '/layout/header.php';
     <?php endif; ?>
 
     <!-- All categories widget -->
-    <div class="sidebar-card">
+    <div class="sidebar-card mb-5">
       <div class="section-heading mb-3">
         <span class="flex items-center gap-2"><?= icon('grid','w-4 h-4') ?> सबै श्रेणीहरू</span>
       </div>
@@ -531,6 +466,7 @@ require SRC_DIR . '/layout/header.php';
       <?php endforeach; ?>
     </div>
 
+    <?php render_ads('sidebar-bottom'); ?>
   </aside>
 
 </div>
