@@ -174,6 +174,9 @@ if (!empty($bulletin_items)):
         <?php if ($fa['image_url']): ?>
           <img src="<?= h($fa['image_url']) ?>" alt="" loading="lazy">
         <?php endif; ?>
+        <span class="stat-badge">
+          <?= icon('eye','w-3 h-3') ?> <?= np_number((int)($fa['views'] ?? 0)) ?>
+        </span>
       </div>
       <div class="body">
         <span class="cat-badge mb-1 inline-block" style="background:<?= h(category_color($fa['category_color'])) ?>">
@@ -206,12 +209,15 @@ if (!empty($bulletin_items)):
     foreach ($latest12 as $la):
     ?>
     <div class="sidebar-article mb-3">
-      <a href="/article/<?= h($la['slug']) ?>" class="thumb flex-shrink-0" style="width:96px;height:68px;overflow:hidden;border-radius:6px;display:block">
+      <a href="/article/<?= h($la['slug']) ?>" class="thumb flex-shrink-0" style="width:96px;height:68px;overflow:hidden;border-radius:6px;display:block;position:relative">
         <?php if ($la['image_url']): ?>
           <img src="<?= h($la['image_url']) ?>" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">
         <?php else: ?>
           <div style="width:100%;height:100%;background:var(--c-bg3)"></div>
         <?php endif; ?>
+        <span class="stat-badge stat-badge-sm">
+          <?= icon('eye','w-2.5 h-2.5') ?> <?= np_number((int)($la['views'] ?? 0)) ?>
+        </span>
       </a>
       <div class="info flex-1 min-w-0">
         <a href="/article/<?= h($la['slug']) ?>" class="title block hover:underline font-semibold" style="font-size:0.97rem;line-height:1.4;color:var(--c-text1)"><?= h($la['title']) ?></a>
