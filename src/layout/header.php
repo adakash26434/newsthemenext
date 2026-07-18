@@ -280,7 +280,7 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
             <?php else: ?>
               <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:var(--cat-color, var(--c-primary-lt))"></span>
             <?php endif; ?>
-            <span><?= h($_cur_lang==='en' ? ($_cs['name_np']?:$_cs['name']) : ($_cs['name']?:$_cs['name_np'])) ?></span>
+            <span><?= h(cat_name($_cs, $_cur_lang)) ?></span>
           </a>
         </li>
         <?php endforeach; ?>
@@ -301,7 +301,7 @@ $_ann_style = ($_ann_colors[$_ann_type] ?? $_ann_colors['info'])[1];
                 <?php if ($_cs['icon']): ?>
                   <i data-lucide="<?= h($_cs['icon']) ?>" class="w-3.5 h-3.5 inline-block align-middle mr-1"></i>
                 <?php endif; ?>
-                <?= h($_cur_lang==='en' ? ($_cs['name_np']?:$_cs['name']) : ($_cs['name']?:$_cs['name_np'])) ?>
+                <?= h(cat_name($_cs, $_cur_lang)) ?>
               </a>
             </li>
             <?php endforeach; ?>

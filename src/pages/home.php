@@ -106,27 +106,33 @@ require SRC_DIR . '/layout/header.php';
 <!-- Inline header ad -->
 <?php render_ads('header-banner-inline', false); ?>
 
-<!-- Live Data Banner -->
+<!-- Live Data Banner (redesigned: was 6 different rainbow-gradient cards —
+     now one consistent neutral ticker style using theme tokens; a colour
+     is used only as a small accent, never as the whole card background,
+     so it stays calm/eye-comfortable for reading) -->
 <div class="live-data-banner mb-5">
-    <div class="flex flex-wrap gap-4">
+    <div class="flex flex-wrap gap-3">
         <!-- Weather Widget -->
         <?php if (!empty($live_data['weather'])): ?>
-        <a href="/live-data?tab=weather" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg" style="background: linear-gradient(135deg, #3B82F6, #1D4ED8); color: white;">
+        <a href="/live-data?tab=weather" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg">
             <span class="text-2xl"><?= $live_data['weather']['current']['weather_code'] === 0 ? '☀️' : '☁️' ?></span>
             <div>
                 <div class="font-bold text-lg"><?= round($live_data['weather']['current']['temperature']) ?>°C</div>
-                <div class="text-xs opacity-80"><?= $live_data['weather']['city'] ?></div>
+                <div class="text-xs" style="color:var(--c-text3)"><?= $live_data['weather']['city'] ?></div>
             </div>
         </a>
         <?php endif; ?>
         
-        <!-- Air Quality Widget -->
-        <?php if (!empty($live_data['air_quality'])): ?>
-        <a href="/live-data?tab=air" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg" style="background: linear-gradient(135deg, <?= $live_data['air_quality']['aqi'] <= 50 ? '#10B981, #059669' : ($live_data['air_quality']['aqi'] <= 100 ? '#FBBF24, #F59E0B' : '#EF4444, #DC2626') ?>); color: white;">
+        <!-- Air Quality Widget: colour used only on the number, not the whole card -->
+        <?php if (!empty($live_data['air_quality'])):
+            $aqi = $live_data['air_quality']['aqi'];
+            $aqi_color = $aqi <= 50 ? 'var(--c-success)' : ($aqi <= 100 ? 'var(--c-warning)' : 'var(--c-error)');
+        ?>
+        <a href="/live-data?tab=air" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg">
             <span class="text-2xl">🌬️</span>
             <div>
-                <div class="font-bold text-lg">AQI <?= $live_data['air_quality']['aqi'] ?></div>
-                <div class="text-xs opacity-80"><?= $live_data['air_quality']['status_np'] ?></div>
+                <div class="font-bold text-lg" style="color:<?= $aqi_color ?>">AQI <?= $aqi ?></div>
+                <div class="text-xs" style="color:var(--c-text3)"><?= $live_data['air_quality']['status_np'] ?></div>
             </div>
         </a>
         <?php endif; ?>
@@ -134,50 +140,53 @@ require SRC_DIR . '/layout/header.php';
         <!-- Earthquake Widget -->
         <?php if (!empty($live_data['earthquakes'][0])): ?>
         <?php $eq = $live_data['earthquakes'][0]; ?>
-        <a href="/live-data?tab=earthquake" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg" style="background: linear-gradient(135deg, #EF4444, #B91C1C); color: white;">
+        <a href="/live-data?tab=earthquake" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg">
             <span class="text-2xl">🌍</span>
             <div>
-                <div class="font-bold text-lg"><?= $eq['magnitude'] ?> M</div>
-                <div class="text-xs opacity-80"><?= h(mb_substr($eq['place'], 0, 25)) ?>...</div>
+                <div class="font-bold text-lg" style="color:var(--c-error)"><?= $eq['magnitude'] ?> M</div>
+                <div class="text-xs" style="color:var(--c-text3)"><?= h(mb_substr($eq['place'], 0, 25)) ?>...</div>
             </div>
         </a>
         <?php endif; ?>
         
         <!-- NEPSE Widget -->
         <?php if (!empty($nepse_widgets[0])): ?>
-        <a href="/live-data?tab=notices" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg" style="background: linear-gradient(135deg, #7C3AED, #5B21B6); color: white;">
+        <a href="/live-data?tab=notices" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg">
             <span class="text-2xl">📈</span>
             <div>
                 <div class="font-bold text-lg">नेप्से</div>
-                <div class="text-xs opacity-80">शेयर बजार</div>
+                <div class="text-xs" style="color:var(--c-text3)">शेयर बजार</div>
             </div>
         </a>
         <?php endif; ?>
         
-        <!-- Forex Rate -->
+        <!-- Forex Rate (bug-fixed: value is a formatted string like "रू 154.36",
+             casting it straight to float gave 0 — now parsed via market_value_num()) -->
         <?php if (!empty($forex_widgets[0])): ?>
-        <a href="/live-data" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg" style="background: linear-gradient(135deg, #059669, #047857); color: white;">
+        <a href="/live-data" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg">
             <span class="text-2xl">💱</span>
             <div>
-                <div class="font-bold text-lg">$ <?= number_format((float)($forex_widgets[0]['value'] ?? 0)) ?></div>
-                <div class="text-xs opacity-80">अमेरिकी डलर</div>
+                <div class="font-bold text-lg">रू <?= number_format(market_value_num($forex_widgets[0]['value'] ?? null), 2) ?></div>
+                <div class="text-xs" style="color:var(--c-text3)">अमेरिकी डलर</div>
             </div>
         </a>
         <?php endif; ?>
         
-        <!-- Gold Price -->
+        <!-- Gold Price (bug-fixed: substr() was byte-based and cut mid-character
+             producing mojibake on Nepali text; also removed the redundant duplicate
+             "सुन" caption since the label already contains it) -->
         <?php if (!empty($gold_widgets[0])): ?>
-        <a href="/live-data" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white;">
+        <a href="/live-data" class="live-widget flex items-center gap-3 px-4 py-2 rounded-lg">
             <span class="text-2xl">🥇</span>
             <div>
-                <div class="font-bold text-lg"><?= h(substr($gold_widgets[0]['label'] ?? '', 0, 12)) ?></div>
-                <div class="text-xs opacity-80">सुन</div>
+                <div class="font-bold text-lg"><?= h(market_label_short($gold_widgets[0]['label'] ?? '', 14)) ?></div>
+                <div class="text-xs" style="color:var(--c-text3)"><?= h($gold_widgets[0]['value'] ?? '') ?></div>
             </div>
         </a>
         <?php endif; ?>
         
         <!-- Quick Links -->
-        <a href="/live-data" class="live-widget flex items-center gap-2 px-4 py-2 rounded-lg" style="background: var(--c-surface); color: var(--c-text); border: 1px solid var(--c-border);">
+        <a href="/live-data" class="live-widget flex items-center gap-2 px-4 py-2 rounded-lg">
             <span class="text-sm">📡</span>
             <span class="text-sm font-medium">Live Data</span>
         </a>
@@ -327,7 +336,7 @@ require SRC_DIR . '/layout/header.php';
       <div class="flex items-center justify-between mb-4 pb-2" style="border-bottom: 2px solid <?= h($cat['color']?:accent_color()) ?>">
         <h2 class="flex items-center gap-2 text-lg font-bold" style="color:<?= h($cat['color']?:accent_color()) ?>">
           <?php if ($cat['icon']): ?><i data-lucide="<?= h($cat['icon']) ?>" class="w-5 h-5"></i><?php endif; ?>
-          <?= h($cat['name_np']?:$cat['name']) ?>
+          <?= h(cat_name($cat, $_cur_lang ?? current_lang())) ?>
         </h2>
         <a href="/category/<?= h($cat['slug']) ?>" class="flex items-center gap-1 text-sm font-semibold hover:underline" style="color:<?= h($cat['color']?:accent_color()) ?>">
           थप हेर्नुस् <?= icon('arrow-right','w-4 h-4') ?>
@@ -344,7 +353,7 @@ require SRC_DIR . '/layout/header.php';
             <?php endif; ?>
             <div class="news-card-img-overlay"></div>
             <span class="cat-badge absolute top-3 left-3" style="background:<?= h($cat['color']?:accent_color()) ?>">
-              <?= h($cat['name_np']?:$cat['name']) ?>
+              <?= h(cat_name($cat, $_cur_lang ?? current_lang())) ?>
             </span>
           </div>
           <div class="news-card-body">
@@ -602,7 +611,7 @@ require SRC_DIR . '/layout/header.php';
           <?php else: ?>
             <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:<?= h($cw['color']?:accent_color()) ?>"></span>
           <?php endif; ?>
-          <?= h($cw['name_np']?:$cw['name']) ?>
+          <?= h(cat_name($cw, $_cur_lang ?? current_lang())) ?>
         </span>
         <span class="text-xs font-normal" style="color:var(--c-muted)"><?= np_number((int)($cw['article_count']??0)) ?></span>
       </a>

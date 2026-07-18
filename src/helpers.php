@@ -130,6 +130,34 @@ function np_number(int $n): string {
     );
 }
 
+// ── Category / Author display name (SINGLE SOURCE — bug-fixed 2024) ──
+// Previously this ternary was copy-pasted in 5 different files with the
+// en/np fallback INVERTED in 3 of them (header.php x2, footer.php x1),
+// causing English category names to show in Nepali mode and vice-versa.
+// Every page must call this one function instead of writing the ternary inline.
+function cat_name(array $row, ?string $lang = null): string {
+    $lang = $lang ?? (function_exists('current_lang') ? current_lang() : ($GLOBALS['_cur_lang'] ?? 'np'));
+    $en = $row['name'] ?? '';
+    $np = $row['name_np'] ?? '';
+    return $lang === 'en' ? ($en ?: $np) : ($np ?: $en);
+}
+
+// ── Market widget numeric value (bug-fixed) ─────────────────────────
+// market_widgets.value stores a formatted display string like "रू 154.36"
+// (Nepali rupee sign prefix). Casting that directly to (float) yields 0
+// because the string doesn't start with a digit. This extracts the real
+// number safely, and mb-safe-truncates the label so multi-byte Nepali
+// characters are never cut mid-byte (which produced the mojibake "�").
+function market_value_num(?string $raw): float {
+    if (!$raw) return 0.0;
+    $clean = preg_replace('/[^0-9.]/', '', $raw);
+    return (float)$clean;
+}
+function market_label_short(?string $label, int $chars = 10): string {
+    $label = trim((string)$label);
+    return mb_strlen($label) > $chars ? mb_substr($label, 0, $chars) . '…' : $label;
+}
+
 // ── Date helpers ───────────────────────────────────────────
 function format_date(string $date, bool $time = false): string {
     $ts = strtotime($date);

@@ -2,17 +2,26 @@
 -- Run this SQL to populate the database with sample news articles
 
 -- Categories
+-- NOTE: slugs here are intentionally kept IDENTICAL to the canonical list
+-- auto-seeded by src/init.php (INSERT IGNORE only dedupes on exact slug
+-- match). Previously this file used different slugs for the same topics
+-- (prabidhi/khel-kurod/"par tourism"/sansar/opinions vs init.php's
+-- technology/sports/paryatan/world/bichar), which created duplicate
+-- category rows — including a broken slug with a literal space
+-- ("par tourism") — the moment both were run against the same database.
+-- If you already imported the old version of this file, run
+-- fix_duplicate_categories.php once to merge the duplicates it created.
 INSERT IGNORE INTO categories (name, slug, name_np, color, icon, description) VALUES
 ('Economy', 'arthatantra', 'अर्थतन्त्र', '#059669', 'trending-up', 'Economic news and analysis'),
 ('Banking', 'banking', 'बैंकिङ', '#2563EB', 'landmark', 'Banking and finance sector news'),
 ('Share Market', 'share-bazar', 'शेयर बजार', '#7C3AED', 'line-chart', 'Stock market and investment news'),
 ('Politics', 'rajniti', 'राजनीति', '#DC2626', 'flag', 'Political news and updates'),
-('Technology', 'prabidhi', 'प्रविधि', '#0891B2', 'cpu', 'Technology and innovation news'),
-('Sports', 'khel-kurod', 'खेलकुद', '#EA580C', 'trophy', 'Sports news and updates'),
+('Technology', 'technology', 'प्रविधि', '#0891B2', 'cpu', 'Technology and innovation news'),
+('Sports', 'sports', 'खेलकुद', '#EA580C', 'trophy', 'Sports news and updates'),
 ('Society', 'samaj', 'समाज', '#4F46E5', 'users', 'Social and community news'),
-('Tourism', 'par tourism', 'पर्यटन', '#0D9488', 'map', 'Tourism and travel news'),
-('World', 'sansar', 'संसार', '#6366F1', 'globe', 'International news'),
-('Opinion', 'opinions', 'विचार', '#8B5CF6', 'message-square', 'Opinion and editorial pieces'),
+('Tourism', 'paryatan', 'पर्यटन', '#0D9488', 'map', 'Tourism and travel news'),
+('World', 'world', 'विश्व', '#6366F1', 'globe', 'International news'),
+('Opinion', 'bichar', 'विचार', '#8B5CF6', 'message-square', 'Opinion and editorial pieces'),
 ('Insurance', 'bima', 'बिमा', '#10B981', 'shield', 'Insurance sector news'),
 ('Corporate', 'corporate', 'कर्पोरेट', '#F59E0B', 'briefcase', 'Corporate and business news');
 
