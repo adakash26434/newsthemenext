@@ -10,6 +10,7 @@ RewriteBase /
 RewriteRule ^db\.config\.php$ - [F,L]
 RewriteRule ^seed.*\.php$ - [F,L]
 RewriteRule ^fix_.*\.php$ - [F,L]
+RewriteRule ^debug\.php$ - [F,L]
 RewriteRule ^deploy\.sh$ - [F,L]
 RewriteRule ^demo_data\.sql$ - [F,L]
 
