@@ -497,12 +497,11 @@ class LiveDataService {
     
     private function getCached(string $key): ?array {
         try {
-            $stmt = $this->db->prepare("SELECT data, expires_at FROM api_cache WHERE cache_key = ? AND expires_at > NOW()");
-            $stmt->bind_param('s', $key);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            
-            if ($row = $result->fetch_assoc()) {
+            $expires = date('Y-m-d H:i:s');
+            $stmt = $this->db->prepare("SELECT data, expires_at FROM api_cache WHERE cache_key = ? AND expires_at > ?");
+            $stmt->execute([$key, $expires]);
+            $row = $stmt->fetch();
+            if ($row) {
                 return json_decode($row['data'], true);
             }
         } catch (Exception $e) {
@@ -513,16 +512,17 @@ class LiveDataService {
     
     private function setCached(string $key, array $data, int $duration = self::CACHE_DURATION): void {
         try {
+            $expires = date('Y-m-d H:i:s', time() + $duration);
             $stmt = $this->db->prepare("
-                INSERT INTO api_cache (cache_key, data, expires_at) 
-                VALUES (?, ?, DATE_ADD(NOW(), INTERVAL ? SECOND))
+                INSERT INTO api_cache (cache_key, data, expires_at)
+                VALUES (?, ?, ?)
                 ON DUPLICATE KEY UPDATE data = VALUES(data), expires_at = VALUES(expires_at)
             ");
-            $stmt->bind_param('ssi', $key, json_encode($data), $duration);
-            $stmt->execute();
+            $stmt->execute([$key, json_encode($data), $expires]);
         } catch (Exception $e) {
             // Table might not exist
         }
+    }
     }
     
     private function getWeatherText(int $code): string {

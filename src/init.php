@@ -262,6 +262,227 @@ if ($mysql) {
         PRIMARY KEY (id),
         UNIQUE KEY uq_rl_key (action_key)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS comments (
+        id         INT NOT NULL AUTO_INCREMENT,
+        article_id INT NOT NULL,
+        parent_id  INT DEFAULT NULL,
+        name       VARCHAR(100) NOT NULL,
+        email      VARCHAR(200) DEFAULT '',
+        website    VARCHAR(200) DEFAULT '',
+        content    TEXT NOT NULL,
+        status     VARCHAR(20) DEFAULT 'pending',
+        ip         VARCHAR(50) DEFAULT '',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_article (article_id),
+        KEY idx_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS horoscope_daily (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        sign            VARCHAR(20) NOT NULL,
+        date            DATE NOT NULL,
+        overall_score   DECIMAL(3,2) DEFAULT 3.00,
+        love_score      DECIMAL(3,2) DEFAULT 3.00,
+        career_score    DECIMAL(3,2) DEFAULT 3.00,
+        health_score    DECIMAL(3,2) DEFAULT 3.00,
+        finance_score   DECIMAL(3,2) DEFAULT 3.00,
+        prediction      TEXT,
+        lucky_color     VARCHAR(50),
+        lucky_number    INT,
+        lucky_direction VARCHAR(30),
+        lucky_gemstone VARCHAR(50),
+        caution         TEXT,
+        mantra          VARCHAR(255),
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_sign_date (sign, date),
+        INDEX idx_date (date),
+        INDEX idx_sign (sign)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS horoscope_monthly (
+        id                  INT AUTO_INCREMENT PRIMARY KEY,
+        sign                VARCHAR(20) NOT NULL,
+        month               INT NOT NULL,
+        year                INT NOT NULL,
+        overall_prediction  TEXT,
+        love_prediction     TEXT,
+        career_prediction   TEXT,
+        health_prediction   TEXT,
+        finance_prediction  TEXT,
+        important_dates     TEXT,
+        key_themes          TEXT,
+        created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_sign_month_year (sign, month, year),
+        INDEX idx_month_year (month, year)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS horoscope_yearly (
+        id                 INT AUTO_INCREMENT PRIMARY KEY,
+        sign               VARCHAR(20) NOT NULL,
+        year               INT NOT NULL,
+        overview           TEXT,
+        love               TEXT,
+        career             TEXT,
+        health             TEXT,
+        finance            TEXT,
+        predictions        JSON,
+        key_predictions    TEXT,
+        created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_sign_year (sign, year),
+        INDEX idx_year (year)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS auspicious_times (
+        id                INT AUTO_INCREMENT PRIMARY KEY,
+        nepali_date       VARCHAR(50) NOT NULL,
+        english_date      DATE NOT NULL,
+        abhijeet_mulat    VARCHAR(100),
+        brahma_muhurat    VARCHAR(100),
+        amrit_kalash      VARCHAR(100),
+        ravi_kalash       VARCHAR(100),
+        chartime_start    VARCHAR(20),
+        chartime_end      VARCHAR(20),
+        labh_kalash       VARCHAR(100),
+        shubh_kalash      VARCHAR(100),
+        notes             TEXT,
+        created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_nepali_date (nepali_date),
+        INDEX idx_english_date (english_date)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS auspicious_days (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        nepali_date     VARCHAR(50) NOT NULL,
+        english_date    DATE NOT NULL,
+        day_name        VARCHAR(30),
+        day_type        VARCHAR(20),
+        title           VARCHAR(100),
+        description     TEXT,
+        significance    VARCHAR(255),
+        month           INT NOT NULL,
+        year            INT NOT NULL,
+        day             INT NOT NULL,
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_month_year (month, year)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS lagna_info (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        nepali_date     VARCHAR(50) NOT NULL,
+        english_date    DATE NOT NULL,
+        moon_sign       VARCHAR(30),
+        ascendant       VARCHAR(30),
+        nakshatra       VARCHAR(30),
+        tithi           VARCHAR(30),
+        yoga            VARCHAR(30),
+        karana          VARCHAR(30),
+        sun_time        VARCHAR(50),
+        moon_time       VARCHAR(50),
+        notes           TEXT,
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_nepali_date (nepali_date)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS gud_milan (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        boy_sign        VARCHAR(20) NOT NULL,
+        girl_sign       VARCHAR(20) NOT NULL,
+        varna           INT DEFAULT 1,
+        vasya           DECIMAL(3,2) DEFAULT 0.5,
+        tatva           DECIMAL(3,2) DEFAULT 0.5,
+        grah            DECIMAL(3,2) DEFAULT 2.5,
+        nadi            DECIMAL(3,2) DEFAULT 8,
+        gana            INT DEFAULT 1,
+        manglik         INT DEFAULT 0,
+        total_score     DECIMAL(4,2) DEFAULT 0,
+        compatibility   VARCHAR(20),
+        summary         TEXT,
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_signs (boy_sign, girl_sign)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS bastu_recommendations (
+        id                  INT AUTO_INCREMENT PRIMARY KEY,
+        sign                VARCHAR(20) NOT NULL,
+        fav_gem             VARCHAR(50),
+        fav_color           VARCHAR(50),
+        fav_day             VARCHAR(20),
+        fav_metal           VARCHAR(30),
+        fav_number          INT,
+        fav_direction       VARCHAR(30),
+        wear_gem            VARCHAR(100),
+        avoid_gem           VARCHAR(100),
+        home_direction     VARCHAR(30),
+        office_direction   VARCHAR(30),
+        good_feng_shui     TEXT,
+        bad_feng_shui      TEXT,
+        created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_sign (sign)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS api_cache (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        cache_key       VARCHAR(100) NOT NULL,
+        data            LONGTEXT,
+        fetched_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at      TIMESTAMP NOT NULL,
+        UNIQUE KEY unique_key (cache_key),
+        INDEX idx_expires (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS weather_alerts (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        alert_type      VARCHAR(50) NOT NULL,
+        severity        VARCHAR(20) DEFAULT 'moderate',
+        title           VARCHAR(255),
+        description     TEXT,
+        source          VARCHAR(100),
+        start_time      DATETIME,
+        end_time        DATETIME,
+        is_active       TINYINT(1) DEFAULT 1,
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_active (is_active)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS earthquake_records (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        external_id     VARCHAR(50) UNIQUE,
+        magnitude       DECIMAL(4,2),
+        place           VARCHAR(255),
+        latitude        DECIMAL(10,6),
+        longitude       DECIMAL(10,6),
+        depth           DECIMAL(8,2),
+        event_time      DATETIME,
+        tsunami         TINYINT(1) DEFAULT 0,
+        source          VARCHAR(50) DEFAULT 'USGS',
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_magnitude (magnitude),
+        INDEX idx_time (event_time)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    CREATE TABLE IF NOT EXISTS government_notices (
+        id              INT AUTO_INCREMENT PRIMARY KEY,
+        title           VARCHAR(255) NOT NULL,
+        description     TEXT,
+        notice_type     VARCHAR(50),
+        source          VARCHAR(100),
+        notice_date     DATE,
+        expiry_date     DATE,
+        url             VARCHAR(500),
+        is_featured     TINYINT(1) DEFAULT 0,
+        created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        INDEX idx_date (notice_date),
+        INDEX idx_featured (is_featured)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ");
 
     // Migrations for existing MySQL installs
@@ -483,6 +704,204 @@ if ($mysql) {
         action_key TEXT NOT NULL UNIQUE,
         attempts   INTEGER DEFAULT 0,
         expires_at TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS comments (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        article_id INTEGER NOT NULL,
+        parent_id  INTEGER DEFAULT NULL,
+        name       TEXT NOT NULL,
+        email      TEXT DEFAULT '',
+        website    TEXT DEFAULT '',
+        content    TEXT NOT NULL,
+        status     TEXT DEFAULT 'pending',
+        ip         TEXT DEFAULT '',
+        created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS horoscope_daily (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        sign            TEXT NOT NULL,
+        date            TEXT NOT NULL,
+        overall_score   REAL DEFAULT 3.00,
+        love_score      REAL DEFAULT 3.00,
+        career_score    REAL DEFAULT 3.00,
+        health_score    REAL DEFAULT 3.00,
+        finance_score   REAL DEFAULT 3.00,
+        prediction      TEXT,
+        lucky_color     TEXT,
+        lucky_number    INTEGER,
+        lucky_direction TEXT,
+        lucky_gemstone TEXT,
+        caution         TEXT,
+        mantra          TEXT,
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP),
+        updated_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS horoscope_monthly (
+        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+        sign                TEXT NOT NULL,
+        month               INTEGER NOT NULL,
+        year                INTEGER NOT NULL,
+        overall_prediction  TEXT,
+        love_prediction     TEXT,
+        career_prediction   TEXT,
+        health_prediction   TEXT,
+        finance_prediction  TEXT,
+        important_dates     TEXT,
+        key_themes          TEXT,
+        created_at          TEXT DEFAULT (CURRENT_TIMESTAMP),
+        updated_at          TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS horoscope_yearly (
+        id                 INTEGER PRIMARY KEY AUTOINCREMENT,
+        sign               TEXT NOT NULL,
+        year               INTEGER NOT NULL,
+        overview           TEXT,
+        love               TEXT,
+        career             TEXT,
+        health             TEXT,
+        finance            TEXT,
+        predictions        TEXT,
+        key_predictions    TEXT,
+        created_at         TEXT DEFAULT (CURRENT_TIMESTAMP),
+        updated_at         TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS auspicious_times (
+        id                INTEGER PRIMARY KEY AUTOINCREMENT,
+        nepali_date       TEXT NOT NULL,
+        english_date      TEXT NOT NULL,
+        abhijeet_mulat    TEXT,
+        brahma_muhurat    TEXT,
+        amrit_kalash      TEXT,
+        ravi_kalash       TEXT,
+        chartime_start    TEXT,
+        chartime_end      TEXT,
+        labh_kalash       TEXT,
+        shubh_kalash      TEXT,
+        notes             TEXT,
+        created_at        TEXT DEFAULT (CURRENT_TIMESTAMP),
+        updated_at        TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS auspicious_days (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        nepali_date     TEXT NOT NULL,
+        english_date    TEXT NOT NULL,
+        day_name        TEXT,
+        day_type        TEXT,
+        title           TEXT,
+        description     TEXT,
+        significance    TEXT,
+        month           INTEGER NOT NULL,
+        year            INTEGER NOT NULL,
+        day             INTEGER NOT NULL,
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS lagna_info (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        nepali_date     TEXT NOT NULL,
+        english_date    TEXT NOT NULL,
+        moon_sign       TEXT,
+        ascendant       TEXT,
+        nakshatra       TEXT,
+        tithi           TEXT,
+        yoga            TEXT,
+        karana          TEXT,
+        sun_time        TEXT,
+        moon_time       TEXT,
+        notes           TEXT,
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP),
+        updated_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS gud_milan (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        boy_sign        TEXT NOT NULL,
+        girl_sign       TEXT NOT NULL,
+        varna           INTEGER DEFAULT 1,
+        vasya           REAL DEFAULT 0.5,
+        tatva           REAL DEFAULT 0.5,
+        grah            REAL DEFAULT 2.5,
+        nadi            REAL DEFAULT 8,
+        gana            INTEGER DEFAULT 1,
+        manglik         INTEGER DEFAULT 0,
+        total_score     REAL DEFAULT 0,
+        compatibility   TEXT,
+        summary         TEXT,
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP),
+        updated_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS bastu_recommendations (
+        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+        sign                TEXT NOT NULL,
+        fav_gem             TEXT,
+        fav_color           TEXT,
+        fav_day             TEXT,
+        fav_metal           TEXT,
+        fav_number          INTEGER,
+        fav_direction       TEXT,
+        wear_gem            TEXT,
+        avoid_gem           TEXT,
+        home_direction     TEXT,
+        office_direction   TEXT,
+        good_feng_shui     TEXT,
+        bad_feng_shui      TEXT,
+        created_at          TEXT DEFAULT (CURRENT_TIMESTAMP),
+        updated_at          TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS api_cache (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        cache_key       TEXT NOT NULL UNIQUE,
+        data            TEXT,
+        fetched_at      TEXT DEFAULT (CURRENT_TIMESTAMP),
+        expires_at      TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS weather_alerts (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        alert_type      TEXT NOT NULL,
+        severity        TEXT DEFAULT 'moderate',
+        title           TEXT,
+        description     TEXT,
+        source          TEXT,
+        start_time      TEXT,
+        end_time        TEXT,
+        is_active       INTEGER DEFAULT 1,
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS earthquake_records (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        external_id     TEXT UNIQUE,
+        magnitude       REAL,
+        place           TEXT,
+        latitude        REAL,
+        longitude       REAL,
+        depth           REAL,
+        event_time      TEXT,
+        tsunami         INTEGER DEFAULT 0,
+        source          TEXT DEFAULT 'USGS',
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
+    );
+
+    CREATE TABLE IF NOT EXISTS government_notices (
+        id              INTEGER PRIMARY KEY AUTOINCREMENT,
+        title           TEXT NOT NULL,
+        description     TEXT,
+        notice_type     TEXT,
+        source          TEXT,
+        notice_date     TEXT,
+        expiry_date     TEXT,
+        url             TEXT,
+        is_featured     INTEGER DEFAULT 0,
+        created_at      TEXT DEFAULT (CURRENT_TIMESTAMP)
     );
 
     CREATE INDEX IF NOT EXISTS idx_art_status   ON articles(status);
