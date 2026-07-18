@@ -8,6 +8,19 @@ deploymentTarget = "autoscale"
 args = ["pnpm", "store", "prune"]
 env = { "CI" = "true" }
 
+# Nepal News Portal → root (port 80); artifacts at their own ports
+[[ports]]
+localPort = 3000
+externalPort = 80
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
+
 [workflows]
 runButton = "Project"
 
@@ -20,16 +33,25 @@ author = "agent"
 task = "workflow.run"
 args = "Nepal News Portal"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/api-server: API Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "artifacts/mockup-sandbox: Component Preview Server"
+
 [[workflows.workflow]]
 name = "Nepal News Portal"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd /home/runner/workspace/nepal-news && php -S 0.0.0.0:3000 router.php"
+args = "cd /home/runner/workspace/nepal-news && php -S 0.0.0.0:${PORT:-3000} router.php"
 waitForPort = 3000
 
 [workflows.workflow.metadata]
+agentBlurb = "नेपाली न्यूज पोर्टल — PHP 8.2 + SQLite"
 outputType = "webview"
 
 [agent]
