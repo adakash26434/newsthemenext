@@ -1088,12 +1088,16 @@ i[data-lucide] { display: inline-flex; flex-shrink: 0; }
     padding: 10px 16px;
     border-radius: 10px;
     font-size: 13px;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all var(--t-base);
+    background: var(--c-surface2);
+    border: 1px solid var(--c-border);
+    color: var(--c-text);
+    box-shadow: var(--shadow-xs);
 }
 .live-widget:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: var(--shadow-sm);
+    border-color: var(--c-primary-lt);
 }
 
 /* ── Bulletin Ticker ────────────────────────────────────── */

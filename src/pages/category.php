@@ -4,7 +4,7 @@ $cat  = get_category_by_slug($slug);
 if (!$cat) { http_response_code(404); require SRC_DIR . '/pages/404.php'; exit; }
 
 $lang       = current_lang();
-$cat_name   = $lang==='en' ? ($cat['name_np']?:$cat['name']) : ($cat['name']?:$cat['name_np']);
+$cat_name   = cat_name($cat, $lang);
 $page       = max(1, (int)($_GET['page'] ?? 1));
 $per_page   = ARTICLES_PER_PAGE;
 $opts       = ['status'=>'published','category_slug'=>$slug];
@@ -121,7 +121,7 @@ require SRC_DIR . '/layout/header.php';
           <?php else: ?>
             <span class="w-2 h-2 rounded-full" style="background:<?= h($c['color']?:accent_color()) ?>"></span>
           <?php endif; ?>
-          <?= h($c['name_np']?:$c['name']) ?>
+          <?= h(cat_name($c, $lang)) ?>
         </span>
         <span style="color:var(--c-muted);font-size:11px"><?= np_number((int)($c['article_count']??0)) ?></span>
       </a>

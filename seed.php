@@ -28,12 +28,12 @@ try {
         ['Banking', 'banking', 'बैंकिङ', '#2563EB', 'landmark', 'Banking and finance sector news'],
         ['Share Market', 'share-bazar', 'शेयर बजार', '#7C3AED', 'line-chart', 'Stock market and investment news'],
         ['Politics', 'rajniti', 'राजनीति', '#DC2626', 'flag', 'Political news and updates'],
-        ['Technology', 'prabidhi', 'प्रविधि', '#0891B2', 'cpu', 'Technology and innovation news'],
-        ['Sports', 'khel-kurod', 'खेलकुद', '#EA580C', 'trophy', 'Sports news and updates'],
+        ['Technology', 'technology', 'प्रविधि', '#0891B2', 'cpu', 'Technology and innovation news'],
+        ['Sports', 'sports', 'खेलकुद', '#EA580C', 'trophy', 'Sports news and updates'],
         ['Society', 'samaj', 'समाज', '#4F46E5', 'users', 'Social and community news'],
-        ['Tourism', 'par-tourism', 'पर्यटन', '#0D9488', 'map', 'Tourism and travel news'],
-        ['World', 'sansar', 'संसार', '#6366F1', 'globe', 'International news'],
-        ['Opinion', 'opinions', 'विचार', '#8B5CF6', 'message-square', 'Opinion and editorial pieces'],
+        ['Tourism', 'paryatan', 'पर्यटन', '#0D9488', 'map', 'Tourism and travel news'],
+        ['World', 'world', 'विश्व', '#6366F1', 'globe', 'International news'],
+        ['Opinion', 'bichar', 'विचार', '#8B5CF6', 'message-square', 'Opinion and editorial pieces'],
         ['Insurance', 'bima', 'बिमा', '#10B981', 'shield', 'Insurance sector news'],
         ['Corporate', 'corporate', 'कर्पोरेट', '#F59E0B', 'briefcase', 'Corporate and business news'],
     ];
@@ -97,7 +97,7 @@ try {
             'नेपाली प्रविधि क्षेत्रमा नयाँ आयाम थपिएको छ।',
             '<p>नेपाली प्रविधि क्षेत्रमा नयाँ आयाम थपिएको छ। स्टार्टअप संस्कृतिको विकास भएको छ।</p><p>युवाहरूमा उद्यमशीलताको भावना बढेको छ। धेरै नयाँ प्रविधि कम्पनीहरू स्थापना भएका छन्।</p>',
             'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800',
-            'prabidhi', 'ravi-pant', 0, 1, 'published', 1560
+            'technology', 'ravi-pant', 0, 1, 'published', 1560
         ],
         [
             'क्रिकेट विश्वकप: नेपालको यात्रा',
@@ -105,7 +105,7 @@ try {
             'क्रिकेट विश्वकपमा नेपालको यात्रा रोचक बनेको छ।',
             '<p>क्रिकेट विश्वकपमा नेपालको यात्रा रोचक बनेको छ। नेपालले उत्कृष्ट प्रदर्शन गरेको छ।</p><p>रुबेन क्रेगको कप्तानीमा नेपाली टोलीले उत्कृष्ट खेल देखाएको छ।</p>',
             'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800',
-            'khel-kurod', 'sita-rai', 0, 0, 'published', 2100
+            'sports', 'sita-rai', 0, 0, 'published', 2100
         ],
         [
             'पर्यटन क्षेत्र: कोभिड पछिको पुनरागमन',
@@ -113,7 +113,7 @@ try {
             'पर्यटन क्षेत्र कोभिड पछि पुनरागमन गर्दै।',
             '<p>नेपालको पर्यटन क्षेत्र कोभिड पछि पुनरागमन गर्दै छ। पर्यटकहरूको आगमन बढेको छ।</p><p>माउन्ट एवरेस्ट र अन्य पर्यटकीय स्थलहरूमा पर्यटकहरूको चाप बढेको छ।</p>',
             'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
-            'par-tourism', 'sita-rai', 0, 0, 'published', 980
+            'paryatan', 'sita-rai', 0, 0, 'published', 980
         ],
     ];
     

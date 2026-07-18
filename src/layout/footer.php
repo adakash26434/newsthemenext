@@ -211,7 +211,7 @@ $_cur_lang = current_lang();
           <li>
             <a href="/category/<?= h($_fc['slug']) ?>" class="footer-link flex items-center gap-2 text-sm">
               <?php if ($_fc['icon']): ?><i data-lucide="<?= h($_fc['icon']) ?>" class="w-3.5 h-3.5 flex-shrink-0"></i><?php else: ?><span class="w-2 h-2 rounded-full flex-shrink-0" style="background:<?= h($_fc['color']?:accent_color()) ?>"></span><?php endif; ?>
-              <span class="flex-1"><?= h($_cur_lang==='en'?($_fc['name_np']?:$_fc['name']):($_fc['name']?:$_fc['name_np'])) ?></span>
+              <span class="flex-1"><?= h(cat_name($_fc, $_cur_lang)) ?></span>
               <?php if ((int)($_fc['article_count']??0)>0): ?>
                 <span class="text-xs px-1.5 py-0.5 rounded" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)"><?= np_number((int)$_fc['article_count']) ?></span>
               <?php endif; ?>
