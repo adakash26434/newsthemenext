@@ -90,6 +90,8 @@ if ($mysql) {
         KEY idx_art_cat       (category_id),
         KEY idx_art_author    (author_id),
         KEY idx_art_pub       (published_at),
+        KEY idx_art_status_pub     (status, published_at),
+        KEY idx_art_cat_status_pub (category_id, status, published_at),
         CONSTRAINT fk_art_cat    FOREIGN KEY (category_id) REFERENCES categories(id),
         CONSTRAINT fk_art_author FOREIGN KEY (author_id)   REFERENCES authors(id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -98,6 +100,7 @@ if ($mysql) {
         article_id INT NOT NULL,
         tag_id     INT NOT NULL,
         PRIMARY KEY (article_id, tag_id),
+        KEY idx_atag_tag (tag_id),
         CONSTRAINT fk_atag_art FOREIGN KEY (article_id) REFERENCES articles(id) ON DELETE CASCADE,
         CONSTRAINT fk_atag_tag FOREIGN KEY (tag_id)     REFERENCES tags(id)     ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -277,6 +280,20 @@ if ($mysql) {
         PRIMARY KEY (id),
         KEY idx_article (article_id),
         KEY idx_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+    -- Was missing entirely: get_reaction_counts()/database.php queried and
+    -- inserted into this table on every single article page view with no
+    -- try/catch around it, so a fresh/redeployed DB without this table
+    -- would fatal-error (uncaught PDOException) on every article page.
+    CREATE TABLE IF NOT EXISTS reaction_counts (
+        id         INT NOT NULL AUTO_INCREMENT,
+        article_id INT NOT NULL,
+        type       VARCHAR(20) NOT NULL,
+        count      INT DEFAULT 0,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_article_type (article_id, type),
+        KEY idx_article (article_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
     CREATE TABLE IF NOT EXISTS horoscope_daily (
@@ -497,8 +514,11 @@ if ($mysql) {
         "ALTER TABLE articles ADD COLUMN trending_score FLOAT DEFAULT 0",
         "ALTER TABLE articles ADD COLUMN type VARCHAR(20) DEFAULT 'news'",
         "ALTER TABLE articles ADD COLUMN image_credit VARCHAR(200) DEFAULT ''",
-        "ALTER TABLE articles ADD COLUMN KEY idx_art_trending (trending_score DESC)",
-        "ALTER TABLE article_translations ADD FULLTEXT INDEX ft_search (title, summary, body)",
+        "ALTER TABLE articles ADD INDEX idx_art_trending (trending_score DESC)",
+        "ALTER TABLE articles ADD FULLTEXT INDEX ft_search (title, title_np, summary, summary_np)",
+        "ALTER TABLE articles ADD INDEX idx_art_status_pub (status, published_at)",
+        "ALTER TABLE articles ADD INDEX idx_art_cat_status_pub (category_id, status, published_at)",
+        "ALTER TABLE article_tags ADD INDEX idx_atag_tag (tag_id)",
         "ALTER TABLE authors ADD COLUMN IF NOT EXISTS twitter_url VARCHAR(300) DEFAULT ''",
         "ALTER TABLE authors ADD COLUMN IF NOT EXISTS facebook_url VARCHAR(300) DEFAULT ''",
         "ALTER TABLE authors ADD COLUMN IF NOT EXISTS linkedin_url VARCHAR(300) DEFAULT ''",
@@ -719,6 +739,14 @@ if ($mysql) {
         created_at TEXT DEFAULT (CURRENT_TIMESTAMP)
     );
 
+    CREATE TABLE IF NOT EXISTS reaction_counts (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        article_id INTEGER NOT NULL,
+        type       TEXT NOT NULL,
+        count      INTEGER DEFAULT 0,
+        UNIQUE (article_id, type)
+    );
+
     CREATE TABLE IF NOT EXISTS horoscope_daily (
         id              INTEGER PRIMARY KEY AUTOINCREMENT,
         sign            TEXT NOT NULL,
@@ -937,6 +965,10 @@ if ($mysql) {
         "ALTER TABLE authors ADD COLUMN email TEXT DEFAULT ''",
         "ALTER TABLE authors ADD COLUMN role TEXT DEFAULT ''",
         "ALTER TABLE newsletter_subscribers ADD COLUMN token TEXT DEFAULT ''",
+        "CREATE INDEX IF NOT EXISTS idx_art_trending ON articles(trending_score DESC)",
+        "CREATE INDEX IF NOT EXISTS idx_art_status_pub ON articles(status, published_at)",
+        "CREATE INDEX IF NOT EXISTS idx_art_cat_status_pub ON articles(category_id, status, published_at)",
+        "CREATE INDEX IF NOT EXISTS idx_atag_tag ON article_tags(tag_id)",
         // Create rate_limits table if not exists
         "CREATE TABLE IF NOT EXISTS rate_limits (
             id         INTEGER PRIMARY KEY AUTOINCREMENT,

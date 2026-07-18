@@ -880,13 +880,19 @@ function count_comments(string $status = ''): int {
 // ── Reactions ─────────────────────────────────────────────────────────────────
 
 function get_reaction_counts(int $article_id): array {
-    $rows = db_fetchAll(
-        "SELECT type, count FROM reaction_counts WHERE article_id=?",
-        [$article_id]
-    );
     $counts = ['like'=>0,'love'=>0,'wow'=>0,'sad'=>0,'helpful'=>0];
-    foreach ($rows as $r) {
-        $counts[$r['type']] = (int)$r['count'];
+    try {
+        $rows = db_fetchAll(
+            "SELECT type, count FROM reaction_counts WHERE article_id=?",
+            [$article_id]
+        );
+        foreach ($rows as $r) {
+            $counts[$r['type']] = (int)$r['count'];
+        }
+    } catch (Exception $e) {
+        // Table missing on an already-initialized DB (e.g. pre-dates this
+        // feature) — degrade to all-zero counts instead of fataling the
+        // whole article page. Run fix_missing_tables.php to create it.
     }
     return $counts;
 }
