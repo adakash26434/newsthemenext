@@ -216,7 +216,7 @@ function site_name_en(): string   { return setting('site_name_en', DEFAULT_SITE_
 function site_tagline(): string   { return setting('site_tagline', DEFAULT_SITE_TAGLINE); }
 function site_logo_url(): string  { return setting('site_logo_url', ''); }
 function site_logo_text(): string { return setting('site_logo_text', site_name_np()); }
-function category_color(string $color = ''): string { return $color ?: accent_color(); }
+function category_color(?string $color = ''): string { return $color ?: accent_color(); }
 
 // ── Ads helpers ────────────────────────────────────────────
 function render_ad(array $ad): string {

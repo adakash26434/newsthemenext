@@ -513,16 +513,19 @@ class LiveDataService {
     private function setCached(string $key, array $data, int $duration = self::CACHE_DURATION): void {
         try {
             $expires = date('Y-m-d H:i:s', time() + $duration);
-            $stmt = $this->db->prepare("
-                INSERT INTO api_cache (cache_key, data, expires_at)
-                VALUES (?, ?, ?)
-                ON DUPLICATE KEY UPDATE data = VALUES(data), expires_at = VALUES(expires_at)
-            ");
-            $stmt->execute([$key, json_encode($data), $expires]);
+            $json    = json_encode($data);
+            $existing = $this->db->prepare("SELECT id FROM api_cache WHERE cache_key = ?");
+            $existing->execute([$key]);
+            if ($row = $existing->fetch()) {
+                $stmt = $this->db->prepare("UPDATE api_cache SET data = ?, expires_at = ? WHERE id = ?");
+                $stmt->execute([$json, $expires, $row['id']]);
+            } else {
+                $stmt = $this->db->prepare("INSERT INTO api_cache (cache_key, data, expires_at) VALUES (?, ?, ?)");
+                $stmt->execute([$key, $json, $expires]);
+            }
         } catch (Exception $e) {
             // Table might not exist
         }
-    }
     }
     
     private function getWeatherText(int $code): string {

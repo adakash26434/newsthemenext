@@ -209,7 +209,7 @@ function get_most_commented_articles(int $limit = 5): array {
                 c.name AS category_name, c.name_np AS category_name_np, c.color AS category_color,
                 COUNT(cm.id) AS comment_count
          FROM articles a
-         JOIN categories c ON c.id = a.category_id
+         LEFT JOIN categories c ON c.id = a.category_id
          LEFT JOIN comments cm ON cm.article_id = a.id AND cm.status = 'approved'
          WHERE a.status = 'published'
          GROUP BY a.id
@@ -251,8 +251,8 @@ function get_articles(array $opts = []): array {
                 au.name AS author_name, au.name_np AS author_name_np, au.slug AS author_slug,
                 au.avatar_url AS author_avatar
          FROM articles a
-         JOIN categories c  ON c.id = a.category_id
-         JOIN authors    au ON au.id = a.author_id
+         LEFT JOIN categories c  ON c.id = a.category_id
+         LEFT JOIN authors    au ON au.id = a.author_id
          $tag_join
          WHERE $ws ORDER BY $order LIMIT $limit OFFSET $offset",
         $params
@@ -277,8 +277,8 @@ function count_articles(array $opts = []): int {
     $ws = implode(' AND ', $where);
     return db_count(
         "SELECT COUNT(*) FROM articles a
-         JOIN categories c  ON c.id = a.category_id
-         JOIN authors    au ON au.id = a.author_id
+         LEFT JOIN categories c  ON c.id = a.category_id
+         LEFT JOIN authors    au ON au.id = a.author_id
          $tag_join
          WHERE $ws",
         $params
@@ -291,8 +291,8 @@ function get_article_by_slug(string $slug): ?array {
                 au.name AS author_name, au.name_np AS author_name_np,
                 au.slug AS author_slug, au.bio AS author_bio, au.avatar_url AS author_avatar
          FROM articles a
-         JOIN categories c  ON c.id = a.category_id
-         JOIN authors    au ON au.id = a.author_id
+         LEFT JOIN categories c  ON c.id = a.category_id
+         LEFT JOIN authors    au ON au.id = a.author_id
          WHERE a.slug = ?",
         [$slug]
     );
@@ -309,8 +309,8 @@ function get_article_by_id(int $id): ?array {
                 c.slug AS category_slug, c.color AS category_color,
                 au.name AS author_name, au.slug AS author_slug
          FROM articles a
-         JOIN categories c  ON c.id = a.category_id
-         JOIN authors    au ON au.id = a.author_id
+         LEFT JOIN categories c  ON c.id = a.category_id
+         LEFT JOIN authors    au ON au.id = a.author_id
          WHERE a.id = ?",
         [$id]
     );
@@ -742,8 +742,8 @@ function search_articles_advanced(string $q, array $opts = []): array {
                         au.slug AS author_slug, au.avatar_url AS author_avatar,
                         MATCH(a.title, a.summary, a.content) AGAINST(? IN BOOLEAN MODE) AS _rel
                  FROM articles a
-                 JOIN categories c  ON c.id = a.category_id
-                 JOIN authors    au ON au.id = a.author_id
+                 LEFT JOIN categories c  ON c.id = a.category_id
+                 LEFT JOIN authors    au ON au.id = a.author_id
                  WHERE a.status = 'published'
                    AND (MATCH(a.title, a.summary, a.content) AGAINST(? IN BOOLEAN MODE)
                         OR a.title LIKE ? OR a.title_np LIKE ?)

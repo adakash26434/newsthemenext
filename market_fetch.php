@@ -114,7 +114,21 @@ function refresh_market_data(): bool {
         }
     }
 
-    // ── 3. Store last fetch time ─────────────────────────────
+    // ── 3. NEPSE Index (previously missing entirely — the homepage
+    //      NEPSE widget checked market_widgets for widget_type='nepse'
+    //      but nothing ever populated it, so it silently never showed) ──
+    $nepse_url = fetch_url("https://www.nepalipaisa.com/api/GetMarketCap?type=main");
+    if ($nepse_url) {
+        $nj = json_decode($nepse_url, true);
+        if (isset($nj[0]['nepseIndex'])) {
+            $idx    = (float)$nj[0]['nepseIndex'];
+            $chg    = (float)($nj[0]['percentChange'] ?? 0);
+            update_market_widget('nepse', 'नेप्से परिसूचक', number_format($idx, 2), $chg, 1);
+            $updated = true;
+        }
+    }
+
+    // ── 4. Store last fetch time ─────────────────────────────
     save_setting('market_last_fetch', date('Y-m-d H:i:s'));
 
     return $updated;
