@@ -1,5 +1,17 @@
 # PHP News Portal - Git Ignore
 
+# Replit-specific (not needed for cPanel deployment)
+.replit
+replit.md
+.agents/
+artifacts/
+lib/
+scripts/
+attached_assets/
+node_modules/
+.vite/
+*.tsbuildinfo
+
 # Database files
 data/*.db
 data/*.sqlite

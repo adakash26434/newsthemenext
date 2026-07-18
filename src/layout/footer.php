@@ -19,34 +19,6 @@ $_cur_lang = current_lang();
 ?>
 </main>
 
-<!-- Reading Progress Bar -->
-<div class="reading-progress" id="reading-progress">
-  <div class="reading-progress-bar" id="reading-progress-bar"></div>
-</div>
-<script>
-(function(){
-  var progress = document.getElementById('reading-progress-bar');
-  if (!progress) return;
-  
-  function updateProgress() {
-    var article = document.querySelector('.article-content');
-    if (!article) {
-      progress.style.display = 'none';
-      return;
-    }
-    
-    var rect = article.getBoundingClientRect();
-    var totalHeight = rect.height;
-    var scrolled = Math.max(0, -rect.top);
-    var progress_pct = Math.min(100, (scrolled / totalHeight) * 100);
-    progress.style.width = progress_pct + '%';
-  }
-  
-  window.addEventListener('scroll', updateProgress, {passive: true});
-  updateProgress();
-})();
-</script>
-
 
 <!-- Footer banner ad -->
 <?php render_ads('footer-banner', false); ?>
@@ -286,9 +258,7 @@ $_cur_lang = current_lang();
 
 <script>
 // Lucide icons init + re-run after Alpine mutations
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.lucide) lucide.createIcons();
-});
+// Lucide icons re-run after AJAX load-more (initial run is in header.php)
 document.addEventListener('alpine:initialized', function() {
   if (window.lucide) lucide.createIcons();
 });
@@ -360,21 +330,7 @@ window.loadMore = function(btn) {
     });
 };
 
-// ── Back to Top ──────────────────────────────────────────
-(function(){
-  var btn = document.createElement('button');
-  btn.id = 'back-top';
-  btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><polyline points="18 15 12 9 6 15"></polyline></svg>';
-  btn.title = 'माथि जानुस्';
-  btn.setAttribute('aria-label','Back to top');
-  document.body.appendChild(btn);
-  window.addEventListener('scroll', function(){
-    btn.classList.toggle('visible', window.scrollY > 400);
-  }, {passive:true});
-  btn.addEventListener('click', function(){
-    window.scrollTo({top:0, behavior:'smooth'});
-  });
-})();
+// Back to top is handled in header.php
 
 // ── Article Bookmark (localStorage) ─────────────────────
 window.toggleBookmark = function(articleId, title, slug) {

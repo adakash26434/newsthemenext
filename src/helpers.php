@@ -186,6 +186,24 @@ function time_ago_np(string $date): string { return time_ago($date); }
 function bs_date_today(): string {
     return \BsDate::today();
 }
+function bs_date_np(): string {
+    // Returns today's BS date in Nepali: "२०८१ श्रावण १५, शनिबार"
+    try { return \BsDate::formatFull(date('Y-m-d H:i:s')); } catch (\Throwable $e) { return ''; }
+}
+function lighten_color(string $hex): string {
+    $hex = ltrim($hex,'#');
+    if (strlen($hex)===3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    $r = hexdec(substr($hex,0,2)); $g = hexdec(substr($hex,2,2)); $b = hexdec(substr($hex,4,2));
+    $r = min(255,(int)($r + (255-$r)*0.2)); $g = min(255,(int)($g + (255-$g)*0.2)); $b = min(255,(int)($b + (255-$b)*0.2));
+    return '#'.sprintf('%02x%02x%02x',$r,$g,$b);
+}
+function darken_color(string $hex): string {
+    $hex = ltrim($hex,'#');
+    if (strlen($hex)===3) $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+    $r = hexdec(substr($hex,0,2)); $g = hexdec(substr($hex,2,2)); $b = hexdec(substr($hex,4,2));
+    $r = max(0,(int)($r*0.6)); $g = max(0,(int)($g*0.6)); $b = max(0,(int)($b*0.6));
+    return '#'.sprintf('%02x%02x%02x',$r,$g,$b);
+}
 function format_bs_date(string $adDate, bool $full = false): string {
     return $full ? \BsDate::formatFull($adDate) : \BsDate::formatShort($adDate);
 }

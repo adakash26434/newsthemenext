@@ -1,7 +1,0 @@
-User-agent: *
-Disallow: /admin/
-Disallow: /data/
-Disallow: /src/
-Allow: /
-
-Sitemap: https://yourdomain.com.np/sitemap.xml
