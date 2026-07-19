@@ -119,3 +119,18 @@ echo "<pre>\n🔗 Routing check:\n";
 echo "REQUEST_URI as PHP sees it: " . h($_SERVER['REQUEST_URI'] ?? '(not set)') . "\n";
 echo "If you loaded this page as https://yourdomain/debug.php it should show '/debug.php' above.\n";
 echo "</pre>";
+
+// ── FATAL ERROR LOG: shows the real error behind any blank-page symptom ──
+// index.php now logs every fatal/parse error here via register_shutdown_function.
+// This is the fastest way to see WHY a page went blank, without SSH/log access.
+echo "<pre>\n💥 Recent fatal errors (data/php-error.log):\n";
+$err_log = __DIR__ . '/data/php-error.log';
+if (file_exists($err_log)) {
+    $lines = file($err_log);
+    $last20 = array_slice($lines, -20);
+    echo empty($last20) ? "(log file is empty — no fatal errors recorded yet)\n" : h(implode('', $last20));
+} else {
+    echo "(no log file yet — either no fatal errors have occurred since this update was deployed,\n";
+    echo " or this is an older deployment that doesn't have the shutdown-function logger yet.)\n";
+}
+echo "</pre>";
