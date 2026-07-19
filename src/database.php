@@ -832,10 +832,10 @@ function save_comment(array $data): bool {
     return $stmt->execute([
         ':article_id' => (int)($data['article_id'] ?? 0),
         ':parent_id'  => $data['parent_id'] ?? null,
-        ':name'       => substr(trim($data['name'] ?? ''), 0, 100),
-        ':email'      => substr(trim($data['email'] ?? ''), 0, 200),
-        ':website'    => substr(trim($data['website'] ?? ''), 0, 200),
-        ':content'    => substr(trim($data['content'] ?? ''), 0, 2000),
+        ':name'       => mb_substr(trim($data['name'] ?? ''), 0, 100),
+        ':email'      => mb_substr(trim($data['email'] ?? ''), 0, 200),
+        ':website'    => mb_substr(trim($data['website'] ?? ''), 0, 200),
+        ':content'    => mb_substr(trim($data['content'] ?? ''), 0, 2000),
         ':status'     => $data['status'] ?? 'pending',
         ':ip'         => $data['ip'] ?? '',
     ]);

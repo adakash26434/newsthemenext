@@ -312,7 +312,7 @@ require SRC_DIR . '/layout/header.php';
         <div class="space-y-4 mb-6">
           <?php foreach ($comments as $cmt): ?>
           <div class="comment-item">
-            <div class="comment-avatar"><?= mb_strtoupper(mb_substr($cmt['name'],0,1)) ?></div>
+            <div class="comment-avatar"><?= h(mb_strtoupper(mb_substr($cmt['name'],0,1))) ?></div>
             <div class="comment-body flex-1">
               <div class="comment-meta">
                 <span class="comment-name"><?= h($cmt['name']) ?></span>
@@ -351,6 +351,8 @@ require SRC_DIR . '/layout/header.php';
           <?php endif; ?>
           <form method="POST" action="/comment/<?= (int)$article['id'] ?>">
             <?= csrf_field() ?>
+            <input type="text" name="website_confirm" value="" autocomplete="off" tabindex="-1"
+                   style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <input type="text" name="name" placeholder="नाम *" required maxlength="100"
                      class="admin-input text-sm" value="<?= h($_POST['name'] ?? '') ?>">

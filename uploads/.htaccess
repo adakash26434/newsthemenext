@@ -1,0 +1,8 @@
+# Allow image serving but block PHP execution — defense in depth in case
+# a future upload-validation bug ever slips through again (see media.php
+# security fix: server-side MIME verification via mime_content_type()).
+Options -Indexes
+AddType text/plain .php .php3 .php4 .php5 .phtml .phps
+<FilesMatch "\.ph(p[0-9]?|tml|ps)$">
+  Deny from all
+</FilesMatch>

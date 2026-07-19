@@ -22,24 +22,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
 // Upload
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_FILES['media']['name'])) {
     csrf_check();
-    $allowed = ['image/jpeg','image/png','image/gif','image/webp','image/svg+xml'];
+    // SECURITY: $file['type'] below is the CLIENT-supplied Content-Type from
+    // the upload request — fully attacker-controlled and trivially spoofed
+    // (e.g. with curl), so it must never be trusted to decide what a file
+    // "is". The previous version trusted it, and separately used the
+    // user-supplied filename's extension for the saved file — together
+    // that allowed uploading an executable .php file disguised with an
+    // image Content-Type. Fixed to verify the REAL file content server-side
+    // (mime_content_type reads the actual file bytes) and to always derive
+    // the saved extension from that verified type, never from user input.
+    $allowed_ext = [
+        'image/jpeg'    => 'jpg',
+        'image/png'     => 'png',
+        'image/gif'     => 'gif',
+        'image/webp'    => 'webp',
+        'image/svg+xml' => 'svg',
+    ];
     $max_size = 5 * 1024 * 1024; // 5 MB
     $file = $_FILES['media'];
 
     if ($file['error'] !== UPLOAD_ERR_OK) {
         $error = 'अपलोड गर्दा समस्या भयो। (error '.$file['error'].')';
-    } elseif (!in_array($file['type'], $allowed)) {
-        $error = 'अनुमत फाइल प्रकार: JPG, PNG, GIF, WebP, SVG मात्र।';
     } elseif ($file['size'] > $max_size) {
         $error = 'फाइल साइज ५ MB भन्दा बढी छ।';
     } else {
-        $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $name = slug_from_title(pathinfo($file['name'], PATHINFO_FILENAME)) . '-' . time() . '.' . $ext;
-        $dest = $upload_dir . '/' . $name;
-        if (move_uploaded_file($file['tmp_name'], $dest)) {
-            flash_set('success', 'फाइल सफलतापूर्वक अपलोड भयो। URL: ' . $upload_url . '/' . $name);
+        $real_mime = @mime_content_type($file['tmp_name']);
+        if (!$real_mime || !isset($allowed_ext[$real_mime])) {
+            $error = 'अनुमत फाइल प्रकार: JPG, PNG, GIF, WebP, SVG मात्र।';
         } else {
-            $error = 'फाइल सार्न सकिएन।';
+            $ext  = $allowed_ext[$real_mime]; // derived from VERIFIED content, never from user filename
+            $name = slug_from_title(pathinfo($file['name'], PATHINFO_FILENAME)) . '-' . time() . '.' . $ext;
+            $dest = $upload_dir . '/' . $name;
+            if (move_uploaded_file($file['tmp_name'], $dest)) {
+                flash_set('success', 'फाइल सफलतापूर्वक अपलोड भयो। URL: ' . $upload_url . '/' . $name);
+            } else {
+                $error = 'फाइल सार्न सकिएन।';
+            }
         }
     }
     if ($error) flash_set('error', $error);
