@@ -5,6 +5,37 @@
  */
 define('APP_START', true);
 
+// ── Global fatal-error safety net ────────────────────────────
+// display_errors is Off on most production hosts (correct, for security),
+// which means an uncaught fatal error currently shows a completely blank
+// white page with zero indication of what broke — very hard to diagnose
+// without SSH/log access. This logs the real error to storage/php-error.log
+// and, only if nothing has been printed yet, shows a minimal friendly
+// message instead of a silent blank page.
+register_shutdown_function(function () {
+    $err = error_get_last();
+    if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        $log_dir = __DIR__ . '/data';
+        if (is_dir($log_dir) && is_writable($log_dir)) {
+            @file_put_contents(
+                $log_dir . '/php-error.log',
+                '[' . date('Y-m-d H:i:s') . '] ' . $err['message'] . ' in ' . $err['file'] . ':' . $err['line'] . "\n",
+                FILE_APPEND
+            );
+        }
+        if (ob_get_length() === false || ob_get_length() === 0) {
+            http_response_code(500);
+            echo '<!doctype html><html lang="ne"><head><meta charset="utf-8">'
+               . '<title>अस्थायी समस्या</title></head><body style="font-family:sans-serif;text-align:center;padding:60px 20px">'
+               . '<h2>अस्थायी प्राविधिक समस्या</h2>'
+               . '<p>पृष्ठ लोड गर्न सकिएन। केही समयमा पुनः प्रयास गर्नुहोस्।</p>'
+               . '<p><a href="/">गृहपृष्ठमा फर्कनुहोस्</a></p>'
+               . '</body></html>';
+        }
+    }
+});
+ob_start();
+
 require_once __DIR__ . '/src/config.php';
 require_once __DIR__ . '/src/database.php';
 require_once __DIR__ . '/src/helpers.php';

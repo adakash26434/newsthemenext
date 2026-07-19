@@ -171,7 +171,8 @@ function format_date(string $date, bool $time = false): string {
     if ($time) $str .= ', ' . date('g:i A', $ts);
     return $str;
 }
-function time_ago(string $date): string {
+function time_ago(?string $date): string {
+    if (!$date) return '';
     $ts = strtotime($date);
     if (!$ts) return '';
     $diff = time() - $ts;
@@ -182,7 +183,7 @@ function time_ago(string $date): string {
     return format_date($date);
 }
 // Alias — Nepali time ago (same output, kept for template clarity)
-function time_ago_np(string $date): string { return time_ago($date); }
+function time_ago_np(?string $date): string { return time_ago($date); }
 function bs_date_today(): string {
     return \BsDate::today();
 }
