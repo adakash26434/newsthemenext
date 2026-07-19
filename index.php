@@ -648,6 +648,48 @@ if ($m = route_match('/ad/click/{id}', $uri)) {
     redirect('/');
 }
 
+// Comment submission — was previously missing entirely: the form in
+// article.php POSTs to /comment/{id} but no route ever existed to handle
+// it, so comments could never actually be submitted on the live site.
+if (($m = route_match('/comment/{id}', $uri)) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $article_id = (int)$m[0];
+    csrf_check();
+
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    if (!check_rate_limit('comment_submit', $ip, 5, 300)) {
+        flash_set('comment_error', 'धेरै टिप्पणी पठाइयो। ५ मिनेटपछि फेरि प्रयास गर्नुहोस्।');
+        redirect($_SERVER['HTTP_REFERER'] ?? '/');
+    }
+
+    // Honeypot: a hidden field real users never fill; bots that
+    // auto-fill every form field will trip it.
+    if (!empty($_POST['website_confirm'] ?? '')) {
+        redirect($_SERVER['HTTP_REFERER'] ?? '/'); // silently drop, look successful to the bot
+    }
+
+    $name    = trim($_POST['name'] ?? '');
+    $content = trim($_POST['content'] ?? '');
+    $article = get_article_by_id($article_id);
+
+    if (!$article) {
+        flash_set('comment_error', 'यो article फेला परेन।');
+    } elseif ($name === '' || $content === '') {
+        flash_set('comment_error', 'नाम र टिप्पणी दुबै आवश्यक छ।');
+    } else {
+        save_comment([
+            'article_id' => $article_id,
+            'name'       => $name,
+            'email'      => trim($_POST['email'] ?? ''),
+            'website'    => trim($_POST['website'] ?? ''),
+            'content'    => $content,
+            'status'     => 'pending',
+            'ip'         => $ip,
+        ]);
+        flash_set('comment_success', 'तपाईंको टिप्पणी पेश गरियो, समीक्षा पछि प्रकाशित हुनेछ।');
+    }
+    redirect('/article/' . ($article['slug'] ?? '') ?: ($_SERVER['HTTP_REFERER'] ?? '/'));
+}
+
 // ── Admin routes ──────────────────────────────────────────
 if ($uri === '/admin' || $uri === '/admin/') {
     admin_check(); require SRC_DIR . '/admin/dashboard.php'; exit;
