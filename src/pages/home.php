@@ -328,6 +328,12 @@ if (!empty($bulletin_items)):
     <?php render_ads('article-middle'); ?>
 
     <?php
+    // Each widget below is independently try/caught: if any ONE of them
+    // throws (bad data, a future DB issue, etc.) the rest of the page —
+    // including the footer — still renders instead of going blank.
+    // (This is a structural safety net; see data/php-error.log for the
+    // real error if a section silently stops appearing.)
+    try {
     $cat_count = 0;
     foreach ($cat_articles as $slug => $block):
         $cat    = $block['cat'];
@@ -385,13 +391,17 @@ if (!empty($bulletin_items)):
     </div>
     <?php if ($cat_count % 3 === 0) render_ads('in-feed'); ?>
     <?php endforeach; ?>
+    } catch (\Throwable $e) {
+        error_log('[home.php category-blocks] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+    }
+    ?>
   </div>
 
   <!-- Zone 3 sidebar -->
   <aside class="lg:col-span-1">
 
     <!-- Most popular -->
-    <?php if (!empty($popular)): ?>
+    <?php try { if (!empty($popular)): ?>
     <div class="sidebar-card mb-5">
       <div class="section-heading mb-3">
         <span class="flex items-center gap-2"><?= icon('flame','w-4 h-4') ?> सबैभन्दा पढिएका</span>
@@ -411,11 +421,12 @@ if (!empty($bulletin_items)):
       </div>
       <?php endforeach; ?>
     </div>
-    <?php endif; ?>
+    <?php endif; } catch (\Throwable $e) { error_log('[home.php popular] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
     <!-- Most commented -->
-    <?php $most_commented = get_most_commented_articles(5); ?>
-    <?php if (!empty($most_commented)): ?>
+    <?php try {
+    $most_commented = get_most_commented_articles(5);
+    if (!empty($most_commented)): ?>
     <div class="sidebar-card mb-5">
       <div class="section-heading mb-3">
         <span class="flex items-center gap-2"><?= icon('message-circle','w-4 h-4') ?> सर्वाधिक टिप्पणी</span>
@@ -433,9 +444,10 @@ if (!empty($bulletin_items)):
       </div>
       <?php endforeach; ?>
     </div>
-    <?php endif; ?>
+    <?php endif; } catch (\Throwable $e) { error_log('[home.php most_commented] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
     <!-- Newsletter widget -->
+    <?php try { ?>
     <div class="newsletter-widget mb-5">
       <h3 class="flex items-center gap-2"><?= icon('mail','w-4 h-4') ?> न्यूजलेटर</h3>
       <p>ताजा समाचार इमेलमा पाउनुस्</p>
@@ -445,9 +457,10 @@ if (!empty($bulletin_items)):
         <button type="submit" class="newsletter-btn">सदस्य बन्नुस् →</button>
       </form>
     </div>
+    <?php } catch (\Throwable $e) { error_log('[home.php newsletter] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
     <!-- Upcoming events widget -->
-    <?php if (!empty($upcoming_evts)): ?>
+    <?php try { if (!empty($upcoming_evts)): ?>
     <div class="sidebar-card mb-5">
       <div class="section-heading mb-3">
         <span class="flex items-center gap-2"><?= icon('calendar','w-4 h-4') ?> आगामी कार्यक्रम</span>
@@ -474,9 +487,10 @@ if (!empty($bulletin_items)):
       </a>
       <?php endforeach; ?>
     </div>
-    <?php endif; ?>
+    <?php endif; } catch (\Throwable $e) { error_log('[home.php upcoming_events] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
     <!-- All categories widget -->
+    <?php try { ?>
     <div class="sidebar-card mb-5">
       <div class="section-heading mb-3">
         <span class="flex items-center gap-2"><?= icon('grid','w-4 h-4') ?> सबै श्रेणीहरू</span>
@@ -497,8 +511,9 @@ if (!empty($bulletin_items)):
       </a>
       <?php endforeach; ?>
     </div>
+    <?php } catch (\Throwable $e) { error_log('[home.php all_categories] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
-    <?php render_ads('sidebar-bottom'); ?>
+    <?php try { render_ads('sidebar-bottom'); } catch (\Throwable $e) { error_log('[home.php sidebar-bottom ad] ' . $e->getMessage()); } ?>
   </aside>
 
 </div>
