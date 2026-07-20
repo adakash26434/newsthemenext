@@ -104,13 +104,18 @@ require SRC_DIR . '/layout/header.php';
 ?>
 
 <!-- Inline header ad -->
-<?php render_ads('header-banner-inline', false); ?>
+<?php try { render_ads('header-banner-inline', false); } catch (\Throwable $e) { error_log('[home.php header-banner ad] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
 <!-- ══════════════════════════════════════════════════════
      BULLETIN TICKER — Full-width scrolling news bar
      ══════════════════════════════════════════════════════ -->
 <?php
-$bulletin_items = get_articles(['status'=>'published','limit'=>12,'order'=>'a.published_at DESC']);
+$bulletin_items = [];
+try {
+    $bulletin_items = get_articles(['status'=>'published','limit'=>12,'order'=>'a.published_at DESC']);
+} catch (\Throwable $e) {
+    error_log('[home.php bulletin_items] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+}
 if (!empty($bulletin_items)):
 ?>
 <div class="bulletin-ticker-wrap mb-5 home-fullbleed">
@@ -136,7 +141,7 @@ if (!empty($bulletin_items)):
      ZONE 1: HERO — Full-width main news banner
      Layout: 1 big card left + 4 secondary cards right
      ══════════════════════════════════════════════════════ -->
-<?php if (!empty($featured)): $hero = $featured[0]; ?>
+<?php try { if (!empty($featured)): $hero = $featured[0]; ?>
 <div class="hero-section mb-6 home-fullbleed">
   <div class="hero-main-card">
     <?php if ($hero['image_url']): ?>
@@ -192,7 +197,7 @@ if (!empty($bulletin_items)):
   </div>
   <?php endif; ?>
 </div>
-<?php endif; ?>
+<?php endif; } catch (\Throwable $e) { error_log('[home.php hero-section] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
 <!-- ══════════════════════════════════════════════════════
      ZONE 2: ताजा समाचार (left) + विदेशी मुद्रा दर (right)
@@ -205,7 +210,12 @@ if (!empty($bulletin_items)):
       <span class="flex items-center gap-2"><?= icon('newspaper','w-4 h-4') ?> ताजा समाचार</span>
     </div>
     <?php
-    $latest12 = get_articles(['status'=>'published','limit'=>12]);
+    $latest12 = [];
+    try {
+        $latest12 = get_articles(['status'=>'published','limit'=>12]);
+    } catch (\Throwable $e) {
+        error_log('[home.php latest12] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
+    }
     foreach ($latest12 as $la):
     ?>
     <div class="sidebar-article mb-3">
@@ -236,9 +246,9 @@ if (!empty($bulletin_items)):
 
   <!-- Right: Market widgets (Forex / Gold / NEPSE) -->
   <aside class="lg:col-span-1">
-    <?php render_ads('sidebar-top'); ?>
+    <?php try { render_ads('sidebar-top'); } catch (\Throwable $e) { error_log('[home.php sidebar-top ad] ' . $e->getMessage()); } ?>
 
-    <?php if (!empty($forex_widgets) || !empty($gold_widgets) || !empty($nepse_widgets)): ?>
+    <?php try { if (!empty($forex_widgets) || !empty($gold_widgets) || !empty($nepse_widgets)): ?>
     <div class="market-widget-card mb-5">
       <?php
       if (!function_exists('_mw_section')) {
@@ -273,10 +283,10 @@ if (!empty($bulletin_items)):
         <?php if ($mf_ago): ?>&nbsp;· <?= h($mf_ago) ?> अपडेट<?php endif; ?>
       </div>
     </div>
-    <?php endif; ?>
+    <?php endif; } catch (\Throwable $e) { error_log('[home.php market-widget-card] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
     <!-- Trending articles -->
-    <?php if (!empty($trending)): ?>
+    <?php try { if (!empty($trending)): ?>
     <div class="sidebar-card mb-5">
       <div class="section-heading mb-3">
         <span class="flex items-center gap-2"><?= icon('trending-up','w-4 h-4') ?> ट्रेन्डिङ</span>
@@ -298,7 +308,7 @@ if (!empty($bulletin_items)):
       </div>
       <?php endforeach; ?>
     </div>
-    <?php endif; ?>
+    <?php endif; } catch (\Throwable $e) { error_log('[home.php trending] ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine()); } ?>
 
     <!-- Tag cloud -->
     <?php if (!empty($all_tags)): ?>
